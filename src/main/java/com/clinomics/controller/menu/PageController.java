@@ -1,6 +1,10 @@
 package com.clinomics.controller.menu;
 
+import java.util.Map;
+
+import com.clinomics.enums.StatusCode;
 import com.clinomics.service.setting.BundleService;
+import com.google.common.collect.Maps;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,6 +38,11 @@ public class PageController {
 	@GetMapping("/p/{path1}/{path2}")
 	public String intake(@PathVariable String path1, @PathVariable String path2, Model model) {
 		model.addAttribute("bundles", bundleService.selectAll());
+		Map<String, String> statusCodeMap = Maps.newHashMap();
+		for (StatusCode statusCode : StatusCode.values()) {
+			statusCodeMap.put(statusCode.getKey(), statusCode.getValue());
+		}
+		model.addAttribute("statusCodes", statusCodeMap);
 		return path1 + "/" + path2;
 	}
 }
