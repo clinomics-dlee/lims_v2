@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <th:block th:replace="layout/head_login"></th:block>
+</head>
+<body class="pace-top">
+	<!-- begin #page-loader -->
+    <div id="page-loader" class="fade show"><span class="spinner"></span></div>
+    <!-- end #page-loader -->
+    
+    <div id="page-container" class="fade">
+        <!-- begin login -->
+        <div class="login login-with-news-feed">
+            <!-- begin news-feed -->
+            <div class="news-feed">
+                <div class="news-image" style="background-image: url(/assets/img/login-bg/login-bg-bbc.jpg)"></div>
+                <div class="news-caption">
+                    <h4 class="caption-title"><b>LIMS</b></h4>Laboratory Information Management System
+                   <!--  <p>
+                        Download the Color Admin app for iPhone®, iPad®, and Android™. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </p> -->
+                </div>
+            </div>
+            <!-- end news-feed -->
+            <!-- begin right-content -->
+            <div class="right-content">
+                <!-- begin login-header -->
+                <div class="login-header">
+                    <div class="brand">
+                        <!-- <span class="logo"></span> -->
+                        <!-- <img src="/assets/img/logo/lims_logo.png" style="margin-bottom: 5px; width:25px;"/> --> Clinomics <b>LIMS</b>
+                       <!--  <small>Application Administrator</small> -->
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-sign-in"></i>
+                    </div>
+                </div>
+                <!-- end login-header -->
+                <!-- begin login-content -->
+                <div class="login-content">
+                     <form action="/j_security_login" id="loginForm" method="POST" class="margin-bottom-0" data-parsley-validate="true">
+                        
+                        <div class="form-group m-b-15">
+                            <input type="text" class="form-control form-control-lg" name="username" id="username" placeholder="User ID" required />
+                        </div>
+                        <div class="form-group m-b-15">
+                            <input type="password" class="form-control form-control-lg" name="password" id="password" placeholder="Password" required />
+                        </div>
+                        
+                        <div class="login-buttons">
+                            <button type="button" class="btn btn-default btn-block btn-lg" id="loginBtn" th:text="#{button.login}"></button>
+                        </div>
+                        <hr />
+                        <p class="text-center text-grey-darker">
+                            Copyright&copy; 2020. Clinomics. All Right Reserved
+                        </p>
+                    </form>
+                </div>
+                <!-- end login-content -->
+            </div>
+            <!-- end right-container -->
+        </div>
+        <!-- end login -->
+    </div>
+    <!-- end page container -->
+
+	<input type="hidden" id="loginFail" th:value="#{alert.loginFail}"/>
+	<input type="hidden" id="confirm" th:value="#{alert.confirm}"/>
+</body>
+<script type="text/javascript" th:inline="javascript">
+/*<![CDATA[*/
+$(document).ready(function() {
+	App.init();
+	
+	$(document).on('click', '#loginBtn', function(){
+		doSave();
+	});
+	
+	$('#password').keydown(function(e) {
+		if (e.keyCode == 13) {
+			doSave();
+		}
+	});
+	
+	$('.selectpicker').selectpicker();
+});
+//Error page redirect ()
+
+function sendRedirectErrorLocation(){
+	swal({
+		title: $("#loginFail").val(),
+		icon: 'warning',
+		buttons: {
+			confirm: {
+				text: $("#confirm").val(),
+				value: true,
+				visible: true,
+				className: 'btn btn-warning',
+				closeModal: true
+			}
+		}
+	}).then(function(result) {
+		doPrevent($('#loginBtn'), false);
+	});
+}
+
+//save
+var token = $("meta[name='_csrf']").attr("content");
+var header = $("meta[name='_csrf_header']").attr("content");
+function doSave(){
+	
+	$('#loginForm').parsley().validate();
+	if($('#loginForm').parsley().isValid()){
+		doPrevent($('#loginBtn'), true);
+		$.ajax({
+			url : "/j_spring_security_check",
+			//header : csrfParameter
+			type : "POST",
+			dataType : 'json',
+			data : $('#loginForm').serialize(),
+			//processData: false,
+			//contentType: "application/json;charset=utf-8",
+			
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			
+			success: function(data) {
+				//var _parse = $.parseJSON(data);
+				
+				setTimeout(function(){
+					if(data.result == '0000'){
+						$(location).attr('href','/');
+					} else{
+						$('#password').val('');
+						sendRedirectErrorLocation();
+					}
+				}, _delay);
+			},
+			error : function(data){
+				sendRedirectErrorLocation();
+			}
+		});
+	}
+}
+/*]]>*/
+</script>
+</html>

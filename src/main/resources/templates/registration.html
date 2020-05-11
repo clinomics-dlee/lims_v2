@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <th:block th:replace="layout/head_login"></th:block>
+</head>
+
+<body class="pace-top">
+    <div id="page-container">
+        <!-- begin login -->
+        <div class="login login-with-news-feed">
+            <!-- begin news-feed -->
+            <div class="news-feed">
+                <div class="news-image" style="background-image: url(/assets/img/login-bg/login-bg-17.jpg)"></div>
+                <div class="news-caption">
+                    <h4 class="caption-title"><b>LIMS</b></h4>Laboratory Information Management System
+                   <!--  <p>
+                        Download the Color Admin app for iPhone®, iPad®, and Android™. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </p> -->
+                </div>
+            </div>
+            <!-- end news-feed -->
+            <!-- begin right-content -->
+            <div class="right-content">
+                <!-- begin login-header -->
+                <div class="login-header">
+                    <div class="brand">
+                        <!-- <span class="logo"></span> -->
+                        <img src="/assets/img/logo/lims_logo.png" style="margin-bottom: 5px; width:25px;"/> Clinomics <b>LIMS</b>
+                       <!--  <small>Application Administrator</small> -->
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-sign-in"></i>
+                    </div>
+                </div>
+                <!-- end login-header -->
+                <!-- begin login-content -->
+                <div class="login-content">
+					<h3>관리자 등록</h3>
+			        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+					<form th:object="${Member}" th:action="@{/registration}" th:method="post">
+						<table>
+							<tr>
+								<th>아이디</th>
+								<td>
+									<input type="text" th:field="*{id}">
+								</td>
+							</tr>
+							<tr>
+								<th>비밀번호</th>
+								<td>
+									<input type="password" th:field="*{password}">
+								</td>
+							</tr>
+							<tr>
+								<th>이메일</th>
+								<td>
+									<input type="email" th:field="*{email}">
+								</td>
+							</tr>
+							<tr>
+								<th>이름</th>
+								<td>
+					        		<input type="text" th:field="*{name}">
+								</td>
+							</tr>
+						</table>
+				    	<hr>
+					    <button type="submit">저장</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

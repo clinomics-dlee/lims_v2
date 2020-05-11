@@ -1,0 +1,214 @@
+<!-- begin modal-dialog -->
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+#table_form td {
+	padding: 2px 10px;
+	border: 0;
+}
+
+</style>
+<div class="modal fade" id="modal-sample-detail">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Modify Sample</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="div_popup_sample_detail">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<a href="javascript:samplePopupSave(false);" class="btn btn-success">Save</a>
+				<a id="popup_btn_reissue" href="javascript:samplePopupSave(true);" class="btn btn-success hide">Recreate and Save</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script th:inline="javascript">
+/* <![CDATA[ */    
+	function samplePopupOnload(sampleId, reissue) {
+		$("#modal-sample-detail").modal();
+		if (reissue) {
+			$('#popup_btn_reissue').removeClass('hide');
+		}
+		$.ajax({
+			url : "/work/register/itemby/sample/" + sampleId,
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (data) {
+				
+				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
+				var notnull = false, readonly = '', code, value = "";
+				if (data.sampleItem) {
+					
+					html = '<form id="frm_popup_sample_detail" data-parsley-validate="true">';
+					autoComplete = 'autocomplete="off"';
+					html += '<input type="hidden" name="id" value="' + data.sample.id + '">';
+					html += '<div class="form-group row m-b-15">';
+					html += '<table id="table_form" class="table">';
+					var sitm = data.sampleItem;
+					
+					for (var r in sitm) {
+						code = sitm[r].nameCode;
+						
+						readonly = '';
+						notnull = sitm[r].notNull;
+						if ((data.sample.bundle.autoSequence && sitm[r].nameCode == "laboratory")
+							|| (data.sample.bundle.autoBarcode && sitm[r].nameCode == "barcode")) {
+							
+							readonly = ' readonly';
+							notnull = false;
+						}
+						
+						if (code == 'laboratory') value = data.sample.id;
+						else if (code == 'barcode') value = data.sample.barcode;
+						else value = data.sample.items[code];
+						//if (!value) data.sample.items
+						if (!value) value = ""; 
+						
+						if (r % 2 == 0) html += '<tr>'
+						
+						//html += '<label class="width-150 col-form-label m-l-10 m-r-5">';
+						html += '<td>';
+						html += sitm[r].name;
+						html += '</td>';
+						//html += ' </label>';
+						html += '<td>';
+						if (sitm[r].type == "select" && sitm[r].selectValue) {
+							html += '<select class="form-control form-control-sm"' + (notnull ? parsley : '') + ' name="' + code + '">';
+							aSplit = sitm[r].selectValue.split(",");
+							for (var a in aSplit) {
+								html += '<option value="' + aSplit[a] + '"' + (aSplit[a] == value ? " selected" : "") + '>' + aSplit[a] + '</option>';
+							}
+							html += '</select>';
+						} else if (sitm[r].type == "date") {
+							aDateInputs.push("date_" + code);
+							html += '<div class="input-group" id="date_' + code + '" >';
+							html += '<input type="text" class="form-control form-control-sm"'
+								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + code + '"' : '')
+								+ ' placeholder="click to select the date range"'
+								+ ' placeholder="' + sitm[r].exampleValue + '"'
+								+ ' value="' + value + '"'
+								+ ' name="' + code + '" " ' + autoComplete + '/>';
+							html += '<span class="input-group-append">';
+							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
+							html += '</span>';
+							html += '</div><div id="error_' + code + '"></div>';
+						} else {
+							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+								+ 'placeholder="' + sitm[r].exampleValue + '" name="' + code + '" ' + autoComplete;
+							html += readonly
+							html += ' value="' + value + '"'
+							html += '/>';
+						}
+						
+						html += '</td>';
+						
+						if (r % 2 == 1) html += '</tr>';
+					}
+					html += '</table>';
+					html += '</div>';
+					
+					//html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
+					html += '</form>';
+					
+					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
+					
+					$("#div_popup_sample_detail").html(html);
+				}
+				
+				
+				
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			}
+		});
+		
+	}
+	
+	function samplePopupSave(reissue) {
+		if (!$('#frm_popup_sample_detail').parsley().validate()) {
+			return;	
+		}
+		
+		$.ajax({
+            url: '/work/register/save',
+			type: 'post',
+	        data : JSON.stringify($('#frm_popup_sample_detail').serializeObject()),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result == "00") {
+					if (reissue) {
+						samplePopupRecreate();
+					} else {
+			    		CommonMsg.save(function() {
+			    			$("#modal-sample-detail").modal('hide');
+			    			if (collect_table) {
+			    				collect_table.ajax.reload();	
+			    			}
+			    			
+						});
+					}
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function samplePopupRecreate() {
+		CommonMsg.okCancel(function() {
+			$.ajax({
+	            url: '/work/complete/recreate/pdf/' + $('input[name=laboratory]').val(),
+		        dataType : 'json',
+		        contentType : "application/json;charset=utf-8",
+		        beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+			    success: function(data, xhr) {
+			    	if (data.result == "00") {
+			    		CommonMsg.save(function() {
+			    			$("#modal-sample-detail").modal('hide');
+			    			UserTable.reload('_complete_sample_grid');
+						});
+					} else if (!data.result.startsWith("0")) {
+						CommonMsg.error(function() { });
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() { });
+				},
+				complete : function() {
+					
+				}
+			});
+		});
+	}
+	
+	
+	
+/* ]]> */
+</script>

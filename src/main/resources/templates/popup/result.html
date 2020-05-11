@@ -1,0 +1,127 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+</style>
+<div class="modal fade" id="modal-result-detail">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Results <small id="popup_result_title"></small></h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div style="height: 550px; overflow-y: auto;">
+					<table id="_result_popup_table" class="table table-bordered" style="width: 100%">
+					</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+var _result_popup_table;
+//ajax Data List
+/* function resultPopupDynamicTable(tabldId, sampleId, inputColumns){
+	_result_popup_table = $(tabldId).DataTable({
+		"processing" : true, "serverSide" : true,
+		"stateSave" : false, "destory" : true,
+		"paginate" : false, "scrollX" : true,
+		"searching": false, "ordering": false,
+		"scrollCollapse" : true, "fixedColumns" : true,
+		"ajax" : {
+			url : "/work/list/result/" + sampleId,
+			type : "GET",
+			data : function(d) {
+				return {};
+			},
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			dataSrc : function (data){
+				$(tabldId + ' tbody').show();
+				data.draw = 0;
+				return data.data;
+			},
+			error : function(error) {
+				$(tabldId + ' tbody').html('<tr><td valign="top" colspan="10" class="text-center dataTables_empty">error and empty</td></tr>');
+				$(tabldId + '_processing').css('display', 'none');
+				Pace.stop();
+			}
+		},
+		"columns" : inputColumns,
+		"autoWidth" : true,
+		buttons : [],
+		"dom" : 'lBfrtip',
+		createdRow : function(row, data, dataIndex){
+			
+		},
+		"initComplete" : function (setting, json) {
+			
+        }
+	});
+} */
+
+function resultPopupOnload(sampleId) {
+	$("#modal-result-detail").modal();
+	
+	/* if ($.fn.DataTable.isDataTable("#_result_popup_table")) {
+		_result_popup_table.destroy();
+		$("#_result_popup_table").empty();
+	}
+	
+	var n_columns = columns.map(a => Object.assign({}, a));
+	n_columns.splice(0, 3);
+	
+	resultPopupDynamicTable("#_result_popup_table", sampleId, n_columns); */
+	
+	$('#popup_result_title').text(sampleId);
+	$.ajax({
+		url : "/work/mng/result/" + sampleId,
+		type : "GET",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+		success: function (data) {
+			
+			var html = "";
+			for (var d in data) {
+				var rd = data[d].data;
+				
+				var c = 0;
+				for (var k in rd) {
+					if (c % 5 == 0) html += "<tr>";
+					html += "<th>" + k + "</th>";
+					html += "<td>" + rd[k] + "</td>";
+					if (c % 5 == 4) html += "</tr>";	
+					c++;
+				}
+			}
+			$("#_result_popup_table").html(html);
+			
+		},
+		error : function(data) {
+			CommonMsg.error(function() { });
+		}
+	});
+	
+	
+}
+		
+
+
+/* ]]> */
+</script>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="layout/head"></th:block>
+</head>
+<body class="pace-done">
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">Loading</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<!-- end #sidebar -->
+		<th:block th:replace="popup/sample_history"></th:block>
+		<th:block th:replace="popup/result"></th:block>
+		<th:block th:replace="popup/sample_detail"></th:block>
+		<th:block th:replace="popup/sample_detail_readonly"></th:block>
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin page header -->
+			<ol class="breadcrumb float-xl-right">
+				<li class="breadcrumb-item">Home</li>
+				<li class="breadcrumb-item">실험</li>
+				<li class="breadcrumb-item active">실험대기</li>
+			</ol>
+			
+			<h1 id="page-header" class="page-header">실험 - 실험대기</h1>
+			<!-- end page-header -->
+			
+			<!-- begin content panel -->
+			<div class="row">
+				<div class="col-xl-12">
+					<ul class="nav nav-tabs">
+						<li class="nav-item">
+							<a href="#rdy-tab-1" data-toggle="tab" class="nav-link active">
+								<span class="d-sm-none">Tab 1</span>
+								<span class="d-sm-block d-none">목록</span>
+							</a>
+						</li>
+					</ul>
+					
+					<!-- begin tab content -->
+					<div class="tab-content">
+						<!-- begin tab-1 -->
+						<div class="tab-pane fade active show" id="rdy-tab-1">
+							<div class="form-group row m-b-12">
+								<label class="col-form-label col-md-1">상품</label>
+								<div>
+									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
+										<option value="">All</option>
+										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+									</select>
+								</div>
+								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
+								    <span class="input-group-append">
+								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+									</span>
+								</div>
+								<label class="col-form-label col-md-1">검색어</label>
+								<div class="col-xs-push-0">
+								    <input type="text" id="keyword" class="form-control"/>
+								</div>
+								<div>
+									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
+								</div>
+							</div>
+							<hr/>
+							<div id="_rdy_grid"></div>
+						</div>
+						<!-- end tab-1 -->
+					</div>
+					<!-- end tab content -->
+				</div>
+			</div>
+			<!-- end content panel -->
+		</div>
+		
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+	
+	
+	<script th:inline="javascript">
+	/* <![CDATA[ */
+
+	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	
+	//  시작
+	$(document).ready(function() {
+		App.init();
+		
+		$('#sel_bundle').on('change', function () {
+			//search();
+		});
+		
+		$("#keyword").keydown(function(key) {
+			if (key.keyCode == 13) {
+				search();
+			}
+		});
+		
+		//set search date
+		$('#default-daterange').daterangepicker({
+			opens: 'left',
+			format : 'YYYY/MM/DD',
+			separator: ' to ',
+			startDate: moment().subtract(1, 'months'),
+			endDate: moment(),
+			minDate: '2018/01/01',
+			maxDate: moment(),
+		}, function (start, end) {
+			
+			$('#startDate').val(start.format('YYYY-MM-DD'));
+			$('#finishDate').val(end.format('YYYY-MM-DD'));
+			$('#default-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+			
+		});
+		startDate = moment().subtract(1, 'months');
+		endDate = moment();
+		$('#default-daterange input').val(startDate.format('YYYY-MM-DD') + ' ~ ' + endDate.format('YYYY-MM-DD'));
+		$('#startDate').val(startDate.format('YYYY-MM-DD'));
+		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
+		
+		UserTable.init('_rdy_grid', true, [10, 50] , [10, 50]);
+		drawRdyGrid();
+	});
+	
+	function drawRdyGrid() {
+		UserTable.draw('_rdy_grid', {
+			url : "/exp/rdy/get",
+			type : "GET",
+			data : function() {
+				var param = {
+					bundleId : $("#sel_bundle").val(),
+					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
+					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val(),
+					keyword : $("#keyword").val()
+				};
+				return param;
+			},
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			}
+		}, [{
+			title : ' ',
+			data : "id",
+			headClassName : 'width-50',
+			bodyClassName : 'text-center',
+			type : {
+				name : "checkbox"
+			}
+		}, {
+			title : 'History',
+			data : "sample.id",
+			headClassName : 'width-50',
+			bodyClassName : 'text-center',
+			render : function(row, data, index) {
+				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
+			}
+		}, {
+			title : 'No', 
+			data : 'id',
+			headClassName : 'width-50',
+			bodyClassName : 'text-center',
+			render : function(row, data, index) {
+				return '<string>' + (index + 1) + '</string>';
+			}
+		}, {
+			title : "Laboratory",
+			data : "sample.id",
+			render : function(row, data, index) {
+				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
+			}
+		}, {
+			title : "Barcode",
+			data : "sample.barcode"
+		}, {
+			title : "Product",
+			data : "sample.bundle.name",
+		}, {
+			title : "Chip Number",
+			data : "chipNumber",
+		}, {
+			title : "Status",
+			data : "statusCode",
+			render : function(row, data, index) {
+				var value = g_statusCodeInfo[data];
+				return value;
+			}
+		}, {
+			serverHeader : true
+		}, {
+			title : "Experiment Date",
+			data : "createdDate",
+			type : "date"
+		}, {
+			title : "Experiment user",
+			data : "member.name",
+		}]);
+	}
+	
+	function search() {
+		UserTable.reload('_rdy_grid');
+	}
+	
+	function createPdf() {
+		var checkedRows = UserTable.getCheckedRows("_rdy_grid");
+		if (checkedRows.length > 0) {
+			CommonMsg.okCancel(function() {
+				var resultIds = [];
+				for (var i = 0; i < checkedRows.length; i++) {
+					var row = checkedRows[i];
+					resultIds.push(row.id);
+				}
+				
+				$.ajax({
+		            url: '/work/complete/recreate/pdf/multi',
+			        type : "post",
+			        dataType : 'json',
+			        data : {resultIds : resultIds},
+			        beforeSend: function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+				    success: function(data, xhr) {
+				    	if (data.result == "00") {
+				    		CommonMsg.save(function() {
+				    			$("#modal-sample-detail").modal('hide');
+				    			UserTable.reload('_rdy_grid');
+							});
+						} else if (!data.result.startsWith("0")) {
+							CommonMsg.error(function() { });
+						}
+					},
+					error : function(data) {
+						CommonMsg.error(function() { });
+					},
+					complete : function() {
+						
+					}
+				});
+			});
+		}
+	}
+	
+	/* ]]> */
+	</script>
+	
+	<input type="hidden" name="startDate" id="startDate" value="" />
+	<input type="hidden" name="finishDate" id="finishDate" value="" />
+
+</body>
+</html>

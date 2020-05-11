@@ -1,0 +1,110 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+
+#_com_all_popup_table th {
+	white-space: nowrap;
+    word-break: nowrap;
+}
+
+#_com_all_popup_table td {
+	white-space: nowrap;
+	word-break: nowrap;
+}
+</style>
+<div class="modal fade" id="modal-after">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">List</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="_com_after_popup">
+				</div>
+				
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+//ajax Data List
+
+function afterPopupOnload(type, bundleId, startDate, endDate) {
+	$("#modal-after").modal();
+	
+	UserTable.init('_com_after_popup', true);
+	afterAfterGetItem(type, bundleId, startDate, endDate);
+}
+
+function afterAfterGetItem(type, bundleId, startDate, endDate) {
+	var url = "/popup/reported";
+	if (type == 1) {
+		url = "/popup/analysis";
+	} else if (type == 2) {
+		url = "/popup/completed";
+	}
+	UserTable.draw('_com_after_popup', {
+		url : url,
+		type : "GET",
+		data : function() {
+			return {
+				bundleId : bundleId,
+				sDate : startDate,
+				fDate : endDate,
+				all : true
+			};
+		},
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		}
+	}, [{
+		title : 'No', 
+		data : 'id',
+		headClassName : 'width-50',
+		bodyClassName : 'text-center',
+		render : function(row, data, index) {
+			return '<string>' + (index + 1) + '</string>';
+		}
+	}, {
+		title : "Laboratory",
+		data : "sample.id"
+	}, {
+		title : "Barcode",
+		data : "sample.barcode"
+	}, {
+		title : "Product",
+		data : "sample.bundle.name",
+	}, {
+		title : "Chip Number",
+		data : "chipNumber",
+	}, {
+		title : "Status",
+		data : "statusCode",
+	}, {
+		title : "Experiment Date",
+		data : "createdDate",
+		type : "date"
+	}, {
+		title : "Experiment user",
+		data : "member.name",
+	}]);
+	
+}	
+
+
+
+/* ]]> */
+</script>

@@ -1,0 +1,174 @@
+<div id="sidebar" class="sidebar">
+	<!-- begin sidebar scrollbar -->
+	<div data-scrollbar="true" data-height="100%">
+		<!-- begin sidebar user -->
+		<ul class="nav">
+			<li class="nav-profile">
+			<div class="cover with-shadow" style="background: url('/assets/img/login-bg/login-bg-bbc2.jpg');"></div>
+			<div class="image">
+				<!-- <img src="/assets/img/logo/logo.png" alt="" /> -->
+			</div>
+			<div class="info">
+				<!-- <b class="caret pull-right"></b> -->
+				<!-- <b sec:authentication="principal.username">demo</b> -->
+				<!-- <small>Front end developer</small> -->
+			</div>
+		
+		</ul>
+		<!-- end sidebar user -->
+		<!-- begin sidebar nav -->
+		<ul class="nav" th:with="path=${#httpServletRequest.requestURI}">
+			<li class="nav-header">
+				
+			</li>
+			
+            <li class="has-sub" th:classappend="${#strings.equals(path,'/chart') || #strings.equals(path,'/')} ? active : ''">
+            	<a href="javascript:;">
+                    <b class="caret"></b>
+                    <i class="fa fa-th-large"></i>
+                    <span>대시보드</span>
+                </a>
+                <ul class="sub-menu">
+                	<li th:classappend="${#strings.equals(path, '/')} ? active : ''">
+						<a href="/">
+						    <span>달력</span>
+						</a>
+					</li>
+		            <li th:classappend="${#strings.startsWith(path, '/chart')} ? active : ''">
+						<a href="/chart">
+						    <span>차트</span>
+						</a>
+					</li>
+                </ul>
+            </li>
+			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/input')} ? active : ''">
+				<a href="javascript:;">
+                    <b class="caret"></b>
+                    <i class="fa fa-truck"></i>
+                    <span>입고</span>
+                </a>
+				<ul class="sub-menu">
+                    <li th:class="${#strings.contains(path,'/p/input/reg')} ? active : ''">
+                    	<a href="/p/input/reg">검체등록</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/p/input/rcv')} ? active : ''">
+                    	<a href="/p/input/rcv">검체입고</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/p/input/db')} ? active : ''">
+                    	<a href="/p/input/db">입고DB</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/p/input/aprv')} ? active : ''">
+                    	<a href="/p/input/aprv">입고결재</a>
+					</li>
+                </ul>
+			</li>
+			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/exp')} ? active : ''">
+				<a href="javascript:;">
+                    <b class="caret"></b>
+                    <i class="fa fa-flask"></i>
+                    <span>실험</span>
+                </a>
+				<ul class="sub-menu">
+                    <li th:class="${#strings.contains(path,'/p/exp/ready')} ? active : ''">
+                    	<a href="/p/exp/rdy">실험대기</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/p/exp/step1')} ? active : ''">
+                    	<a href="/p/exp/step1">STEP 1</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/p/exp/step2')} ? active : ''">
+                    	<a href="/p/exp/step2">STEP 2</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/p/exp/step3')} ? active : ''">
+                    	<a href="/p/exp/step3">STEP 3</a>
+					</li>
+					<li th:class="${#strings.contains(path,'/p/exp/db')} ? active : ''">
+                    	<a href="/p/exp/db">실험DB</a>
+                    </li>
+                </ul>
+			</li>
+			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/anls')} ? active : ''">
+				<a href="javascript:;">
+                    <b class="caret"></b>
+                    <i class="fa fa-laptop"></i>
+                    <span>분석</span>
+                </a>
+				<ul class="sub-menu">
+                    <li th:class="${#strings.contains(path,'/work/register')} ? active : ''">
+                    	<a href="/p/anls/rdy">분석대기</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/work/expr')} ? active : ''">
+                    	<a href="/p/anls/stts">분석상황</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/work/report')} ? active : ''">
+                    	<a href="/p/anls/rslt">분석결과</a>
+                    </li>
+                    <li th:class="${#strings.contains(path,'/work/complete')} ? active : ''">
+                    	<a href="/p/anls/db">분석DB</a>
+					</li>
+                </ul>
+			</li>
+			<li th:classappend="${#strings.startsWith(path,'/judgment')} ? active : ''">
+				<a href="javascript:;">
+                    <i class="fa fa-balance-scale"></i>
+                    <span>판정</span>
+                </a>
+				
+			</li>
+			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/set')} ? active : ''">
+				<a href="javascript:;">
+                    <b class="caret"></b>
+                    <i class="fa fa-cog fa-fw"></i>
+                    <span>설정</span>
+                </a>
+				<ul class="sub-menu">
+                    <li th:class="${#strings.contains(path,'/set/mbr/mng')} ? active : ''">
+                    	<a href="/p/set/mmbr">사용자</a>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/prd/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    	<a href="/p/set/prd">상품</a>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/bnd/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    	<a href="/p/set/bndl">묶음상품</a>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/item/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    	<a href="/p/set/item">검체 항목 관리</a>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/ritem/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    	<a href="/p/set/ritem">결과 항목 관리</a>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/prd/item')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    	<a href="/p/set/prd_item">검체 연결 설정</a>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/pritem/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    	<a href="/p/set/prd_ritem">결과 연결 설정</a>
+                    </li>
+                </ul>
+			</li>
+			<!-- <li class="has-sub">
+                <a href="javascript:void(0)">
+                    <b class="caret"></b>
+                    <i class="fa fa-list-ol"></i>
+                    <span>Board</span>
+                </a>
+                <ul class="sub-menu">
+                    <li><a href="/application/board/notice">Notice</a></li>
+                </ul>
+            </li>
+            <li class="has-sub closed">
+				<a href="javascript:void(0)">
+			        <b class="caret"></b>
+				    <i class="material-icons">payment</i>
+				    <span>CASH</span>
+				</a>
+				<ul class="sub-menu">
+					<li class="sidebar-cash-menu-sub"><a href="javascript:;">Payment</a></li>
+					<li class="sidebar-cash-menu-sub"><a href="javascript:;">Charge</a></li>
+					<li class="sidebar-cash-menu-sub"><a href="javascript:;">History</a></li>
+				</ul>
+			</li> -->
+		</ul>
+				<!-- end sidebar nav -->
+	</div>
+			<!-- end sidebar scrollbar -->
+</div>
+<div class="sidebar-bg"></div>

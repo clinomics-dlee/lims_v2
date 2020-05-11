@@ -1,0 +1,161 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+</style>
+<div class="modal fade" id="modal-sample-all">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Registered list</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="_cal_all_popup">
+				</div>
+				<!-- <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+				
+					
+					<div class="dataTables_length m-b-10" id="collect_table_length">
+						<label>Show <select id="_cal_all_popup_table_page"
+							aria-controls="collect_table" class="form-control input-sm"><option value="10">10</option>
+							</select> entries</label>
+						<input type="hidden" id="_cal_all_popup_table_start" value="0"/>
+					</div>
+					<div class="dt-buttons btn-group">
+					
+					</div>
+					<div style="clear:both;"></div>
+					<div class="dataTables_scroll" style="overflow: auto;">
+						
+						<table id="_cal_all_popup_table" class="table table-striped table-bordered" style="width: 100%; margin-bottom: 0;">
+							<thead>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<div id="_cal_all_popup_table_paginate" class="m-t-10">
+						
+					</div>
+					
+				</div> -->
+				
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+
+function calPopupOnload(bundleId, startDate, endDate) {
+	$("#modal-sample-all").modal();
+	
+	UserTable.init('_cal_all_popup', true, [10] , [10]);
+			
+	calAfterGetItem(bundleId, startDate, endDate);
+	
+}
+
+function calAfterGetItem(bundleId, startDate, endDate) {
+			
+	UserTable.draw('_cal_all_popup', {
+		url : "/popup/registered",
+		type : "GET",
+		data : function () {
+			return {
+				bundleId : bundleId,
+				sDate : startDate,
+				fDate : endDate,
+				all : true
+			};
+		},
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		}
+	}, [{
+		title : 'No', 
+		data : 'id',
+		headClassName : 'width-50',
+		bodyClassName : 'text-center',
+		render : function(row, data, index) {
+			return '<string>' + (index + 1) + '</string>';
+		}
+	}, {
+		title : "Laboratory",
+		data : "id"
+	}, {
+		title : "Barcode",
+		data : "barcode"
+	}, {
+		title : "Product",
+		data : "bundle.name",
+	}, {
+		title : "Registered Date",
+		data : "createdDate",
+		type : "createdDate"
+	}, {
+		title : "Register",
+		data : "member.name",
+	}]
+	
+	
+	/* , function(data) {
+		var html = '', head = [];
+		
+		head.push('Laboratory');
+		head.push('Barcode');
+		head.push('Product');
+		head.push('Created date');
+		head.push('Created user');
+		for (var s in data) {
+			html += '<tr>';
+			var items = data[s].items;
+			var fields = Object.keys(items);
+			
+			html += '<td>' + data[s].id + '</td>';
+			html += '<td>' + data[s].barcode + '</td>';
+			html += '<td>' + data[s].bundle.name + '</td>';
+			html += '<td>' + data[s].createdDate + '</td>';
+			html += '<td>' + data[s].member.name + '</td>';
+			
+			for (var r in fields) {
+				var val = items[fields[r]];
+				html += '<td>' + (val ? val : '') + '</td>';
+				//if (s == 0) headHtml += '<th>' + (fields[r] ? fields[r] : '') + '</th>';
+				if (s == 0) head.push((fields[r] ? fields[r] : ''));
+				
+				if (s > 0 && head.length - 5 <= r) head.push((fields[r] ? fields[r] : ''));
+			}
+			html += '</tr>';
+		}
+		headHtml = '<tr>';
+		for (var h in head) {
+			headHtml += '<th>' + head[h] + '</th>';
+		}
+		headHtml += '</tr>';
+		var rtn = {
+			html : html,
+			headHtml : headHtml
+		};
+		return rtn;
+	} */
+	);
+	
+	
+}	
+
+
+
+/* ]]> */
+</script>

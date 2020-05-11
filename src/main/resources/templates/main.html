@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="layout/head"></th:block>
+</head>
+<body class="pace-done">
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">로딩</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<!-- end #sidebar -->
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin page-header -->
+			<h1 id="page-header" class="page-header font-weight-bold"></h1>
+			<!-- end page-header -->
+			<!-- begin panel -->
+			<div class="panel panel-inverse">
+				<!-- begin panel-heading -->
+				<div class="panel-heading">
+					<div class="panel-heading-btn">
+						<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+						<a id="reload" href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success"><i class="fa fa-redo"></i></a>
+						<!-- <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+						<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a> -->
+					</div>
+					<h4 class="panel-title">검채 리스트</h4>
+				</div>
+				<!-- end panel-heading -->
+				<!-- begin panel-body -->
+				<div id="panel-body" class="panel-body">
+					<table id="_table" class="table table-striped table-bordered" style="width: 100%">
+						<thead>
+							<tr>
+								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
+								    <span class="input-group-append">
+								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+									</span>
+								</div>
+							</tr>
+							<tr>
+								<th data-orderable="false">NO</th>
+								<th class="text-nowrap" data-orderable="true">A1</th>
+								<th class="text-nowrap" data-orderable="true">A2</th>
+								<th class="text-nowrap" data-orderable="true">A3</th>
+								<th class="text-nowrap" data-orderable="true">A4</th>
+								<th class="text-nowrap" data-orderable="false">A5</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+				<!-- end panel-body -->
+			</div>
+			<!-- end panel -->
+		</div>
+		
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+	
+	
+	<script th:inline="javascript">
+	/* <![CDATA[ */       
+
+	var _table;
+	var _storeName;
+	var count;
+	
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	//ajax Data List
+		function doList(){
+			_table = $('#_table').DataTable({
+				"processing" : true,
+				"serverSide" : true,
+				"stateSave" : false,
+				"destory" : true,
+				"paginate" : true,
+				"scrollX" : true,
+				"searching": false,
+                "ordering": false,
+				"scrollCollapse" : true,
+				"fixedColumns" : true,
+				"ajax" : {
+					url : "/work/getSamples",
+					type : "GET",
+					dataType : "json",
+					contentType : "application/json; charset=utf-8",
+					beforeSend: function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+					data : function(d){
+						console.log(d);
+						var params = {
+							"pageNumber" : d.start == 0 ? 1 : (d.start / d.length) + 1,
+							"pageRowCount" : d.length,
+							"searchCondition" : d.search.value,
+							"startDate" : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
+							"finishDate" : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
+						}
+						return params;
+					},
+					dataSrc : function (data){
+						// 점포이름을 페이지 헤더에 넣는다.
+						_storeName = data.storeName;
+						$('#page-header').html(_storeName);
+						$('#error-text').remove();
+						$('#_table tbody').show();
+						data.draw = 0;
+						
+						return data.data;
+					},
+					error : function(error) {
+					
+						$('#_table > tbody').html('<tr><td valign="top" colspan="10" class="text-center dataTables_empty">empty</td></tr>');
+						$('#_table_processing').css('display', 'none');
+						
+						swal({
+							title: 'asdfasdf',
+							text: 'asdfasdf',
+							icon: 'error'
+						});
+						// alert(error.responseText);
+						Pace.stop();
+					}
+				},
+				"columns" : [
+					{
+						data : 'id',
+						render : function(data, type, row){
+							return data;
+						}
+					},
+					{
+						data : 'code',
+						render : function(data, type, row){
+							return data;
+						}
+					},
+					{
+						data : 'numbering',
+						render : function(data, type, row){
+							return data;
+						}
+					},
+					{
+						data : 'barcode',
+						render : function(data, type, row){
+							return data;
+						}
+					},
+					{
+						data : 'items',
+						render : function(data, type, row){
+							return data.name;
+						}
+					}
+					
+				],
+				"columnDefs": [
+					{ className: "text-center", "targets": '_all' }
+				],
+				
+				//datatable export sample
+				"dom" : 'lBfrtip',
+				buttons : [
+					{
+						extend : 'excel',
+						title : '검채_' + moment().format('YYYYMMDDHHmmss')
+					}
+				],
+				"lengthMenu": [ [10, 25, 50, 100, 500, -1], [10, 25, 50, 100, 500, 'ALL'] ],
+				"initComplete" : function (setting, json) {
+					
+		        }
+			});
+		}
+	
+		
+	$('#reload').on('click', function(){
+		_table.ajax.reload();
+	});
+		
+	// 6초마다 a (reloading 시 선택한 page 에서 리로딩할 수 있도록 수정)
+	//setInterval('_table.ajax.reload(null, false)', 6000);
+		
+	// 금액에 1000원 단위로 콤마를 넣어주는 함수.
+	function numberWithCommas(amount) {
+	    if (amount === undefined || amount === null)
+	        return 0;
+	    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+		
+	// jQuery putSecJSON / deleteSecJSON 확장 함수 정의
+	$.each( [ 'put', 'delete' ], function( i, method ) {
+		$[ method + 'SecJSON' ] = function( url, data, callback, errorCB, secHeader, secToken ) {
+			if ( $.isFunction( data ) ) {
+				type = type || callback;
+				callback = data;
+				data = undefined;
+			}
+			
+			return $.ajax({
+				url: url,
+				type: method,
+				contentType: 'application/json',
+				dataType: 'json',
+				data: JSON.stringify(data),
+				beforeSend : function (jqxhr) {
+					jqxhr.setRequestHeader(secHeader, secToken);
+				},
+				success: callback,
+				error : errorCB
+			});
+		};
+	});
+		
+	// 웹소켓 설정 시작
+	var headers = {};
+	var sessionId = '';
+	var serverName = '${pageContext.request.serverName}';
+	var serverPort = '${pageContext.request.serverPort}';
+	
+	headers[header] = token;
+	
+	var opts = {
+			from: 'from',
+			to: 'to',
+			text: 'text',
+			disconnect: 'disconnect',
+			conversationDiv: 'conversationDiv',
+			response: 'response'
+	};
+			
+	//  시작
+	$(document).ready(function() {
+		App.init();
+		TableManageDefault.init();
+		doList();
+		
+		//set search date
+		$('#default-daterange').daterangepicker({
+			opens: 'left',
+			format : 'YYYY/MM/DD',
+			separator: ' to ',
+			startDate: moment().subtract('days', 30),
+			endDate: moment(),
+			minDate: '2018/01/01',
+			maxDate: moment(),
+		},
+		function (start, end) {
+			$('#startDate').val(start.format('YYYYMMDD'));
+			$('#finishDate').val(end.format('YYYYMMDD'));
+			$('#default-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+			_table.draw();
+		});
+	});
+	/* ]]> */
+	</script>
+	<form name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="startDate" id="startDate" value="" />
+		<input type="hidden" name="finishDate" id="finishDate" value="" />
+	</form>
+</body>
+</html>

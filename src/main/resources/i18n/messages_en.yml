@@ -1,0 +1,36 @@
+alert:
+  confirm: OK
+  cancel: Cancel
+  loginEmail: Please enter ID
+  loginPassword: Please enter password
+  loginFail: Invalid id or password
+button:
+  login: Login
+  logout: Logout
+  language: Language
+  english: English
+  korean: Korean
+  changePassword: ChangePassword
+  save: Save
+  edit: Edit
+menu:
+  dashboard: Dashboard
+  calendar: Calendar
+  chart: Chart
+  work: Work
+  sampleRegistration: Sample registration
+  sampleList: Sample list
+  linkToCelFile: Link to cel file
+  uploadResult: Upload Result
+  experiment: Experiment
+  analysis: Analysis
+  endOfExperiment: End Of Experiment
+  sampleDb: Sample DB
+  reissueResults: Reissue results
+  setting: Setting
+  member: Member
+  product: Product
+  productItem: Product item
+  bundle: Bundle
+  item: Item
+  resultItem: Result item

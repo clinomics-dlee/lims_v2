@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<!-- #. 화면 기본 head 추가 -->
+<th:block th:replace="layout/head"></th:block>
+</head>
+
+<body class="pace-done">
+	<form name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="startDate" id="startDate" value="" />
+		<input type="hidden" name="finishDate" id="finishDate" value="" />
+	</form>
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">Loading</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<!-- end #sidebar -->
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin page header -->
+			<ol class="breadcrumb float-xl-right">
+				<li class="breadcrumb-item"><a href="javascript:;">Home</a></li>
+				<li class="breadcrumb-item"><a href="javascript:;">Setting</a></li>
+				<li class="breadcrumb-item active">Result Item</li>
+			</ol>
+			<h1 class="page-header">Result Item <small>Setting</small></h1>
+			<!-- end page header -->
+			
+			<!-- begin saved panel -->
+			<div id="savedPanel" class="panel panel-inverse" data-sortable-id="form-validation-2" style="display:none;">
+				<!-- begin panel-heading -->
+				<div class="panel-heading">
+					<div class="panel-heading-btn">
+						<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand">
+							<i class="fa fa-expand"></i>
+						</a>
+						<!-- <a id="reload" href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success">
+							<i class="fa fa-redo"></i>
+						</a> -->
+						<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse">
+							<i class="fa fa-minus"></i>
+						</a>
+						<a id="removeSavedPanel" href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" >
+							<i class="fa fa-times"></i>
+						</a>
+					</div>
+					<h4 class="panel-title">Save Result Item</h4>
+				</div>
+				<!-- end panel-heading -->
+				<!-- begin panel-body -->
+				<div class="panel-body">
+					<form id="frmNew" data-parsley-validate="true">
+						<div class="form-group row m-b-15">
+							<label class="col-md-4 col-sm-4 col-form-label">Name <span class="text-danger">*</span> :</label>
+							<div class="col-md-8 col-sm-8">
+								<input class="form-control" type="text" id="itemName" name="name"
+									placeholder="" data-parsley-required="true" maxLength="100"/>
+							</div>
+						</div>
+						<div class="form-group row m-b-15">
+							<label class="col-md-4 col-sm-4 col-form-label">Name Code <span class="text-danger">*</span> :</label>
+							<div class="col-md-8 col-sm-8">
+								<input class="form-control" type="text" id="itemNameCode" name="nameCode"
+									placeholder="" data-parsley-required="true" maxLength="100"/>
+							</div>
+						</div>
+						<div class="form-group row m-b-15">
+							<label class="col-md-4 col-sm-4 col-form-label">REF Value <span class="text-danger">*</span> :</label>
+							<div class="col-md-8 col-sm-8">
+								<input class="form-control" type="text" id="refValue" name="refValue"
+									placeholder="" data-parsley-required="true" maxLength="1"/>
+							</div>
+						</div>
+						<div class="form-group row m-b-15">
+							<label class="col-md-4 col-sm-4 col-form-label">ALT Value <span class="text-danger">*</span> :</label>
+							<div class="col-md-8 col-sm-8">
+								<input class="form-control" type="text" id="altValue" name="altValue" 
+									placeholder="" data-parsley-required="true" maxLength="1"/>
+							</div>
+						</div>
+						<div class="form-group row m-b-15">
+							<label class="col-md-4 col-sm-4 col-form-label">Order :</label>
+							<div class="col-md-8 col-sm-8">
+								<input type="text" class="form-control" data-parsley-type="number" placeholder="" name="ord" />
+							</div>
+						</div>
+					</form>
+					<div class="form-group row m-b-0">
+						<label class="col-md-4 col-sm-4 col-form-label">&nbsp;</label>
+						<div class="col-md-8 col-sm-8">
+							<button id="saveBtn" class="btn btn-primary m-r-5 m-b-5">Save</button>
+							<button id="initBtn" class="btn btn-lime m-r-5 m-b-5">Reset</button>
+						</div>
+					</div>
+				</div>
+				<!-- end panel-body -->
+			</div>
+			
+			<!-- begin list panel -->
+			<div class="panel panel-inverse">
+				<!-- begin panel-heading -->
+				<div class="panel-heading">
+					<div class="panel-heading-btn">
+						<button id="addBtn" type="button" class="btn btn-success btn-xs">Add</button>
+						<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand">
+							<i class="fa fa-expand"></i>
+						</a>
+						<a id="reload" href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success">
+							<i class="fa fa-redo"></i>
+						</a>
+						<!-- 
+						<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+						<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+						 -->
+					</div>
+					<h4 class="panel-title">Result Item List</h4>
+				</div>
+				<!-- end panel-heading -->
+				<!-- begin panel-body -->
+				<div id="panel-body" class="panel-body">
+					<table id="listTable" class="table table-striped table-bordered" style="width: 100%;">
+						<thead>
+							<tr>
+								<th data-orderable="false" width="20px">No</th>
+								<th class="text-nowrap text-center" data-orderable="false">Name</th>
+								<th class="text-nowrap text-center" data-orderable="true">Code</th>
+								<th class="text-nowrap text-center" data-orderable="true">Ref Value</th>
+								<th class="text-nowrap text-center" data-orderable="true">Alt Value</th>
+								<th class="text-nowrap text-center" data-orderable="true" width="50px">Order</th>
+								<th class="text-nowrap text-center" data-orderable="true" width="50px"></th>
+								<th class="text-nowrap text-center" data-orderable="true" width="50px">Active</th>
+							</tr>
+						</thead>
+					</table>
+					<div class="col-md-8 col-sm-8" id="error_table"></div>
+				</div>
+				<!-- end panel-body -->
+			</div>
+			<!-- end list panel -->
+		</div>
+
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+
+
+<script th:inline="javascript">
+// #. 시작
+$(document).ready(function() {
+	App.init();
+	TableManageDefault.init();
+	doList();
+});
+
+var listTable;
+
+var token = $("meta[name='_csrf']").attr("content");
+var header = $("meta[name='_csrf_header']").attr("content");
+
+//ajax Data List
+function doList() {
+	listTable = $("#listTable").DataTable({
+		processing : true,
+		serverSide : true,
+		stateSave : false,
+		destory : true,
+		paginate : true,
+		scrollX : true,
+		// scrollY: "400px",
+		searching : true,
+		ordering : false,
+		scrollCollapse : true,
+		fixedColumns : true,
+		select: {
+            style: 'single'
+        },
+		ajax : {
+			url : "/set/ritem/get",
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : function(d) {
+				var params = {
+					pgNmb : d.start < 0 ? 0 : (d.start / d.length),
+					pgrwc : d.length,
+					srchVal : d.search.value,
+					sDate : $("#startDate").val() == "" || $("#startDate").val() == null ? "" : $("#startDate").val(),
+					fDate : $("#finishDate").val() == "" || $("#finishDate").val() == null ? "" : $("#finishDate").val()
+				}
+				return params;
+			},
+			dataSrc : function(data) {
+				$("#listTable tbody").show();
+				data.draw = 0;
+				
+				return data.data;
+			},
+			error : function(error) {
+				$("#listTable > tbody").html('<tr><td valign="top" colspan="10" class="text-center dataTables_empty">empty</td></tr>');
+				$("#_table_processing").css("display", "none");
+				
+				CommonMsg.error(function() { });
+			}
+		},
+		columns : [{
+    		className : 'text-center align-middle',
+			render : function(data, type, row, meta) {
+				page = meta.settings.oAjaxData;
+				return "<strong>" + (meta.row + 1 + (page.pgNmb * page.pgrwc)) + "</strong>";
+			}
+		}, {
+			data : "name",
+			className : "align-middle",
+			render : function(data, type, row) {
+				return data;
+			}
+		}, {
+			data : "nameCode",
+			className : "align-middle",
+			render : function(data, type, row) {
+				return data;
+			}
+		}, {
+			data : "refValue",
+			className : "align-middle",
+			render : function(data, type, row) {
+				return '<input type="text" id="txt_ref_value' + row.id + '" class="form-control width-full" value="' + data + '" maxLength="1"/>';
+			}
+		}, {
+			data : "altValue",
+			className : "align-middle",
+			render : function(data, type, row) {
+				return '<input type="text" id="txt_alt_value' + row.id + '" class="form-control width-full" value="' + data + '" maxLength="1"/>';
+			}
+		}, {
+			data : "ord",
+			className : "",
+			render : function(data, type, row) {
+				return '<input type="text" data-parsley-type="number" id="txt_ord_' + row.id + '"'
+					+ ' data-parsley-errors-container="#error_table"'
+					+ ' class="form-control form-control-sm width-50" value="' + data + '"/>';
+			}
+		}, {
+			className : "with-btn text-center align-middle",
+			render : function(data, type, row) {
+				return '<button onClick="edit(' + row.id + ', this)" class="btn btn-primary btn-sm m-l-5">Save</button>';
+			}
+		}, {
+			data : "active",
+			className : "with-btn text-center align-middle",
+			render : function(data, type, row) {
+				var checked = "";
+				if (data) checked = "checked";
+				
+				return '<div class="custom-control custom-switch">'
+					+ '<input type="checkbox" class="custom-control-input" onclick="edit(\'' + row.id + '\', this)" id="chk_active_' + row.id + '" ' + checked + '>'
+					+ '<label class="custom-control-label" for="chk_active_' + row.id + '"></label>'
+					+ '</div>';
+			}
+		}],
+		columnDefs : [ {
+			className : "text-center",
+			targets : "_all"
+		} ],
+
+		//datatable export sample
+		dom : "lBfrtip",
+		buttons : [ {
+			extend : "excel",
+			title : "ResultItem_" + moment().format("YYYYMMDDHHmmss")
+		} ],
+		lengthMenu : [ [ 10, 25, 50, 100, 500, -1 ], [ 10, 25, 50, 100, 500, "ALL" ] ],
+		initComplete : function(setting, json) {
+		}
+	});
+}
+
+$("#reload").on("click", function() {
+	listTable.ajax.reload();
+});
+
+$("#removeSavedPanel").on("click", function() {
+	// #. 저장을 위한 panel 숨기기
+	$("#savedPanel").fadeOut();
+});
+
+$("#addBtn").on("click", function() {
+	// #. 저장을 위한 panel 표시
+	$("#savedPanel").fadeIn();
+});
+
+$("#saveBtn").on("click", function(event) {
+	// #. validation
+	$("#frmNew").parsley().validate();
+	
+	if ($("#frmNew").parsley().isValid()) {
+		CommonMsg.okCancel(function() {
+			// #. save
+			$.ajax({
+				url : "/set/ritem/add",
+				type : "post",
+				dataType : "json",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : JSON.stringify($("#frmNew").serializeObject()),
+				contentType : "application/json;charset=utf-8",
+				success : function(data) {
+					if (data.result == "00") {
+						CommonMsg.save(function() {
+							listTable.ajax.reload();
+						});
+					} else {
+						CommonMsg.error(function() {
+							
+						});
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() {
+						
+					});
+				}
+			});
+		});
+	}
+});
+
+$("#initBtn").on("click", function(event) {
+	// #. form 값 초기화
+	$("#frmNew")[0].reset();
+	
+	// #. validation 초기화
+	$("#frmNew").parsley().reset();
+	
+	// #. event 중단
+	event.preventDefault();
+});
+
+function edit(id, element) {
+	var elementId = $(element).attr("id");
+	var data = { id : id }; 
+	
+	if ($(element).prop('tagName').startsWith("BUTTON")) {
+		data.refValue = $("#txt_ref_value" + id).val();
+		data.altValue = $("#txt_alt_value" + id).val();
+		data.ord = $("#txt_ord_" + id).val();
+		
+		$("#txt_ref_value" + id).parsley().validate();
+		if (!$("#txt_ref_value" + id).parsley().isValid()) {
+			return;
+		}
+		
+		$("#txt_alt_value" + id).parsley().validate();
+		if (!$("#txt_alt_value" + id).parsley().isValid()) {
+			return;
+		}
+		
+	} else if (elementId.startsWith("chk_active")) {
+		data.active = $(element).is(":checked");
+	}
+	
+	// #. save
+	$.ajax({
+		url : "/set/ritem/save",
+		type : "post",
+		dataType : "json",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+		data : JSON.stringify(data),
+		contentType : "application/json;charset=utf-8",
+		success : function(data) {
+			if (data.result == "00") {
+				CommonMsg.save(function() {
+					listTable.ajax.reload();
+				});
+			} else {
+				CommonMsg.error(function() {
+					
+				});
+			}
+		},
+		error : function(data) {
+			CommonMsg.error(function() {
+				
+			});
+		}
+	});
+}
+
+</script>
+</body>
+</html>

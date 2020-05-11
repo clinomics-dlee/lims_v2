@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<!-- #. 화면 기본 head 추가 -->
+<th:block th:replace="layout/head"></th:block>
+</head>
+
+<body class="pace-done">
+	<form name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="startDate" id="startDate" value="" />
+		<input type="hidden" name="finishDate" id="finishDate" value="" />
+	</form>
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">Loading</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+
+	<!-- begin #page-container -->
+	<div id="page-container"
+		class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<!-- end #sidebar -->
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin breadcrumb -->
+			<ol class="breadcrumb pull-right">
+				<li class="breadcrumb-item">Home</li>
+				<li class="breadcrumb-item">Setting</li>
+				<li class="breadcrumb-item active">Product Result Item</li>
+			</ol>
+			<!-- end breadcrumb -->
+			<!-- begin page-header -->
+			<h1 class="page-header">Product Result Item<small> </small></h1>
+			<!-- end page-header -->
+			<!-- begin save form -->
+			
+				<!-- begin panel -->
+				<div class="panel panel-inverse">
+					
+					<!-- begin panel-heading -->
+					<div class="panel-heading">
+						<div class="panel-heading-btn">
+							<!-- <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand">
+								<i class="fa fa-expand"></i>
+							</a>
+							<a id="reload" href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success">
+								<i class="fa fa-redo"></i>
+							</a> -->
+							<!-- 
+							<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+							<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+							 -->
+						</div>
+						<h4 class="panel-title">Product in Result item</h4>
+					</div>
+					<!-- end panel-heading -->
+					<!-- begin panel-body -->
+					<div id="panel-body" class="panel-body">
+						<div class="row">
+							<div class="col-lg-6">
+								<table id="listTable" class="table " style="width: 100%;">
+									<thead>
+										<tr>
+											<th data-orderable="false" >No</th>
+											<th class="text-nowrap" data-orderable="true">Product Name</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<div class="col-lg-6">
+								<table id="subListTable" class="table " style="width: 100%;">
+									<thead>
+										<tr>
+											<th data-orderable="false" width="20px">No</th>
+											<th class="text-nowrap" data-orderable="true">Result item name</th>
+											<th class="text-nowrap" data-orderable="true">Ref Value</th>
+											<th class="text-nowrap" data-orderable="true">Alt Value</th>
+											<th class="text-nowrap" data-orderable="true">Mapping</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+						
+					</div>
+					<!-- end panel-body -->
+				</div>
+						
+				<!-- end panel -->
+				
+				<!-- begin panel -->
+		</div>
+
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+
+
+<script th:inline="javascript">
+	// #. 시작
+	$(document).ready(function() {
+		App.init();
+		TableManageDefault.init();
+		doList();
+
+		$("#reload").on("click", function() {
+			listTable.ajax.reload();
+		});
+
+		
+	});
+	
+	var listTable, subListTable, g_SampleItem;
+	var g_selectId = "0", g_selectName = "", g_selectIndex;
+	var count;
+
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	//ajax Data List
+	function doList() {
+		listTable = $("#listTable").DataTable({
+			processing : true, serverSide : true,
+			stateSave : false, destory : true,
+			paginate : true, sStripeEven: '', sStripeOdd: '',
+			scrollX : true, 
+			searching : false, ordering : false,
+			scrollCollapse : true, fixedColumns : true,
+            select: {
+                style: 'single'
+            },
+			ajax : {
+				url : "/set/prd/get",
+				type : "GET",
+				dataType : "json",
+				contentType : "application/json; charset=utf-8",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : function(d) {
+					var params = {
+						pgNmb : d.start < 0 ? 0 : (d.start / d.length),
+						pgrwc : d.length,
+						srchVal : d.search.value
+					}
+					return params;
+				},
+				dataSrc : function(data) {
+					
+					$("#error-text").remove();
+					$("#listTable tbody").show();
+					data.draw = 0;
+
+					return data.data;
+				},
+				error : function(error) {
+					$("#listTable > tbody").html('<tr><td valign="top" colspan="10" class="text-center dataTables_empty">empty</td></tr>');
+					$("#_table_processing").css("display", "none");
+
+					swal({
+						title : "asdfasdf",
+						text : "asdfasdf",
+						icon : "error"
+					});
+					Pace.stop();
+				}
+			},
+			columns : [{
+        		className : 'text-center',
+				render : function(data, type, row, meta) {
+					page = meta.settings.oAjaxData;
+					return "<strong>" + (meta.row + 1 + (page.pgNmb * page.pgrwc)) + "</strong>";
+				}
+			}, {
+				//with-form-control
+				data : "name",
+				className : "",
+				render : function(data, type, row) {
+					//return '<input type="text" id="iptProduct' + row.id + '" class="form-control width-full" value="' + data + '" readonly/>';
+					return data;
+				}
+			}, {
+				data : "id",
+                visible: false,
+				render : function(data, type, row) {
+					return row.id;
+				}
+			}, {
+				data : "resultItem",
+                visible: false,
+				render : function(data, type, row) {
+					return row.id;
+				}
+			}],
+			buttons : [ ],
+			lengthMenu : [ [ 10, 50, 100, 500, -1 ], [ 10, 50, 100, 500, "ALL" ] ],
+			initComplete : function(setting, json) {
+				g_selectIndex = -1;
+				doSubList();
+			},
+			drawCallback : function( settings ) {
+				//FormSliderSwitcher.init("#listTable");
+				
+		    }
+		});
+		
+		$('#listTable').on('click', 'tbody tr', function(e) {
+			g_selectId = "";
+			
+			if ($(this).hasClass('selected') ) {
+	            $(this).removeClass('selected');
+	            g_selectIndex = -1;
+	            subListTable.ajax.reload();
+	        } else {
+	        	listTable.$('tr.selected').removeClass('selected');
+	            $(this).addClass('selected');
+	            
+	            var idx = listTable.row(this).index();
+
+	            g_selectIndex = idx;
+	            g_selectId = listTable.cell(idx, 2).data();
+	            arrSampleItem = listTable.cell(idx, 3).data();
+	            
+	            var checked = false;
+	            
+	            var cellId;
+	            for (var r = 0; r < subListTable.data().count(); r++) {
+	            	cellId = subListTable.cell(r, 4).data();
+		            checked = false;
+		            
+	            	for (var s_index in arrSampleItem) {
+						if (arrSampleItem[s_index].id == cellId) {
+							checked = true;
+							break;
+						}
+					}
+	            	
+	            	$('#chk_mapping_' + cellId).prop("checked", checked);
+	            	$('#chk_mapping_' + cellId).removeAttr("disabled");
+	            }
+	        }
+		});
+	}
+	
+	function doSubList() {
+		subListTable = $("#subListTable").DataTable({
+			processing : true, serverSide : true,
+			stateSave : false, destory : true,
+			paginate : true, sStripeEven: '', sStripeOdd: '',
+			scrollX : true, 
+			searching : true, ordering : false,
+			scrollCollapse : true, fixedColumns : true,
+            select: {
+                style: 'single'
+            },
+			ajax : {
+				url : "/set/ritem/get",
+				type : "GET",
+				dataType : "json",
+				contentType : "application/json; charset=utf-8",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : function(d) {
+					var params = {
+						pgNmb : d.start < 0 ? 0 : (d.start / d.length),
+						pgrwc : d.length,
+						srchVal : d.search.value
+					}
+					return params;
+				},
+				dataSrc : function(data) {
+					// 점포이름을 페이지 헤더에 넣는다.
+					$("#page-header").html(g_selectName);
+					$("#error-text").remove();
+					$("#subListTable tbody").show();
+					data.draw = 0;
+
+					return data.data;
+				},
+				error : function(error) {
+					$("#subListTable > tbody").html('<tr><td valign="top" colspan="10" class="text-center dataTables_empty">empty</td></tr>');
+					$("#_table_processing").hide();
+
+					CommonMsg.error(function() {
+						
+					});
+				}
+			},
+			columns : [{
+        		className : 'text-center',
+				render : function(data, type, row, meta) {
+					page = meta.settings.oAjaxData;
+					return "<strong>" + (meta.row + 1 + (page.pgNmb * page.pgrwc)) + "</strong>";
+				}
+			}, {
+				data : "name",
+				className : "",
+				render : function(data, type, row) {
+					return data;
+				}
+			}, {
+				data : "refValue",
+				className : "",
+				render : function(data, type, row) {
+					return data;
+				}
+			}, {
+				data : "altValue",
+				className : "",
+				render : function(data, type, row) {
+					return data;
+				}
+			}, {
+				data : "id",
+				className : "",
+				render : function(data, type, row) {
+		            var idx = g_selectIndex;
+		            
+		            var checked = "disabled";
+		            if (idx > -1) {
+		            	checked = "";
+		            	
+			            g_selectId = listTable.cell(idx, 2).data();
+			            arrResultItem = listTable.cell(idx, 3).data();
+			            
+			            for (var s_index in arrResultItem) {
+							if (arrResultItem[s_index].id == row.id) {
+								checked = "checked";
+								break;
+							}
+						}
+		            }
+		            
+					var html = '<div class="custom-control custom-switch">';
+					html += '<input class="custom-control-input" id="chk_mapping_' + row.id + '" type="checkbox" onClick="edit(' + row.id + ', this)" ' + checked + '/>';
+					html += '<label class="custom-control-label" for="chk_mapping_' + row.id + '"></label>';
+					html += '</div>';
+					
+					//var html = '<input type="checkbox" data-render="switchery" data-theme="default" ' + checked + ' value="' + data + '" />';
+					return html;
+				}
+			}],
+
+			//datatable export sample
+			dom : "lBfrtip",
+			buttons : [ ],
+			lengthMenu : [ [ 10, 50, 100, 500, -1 ], [ 10, 50, 100, 500, "ALL" ] ],
+			initComplete : function(setting, json) {
+			},
+			drawCallback : function( settings ) {
+				//FormSliderSwitcher.init("#subListTable");
+		    }
+		});
+	}
+	
+	function edit(id, element) {
+		var data = { id : id }; 
+		
+		if (g_selectId == "0") return;
+
+		arrResultItem = listTable.cell(g_selectIndex, 3).data();
+		
+		data.id = g_selectId;
+		data.isAdd = $(element).is(":checked");
+		data.resultItems = id;
+		
+		if (data.isAdd) {
+			arrResultItem.push({"id":id,"name":"","value":"","example":"","notNull":true,"active":true});
+		} else {
+			for (var a in arrResultItem) {
+				if (arrResultItem[a].id == id) {
+					arrResultItem.splice(a, 1);
+					console.log();
+					break;
+				}
+			}
+		}
+		
+		listTable.cell(g_selectIndex, 3).data(arrSampleItem);
+
+		$.ajax({
+			url : "/set/pritem/add/item",
+			type : 'post',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : JSON.stringify(data),
+			contentType : "application/json;charset=utf-8",
+			success : function(data) {
+				
+				if (data.result == "00") {
+					CommonMsg.save(function() { });
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() {
+					
+				});
+			}
+		});
+	}
+</script>
+</body>
+</html>

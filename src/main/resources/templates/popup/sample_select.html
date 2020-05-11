@@ -1,0 +1,174 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+</style>
+<div class="modal fade" id="modal-sample-select">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Sample DB list</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div class="form-group row m-b-12">
+					<label class="col-form-label col-md-1">Product</label>
+				<div class="col-xs-push-0">
+					<select class="form-control width-150" id="sel_bundle">
+						<option value>All</option>
+						<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+					</select>
+				</div>
+				<label class="col-form-label col-md-1">Key word</label>
+				<div class="col-xs-push-0">
+				    <input type="text" id="keyword" class="form-control"/>
+				</div>
+				<label class="col-form-label">Date</label>
+				<div class="col-xs-push-0">
+					<div class="input-group" data-provide="datepicker">
+						<input type="text" id="selStartDate" class="form-control width-100" readonly/>
+						<span class="input-group-append">
+							<span class="input-group-text">
+								<i class="fa fa-calendar"></i>
+							</span>
+						</span>
+						<input type="text" id="selFinishDate" class="form-control width-100" readonly/>
+						<span class="input-group-append">
+							<span class="input-group-text">
+								<i class="fa fa-calendar"></i>
+							</span>
+						</span>
+						
+					</div>
+				</div>
+				<div>
+					<button onClick="popupSelectSearch();" class="btn btn-default m-l-10 ">Search</button>
+				</div>
+				
+				
+				<!-- <div class="input-group" id="sel-pop-daterange"  style="width: auto; float: right; padding-left: 10px;" >
+				    <input type="text" name="sel-pop-daterange" class="form-control width-200" value="" placeholder="click to select the date range" readonly="readonly"/>
+				</div> -->
+				
+			</div>
+				<hr/>
+				<div id="_cal_sel_popup">
+				</div>
+				
+				
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="selStartDate" id="selStartDate" value="" />
+<input type="hidden" name="selFinishDate" id="selFinishDate" value="" />
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+
+function calSelPopupOnload(index) {
+	$("#modal-sample-select").modal();
+	
+	$('#selStartDate').datepicker({
+		dateFormat : 'yy-mm-dd',
+		beforeShow: function() {
+	        setTimeout(function(){
+	            $('.ui-datepicker').css('z-index', 9999);
+	        }, 0);
+	    }
+	});
+	
+	$('#selFinishDate').datepicker({
+		dateFormat : 'yy-mm-dd',
+		beforeShow: function() {
+	        setTimeout(function(){
+	            $('.ui-datepicker').css('z-index', 9999);
+	        }, 0);
+	    }
+	});
+		
+	var startDate = moment().subtract(1, 'months');
+	var endDate = moment();
+	//$('#sel-pop-daterange input').val(startDate.format('YYYY-MM-DD') + ' ~ ' + endDate.format('YYYY-MM-DD'));
+	$('#selStartDate').val(startDate.format('YYYY-MM-DD'));
+	$('#selFinishDate').val(endDate.format('YYYY-MM-DD'));
+	
+	UserTable.init('_cal_sel_popup', true, [10, 30] , [10, 30]);
+	
+	calSelAfterGetItem(index);
+	
+}
+
+function calSelAfterGetItem(selIndex) {
+	
+	UserTable.draw('_cal_sel_popup', {
+		url : "/work/expr/get",
+		type : "GET",
+		data : function () {
+			return {
+				bundleId : $('#sel_bundle').val(),
+				sDate : $('#selStartDate').val(),
+				fDate : $('#selFinishDate').val(),
+				keyword : $("#keyword").val()
+			};
+		},
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		}
+	}, [ 
+		{
+			title : 'No', 
+			data : 'id',
+			headClassName : 'width-50',
+			bodyClassName : 'text-center',
+			render : function(row, data, index) {
+				return '<strong>' + (index + 1) + '</strong>';
+			}
+		},
+		{
+			title : 'Laboratory', 
+			data : 'id',
+			render : function(row, data, index) {
+				return '<a href="#" onClick="$(\'#modal-sample-select\').modal(\'hide\');popupAfter(\'' + selIndex + '\', \'' + data + '\');">' + data + '</a>';
+			}
+		},
+		{
+			title : 'Barcode', 
+			data : 'barcode'
+		},
+		{
+			title : 'Product', 
+			data : 'bundle.name'
+		},
+		{
+			title : 'Created date', 
+			data : 'createdDate',
+			type : 'date'
+		},
+		{
+			title : 'Created user', 
+			data : 'member.name'
+		}
+	], null);
+	
+	
+}	
+
+function popupSelectSearch() {
+	UserTable.reload('_cal_sel_popup');
+}
+
+
+
+/* ]]> */
+</script>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<!-- #. 화면 기본 head 추가 -->
+<th:block th:replace="layout/head"></th:block>
+</head>
+
+<body class="pace-done">
+	<form name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="startDate" id="startDate" value="" />
+		<input type="hidden" name="finishDate" id="finishDate" value="" />
+	</form>
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">Loading</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+
+	<!-- begin #page-container -->
+	<div id="page-container"
+		class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<!-- end #sidebar -->
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin breadcrumb -->
+			<ol class="breadcrumb pull-right">
+				<li class="breadcrumb-item">Home</li>
+				<li class="breadcrumb-item">Setting</li>
+				<li class="breadcrumb-item active">Bundle</li>
+			</ol>
+			<!-- end breadcrumb -->
+			<!-- begin page-header -->
+			<h1 class="page-header">Bundle<small> </small></h1>
+			<!-- end page-header -->
+			<!-- begin save form -->
+			
+			<div class="row">
+				<div class="col-lg-6">
+				<!-- begin panel -->
+					<div class="panel panel-inverse">
+						<!-- begin panel-heading -->
+						<div class="panel-heading">
+							<div class="panel-heading-btn">
+								<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand">
+									<i class="fa fa-expand"></i>
+								</a>
+								<a id="reload" href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success">
+									<i class="fa fa-redo"></i>
+								</a>
+								<!-- 
+								<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+								<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+								 -->
+							</div>
+							<h4 class="panel-title">Bundle</h4>
+						</div>
+						<!-- end panel-heading -->
+						<!-- begin panel-body -->
+						<div id="panel-body" class="panel-body">
+							<table id="listTable" class="table table-bordered" style="width: 100%;">
+								<thead>
+									<tr>
+										<th data-orderable="false" width="20px">No</th>
+										<th class="text-nowrap" width="180px" data-orderable="true">Bundle Name</th>
+										<th class="text-nowrap" width="60px" data-orderable="true">Active</th>
+									</tr>
+								</thead>
+							</table>
+							<div class="col-md-8 col-sm-8" id="error_table">
+							</div>
+						</div>
+						<!-- end panel-body -->
+					</div>
+					<!-- end panel -->
+				</div>
+				<div class="col-lg-6">
+					
+					<!-- begin panel -->
+					<div class="panel panel-inverse" data-sortable-id="form-validation-2">
+						<!-- begin panel-heading -->
+						<div class="panel-heading">
+							<div class="panel-heading-btn">
+							</div>
+							<h4 class="panel-title" id="right_title">Registration</h4>
+						</div>
+						<!-- end panel-heading -->
+						<!-- begin panel-body -->
+						<div class="panel-body">
+							<form id="frm_bundle" data-parsley-validate="true">
+								<input type="hidden" class="form-control" name="id">
+								
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Bundle name</label>
+									<div class="col-md-8 col-sm-8">
+										<input type="text" class="form-control" data-parsley-required="true" id="name" placeholder="Enter name" name="name" />
+									</div>
+								</div>
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Products</label>
+									<div class="col-md-8 col-sm-8" id="newCheckboxs" style="margin-left:-15px;">
+										
+										<div class="form-check checkbox checkbox-css">
+											<input type="checkbox" class="form-check-input" id="mincheck" name="mincheck[]" data-parsley-mincheck="2" value="foo" required="" data-parsley-multiple="mincheck"> 
+											<label class="form-check-label">Checkbox 1</label>
+										</div>
+										<div class="form-check checkbox checkbox-css">
+											<input type="checkbox" class="form-check-input" name="mincheck[]" value="bar" data-parsley-multiple="mincheck"> 
+											<label class="form-check-label">Checkbox 2</label>
+										</div>
+										<div class="form-check checkbox checkbox-css">
+											<input type="checkbox" class="form-check-input" name="mincheck[]" value="baz" data-parsley-multiple="mincheck">
+											<label class="form-check-label">Checkbox 3</label>
+										</div>
+										
+										
+									</div>
+									
+								</div>
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Use auto barcode</label>
+									<div class="col-md-8 col-sm-8">
+										<div class="switcher switcher-success">
+											<input type="checkbox" name="autoBarcode" id="autoBarcode" value="true" />
+											<label for="autoBarcode"></label>
+										</div>
+									</div>
+								</div>
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Barcode Role</label>
+									<div class="col-md-8 col-sm-8">
+										<input type="text" class="form-control" id="barcodeRole" name="barcodeRole" />
+									</div>
+								</div>
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Use auto key</label>
+									<div class="col-md-8 col-sm-8">
+										<div class="switcher switcher-success">
+											<input type="checkbox" name="autoSequence" id="autoSequence" value="true" />
+											<label for="autoSequence"></label>
+										</div>
+									</div>
+								</div>
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Key Role</label>
+									<div class="col-md-8 col-sm-8">
+										<input type="text" class="form-control" id="sequenceRole" name="sequenceRole" />
+									</div>
+								</div>
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Key Type</label>
+									<div class="col-md-8 col-sm-8">
+										<input type="text" class="form-control" id="type" name="type" />
+									</div>
+								</div>
+							</form>
+							<hr/>
+							<div class="form-group row m-b-0">
+								<label class="col-md-4 col-sm-4 col-form-label">&nbsp;</label>
+								<div class="col-md-8 col-sm-8">
+									<button id="btn_registration" class="btn btn-default m-r-5">New</button>
+									<button id="btn_save" class="btn btn-default" >Save</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+					<!-- end panel-body -->
+				
+			</div>
+			<!-- end save form -->
+		</div>
+
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+
+
+<script th:inline="javascript">
+	// #. 시작
+	$(document).ready(function() {
+		doList();
+		App.init();
+		TableManageDefault.init();
+
+		$("#reload").on("click", function() {
+			listTable.ajax.reload();
+		});
+
+		$("#btn_save").on("click", function() {
+			if (!$('#frm_bundle').parsley().validate()) {
+				return;	
+			}
+			
+			var checkedValues = "";
+			$("input[name='chk_product[]']:checked").each(function() {
+				checkedValues += "|" + $(this).val();
+			});
+			checkedValues = checkedValues.substring(1);
+			
+			var data = $('#frm_bundle').serializeObject()
+			data.products = checkedValues;
+			data.single = false;
+			delete data['chk_product[]'];
+						
+			$.ajax({
+				url : "/set/bnd/save",
+				type : 'post',
+				dataType : 'json',
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : JSON.stringify(data),
+				contentType : "application/json;charset=utf-8",
+				success : function(data) {
+					
+					if (data.result == "00") {
+						CommonMsg.save(function() {
+							$("#frm_bundle")[0].reset();
+							listTable.ajax.reload();
+						});
+					} else {
+						CommonMsg.error(function() { });
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() { });
+				}
+			});
+		});
+	});
+	
+	var listTable;
+	var storeName;
+	var count;
+	var products;
+
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	
+	$(document).on("click", "#btn_registration", function() {
+		$("#frm_bundle")[0].reset();
+        $("#right_title").text('Registration');
+        g_selectIndex = -1;
+	});
+	
+	//ajax Data List
+	function doList() {
+		listTable = $("#listTable").DataTable({
+			processing : true, serverSide : true,
+			stateSave : false, destory : true,
+			paginate : true, sStripeEven: '', sStripeOdd: '',
+			scrollX : true, scrollY : "200px",
+			searching : false, ordering : false,
+			scrollCollapse : true, fixedColumns : true,
+            select: {
+                style: 'single'
+            },
+			ajax : {
+				url : "/set/bnd/get",
+				type : "GET",
+				dataType : "json",
+				contentType : "application/json; charset=utf-8",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : function(d) {
+					var params = {
+						pgNmb : d.start < 0 ? 0 : (d.start / d.length),
+						pgrwc : d.length,
+						srchVal : d.search.value
+					}
+					return params;
+				},
+				dataSrc : function(data) {
+					// 점포이름을 페이지 헤더에 넣는다.
+					//storeName = data.storeName;
+					//$("#page-header").html(storeName);
+					$("#error-text").remove();
+					$("#listTable tbody").show();
+					data.draw = 0;
+					products = data.products;
+
+					return data.data;
+				},
+				error : function(error) {
+					$("#listTable > tbody").html('<tr><td valign="top" colspan="10" class="text-center dataTables_empty">empty</td></tr>');
+					$("#_table_processing").css("display", "none");
+
+					/* swal({
+						title : "asdfasdf",
+						text : "asdfasdf",
+						icon : "error"
+					});
+					Pace.stop(); */
+				}
+			},
+			columns : [{
+        		className : 'text-center',
+				render : function(data, type, row, meta) {
+					page = meta.settings.oAjaxData;
+					return "<strong>" + (meta.row + 1 + (page.pgNmb * page.pgrwc)) + "</strong>";
+				}
+			}, {
+				data : "name",
+				className : "text-left",
+				render : function(data, type, row) {
+					return data;
+				}
+			}, {
+				data : "active",
+				className : "with-btn text-center",
+				render : function(data, type, row) {
+					
+					var checked = "";
+					if (data) checked = "checked";
+					
+					var html = '<div class="custom-control custom-switch">';
+					html += '<input class="custom-control-input" id="chk_active_' + row.id + '" type="checkbox" ' + checked + ' onClick="edit(' + row.id + ', this)"/>';
+					html += '<label class="custom-control-label" for="chk_active_' + row.id + '"></label>';
+					html += '</div>';
+					
+					return html;
+				}
+			}, {
+				data : "id",
+                visible: false,
+				render : function(data, type, row) { return data; }
+			}, {
+				data : "autoBarcode",
+                visible: false,
+				render : function(data, type, row) { return data; }
+			}, {
+				data : "barcodeRole",
+                visible: false,
+				render : function(data, type, row) { return data; }
+			}, {
+				data : "autoSequence",
+                visible: false,
+				render : function(data, type, row) { return data; }
+			}, {
+				data : "sequenceRole",
+                visible: false,
+				render : function(data, type, row) { return data; }
+			}, {
+				data : "type",
+                visible: false,
+				render : function(data, type, row) { return data; }
+			}, {
+				data : "product",
+                visible: false,
+				render : function(data, type, row) { return data; }
+			}],
+
+			//datatable export sample
+			dom : "lBfrtip",
+			buttons : [ {
+				extend : "excel",
+				title : "Member_" + moment().format("YYYYMMDDHHmmss")
+			} ],
+			lengthMenu : [ [ 5, 10, -1 ], [ 5, 10, "ALL" ] ],
+			initComplete : function(setting, json) {
+				var html = '<div class="checkbox checkbox-css checkbox-inline"></div>', mincheck = '';
+				products.forEach(function (item, index, array) {
+					checkboxId = 'chk_product_' + item.id;
+					mincheck = '';
+					if (index == 0) {
+						mincheck = ' data-parsley-mincheck="2" required=""';
+					}
+					html += '<div class="form-check checkbox checkbox-css checkbox-inline">'
+						+ '<input type="checkbox" name="chk_product[]" data-parsley-multiple="mincheck" class="form-check-input"' + mincheck
+						+ ' data-parsley-errors-container="#error_new_frm"'
+						+ ' id="' + checkboxId + '" value="'  + item.id + '" >'
+						+ '<label class="form-check-label" for="' + checkboxId + '">' + item.name + '</label>'
+						+ '</div>';
+				});
+				html += '<div style="margin-left:15px;" id="error_new_frm"></div>';
+				$("#newCheckboxs").html(html);
+			},
+			drawCallback : function( settings ) {
+				
+		    }
+		});
+		
+		$('#listTable').on('click', 'tbody tr', function(e) {
+			if ($(this).hasClass('selected') ) {
+	            $(this).removeClass('selected');
+	        } else {
+	        	listTable.$('tr.selected').removeClass('selected');
+	            $(this).addClass('selected');
+	            
+	            var idx = listTable.row(this).index();
+				var name = listTable.cell(idx, 1).data();
+	            $('input[name=id]').val(listTable.cell(idx, 3).data());
+	            $('input[name=name]').val(name);
+	            $('input:checkbox[name=autoBarcode]').prop("checked", listTable.cell(idx, 4).data());
+	            $('input[name=barcodeRole]').val(listTable.cell(idx, 5).data());
+	            $('input:checkbox[name=autoSequence]').prop("checked", listTable.cell(idx, 6).data());
+	            $('input[name=sequenceRole]').val(listTable.cell(idx, 7).data());
+	            $('input[name=type]').val(listTable.cell(idx, 8).data());
+	            
+	            var arrProduct = listTable.cell(idx, 9).data();
+
+            	$('input:checkbox[name^=chk_product]').prop("checked", false);
+            	
+	            for (var a in arrProduct) {
+	            	$('#chk_product_' + arrProduct[a].id).prop("checked", true);
+	            }
+	            
+	            $("#right_title").text('Modify - ' + name);
+	        }
+		});
+	}
+	
+	function edit(id, element) {
+		
+		var elementId = $(element).attr('id');
+		var data = { id : id }; 
+		
+		if ($(element).prop('tagName').startsWith("BUTTON")) {
+			
+			var formField = $('#frm_product_' + id);
+			var bundleNameField = $('#txt_bundle_' + id);
+			if (!bundleNameField.parsley().validate()) {
+				return;
+			}
+			if (!formField.parsley().validate()) {
+				return;
+			}
+			var checkedValues = "";
+			$("input[name='chk_product" + id + "[]']:checked").each(function() {
+				checkedValues += "|" + $(this).val();
+				count++;
+			});
+			checkedValues = checkedValues.substring(1);
+			data.products = checkedValues;
+			
+		} else if (elementId.startsWith("chk_active")) {
+			data.active = $(element).is(":checked");
+		}
+		
+		$.ajax({
+			url : "/set/bnd/save",
+			type : 'post',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : JSON.stringify(data),
+			contentType : "application/json;charset=utf-8",
+			success : function(data) {
+				
+				if (data.result == "00") {
+					CommonMsg.save(function() { });
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			}
+		});
+	}
+	
+</script>
+</body>
+</html>

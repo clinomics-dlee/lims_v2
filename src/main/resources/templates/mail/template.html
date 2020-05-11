@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Demystifying Email Design</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<style>
+		
+		table.normal {
+			border-collapse: collapse;
+			text-align: left;
+			line-height: 1.5;
+
+		}
+		table.normal thead th {
+			padding: 10px;
+			font-weight: bold;
+			vertical-align: top;
+			color: #369;
+			border-bottom: 3px solid #036;
+		}
+		table.normal tbody th {
+			width: 150px;
+			padding: 10px;
+			font-weight: bold;
+			vertical-align: top;
+			border-bottom: 1px solid #ccc;
+			background: #f3f6f7;
+		}
+		table.normal td {
+			width: 350px;
+			padding: 10px;
+			vertical-align: top;
+			border-bottom: 1px solid #ccc;
+		}
+	</style>
+</head>
+<body style="margin: 0; padding: 0;">
+	<h2>
+		분석 실패 항목
+	</h2>
+    <table class="normal"> 
+		<colgroup>
+			<col width="25%" />
+			<col width="25%" />
+			<col width="50%" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th scope="cols">Chip 번호</th>
+				<th scope="cols">실험실 번호</th>
+				<th scope="cols">메세지</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="map : ${info}">
+				<th scope="row" th:text="${map.chipNumber}"> </th>
+				<td>
+					<ul style="list-style: none; padding: 0; margin: 0;" th:each="smpl : ${#strings.arraySplit(map.sampleId, ',')}">
+						<li style="padding: 0;" th:text="${smpl}">
+						</li>
+					</ul>
+				</td>
+				<td th:text="${map.message}"> </td>
+			</tr>
+		</tbody>
+    </table>
+</body>
+</html>

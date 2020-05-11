@@ -1,0 +1,57 @@
+spring:
+  datasource:
+    initialization-mode: always
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  security:
+    user:
+      name: user
+      password: 1234
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+datasource:
+  lims:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 7890uiop
+  pdf:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 7890uiop
+lims:
+  filePath: /BiO/Serve/lims_v2
+  celFilePath: /BiO/Serve/lims_v2/celFiles
+  workspacePath : /BiO/Serve/lims_v2/workspace
+  apmraChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis_GSK.py
+  customChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis.py
+externalApi: 
+  url: http://api.clinomics-dev.com/
+  tokenName: apiKey
+  token: $2y$10$8FzBfexBXEJa7PYaERjLvOk3zGgCSiAyTWiNqsjWktfcvuoAH/fKq
+titan:
+  filePath: /BiO/Serve/lims_v2/titan
+server:
+  port: 8443
+  ssl:
+    key-store: keystore.p12
+    key-store-password: 1234
+    key-alias: airpageserver
+    key-store-type: PKCS12
+rest:
+  http:
+    auth-token-header-name: limsApiKey
+    auth-token: weirjknvi32oinv0923n65lknv993141kln0
+logging:
+  file: /BiO/Serve/lims_v2/logs/lims_v2.log

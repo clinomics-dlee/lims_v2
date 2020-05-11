@@ -1,0 +1,88 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+
+#history_popup_table th {
+	min-width: 100px;
+	white-space: nowrap;
+    word-break: nowrap;
+}
+
+#history_popup_table td {
+	white-space: nowrap;
+	word-break: nowrap;
+}
+
+</style>
+<div class="modal fade" id="modal-sample-history">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Sample History <small id="popup_history_title"></small></h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="_history_popup">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+var _history_popup_table;
+
+
+function historyPopupOnload(sampleId, bundleId) {
+	$("#modal-sample-history").modal();
+	$("#_history_popup").empty();
+	
+	UserTable.init('_history_popup', true);
+	historyAfterGetItem(sampleId);
+}
+
+function historyAfterGetItem(sampleId) {
+	
+	UserTable.draw('_history_popup', {
+		url : "/work/report/db/history/" + sampleId,
+		type : "GET",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+	}, [], function(data) {
+		var html = '', headHtml = '<tr>';
+		for (var s in data) {
+			html += '<tr>';
+			var items = data[s].items;
+			var fields = Object.keys(items);
+			for (var r in fields) {
+				var val = items[fields[r]];
+				html += '<td>' + (val ? val : '') + '</td>';
+				if (s == 0) headHtml += '<th>' + (fields[r] ? toCapitalize(fields[r]) : '') + '</th>';
+			}
+			html += '</tr>';
+		}
+		headHtml += '</tr>';
+		var rtn = {
+			html : html,
+			headHtml : headHtml
+		};
+		return rtn;
+	});
+}
+		
+
+
+/* ]]> */
+</script>

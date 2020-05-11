@@ -1,0 +1,73 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+
+</style>
+<div class="modal fade" id="modal-cel-files">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Cel file list </h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="_cel_popup_grid">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+
+function celfilePopupOnload() {
+	$("#modal-cel-files").modal();
+	$("#_cel_popup_grid").empty();
+	
+	UserTable.init('_cel_popup_grid', true);
+	celfileAfterGetItem();
+}
+
+function celfileAfterGetItem() {
+	
+	UserTable.draw('_cel_popup_grid', {
+		url : "/work/expr/celfile/get",
+		type : "GET",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+	}, [
+		{
+			title : 'Chip number',
+			data : 'chipNumber'
+		},
+		{
+			title : 'File list',
+			data : 'files',
+			render : function(row, data, index) {
+				var html = '';
+				for (var d in data) {
+					html += '<span class="label label-inverse">' + data[d] + '</span> '
+					if (d > 0 && d % 2 == 1) html += '<br/>';
+				}
+				return html;
+			}
+		}
+	], null);
+}
+		
+
+
+/* ]]> */
+</script>

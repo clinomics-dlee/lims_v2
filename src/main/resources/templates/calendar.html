@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="layout/head"></th:block>
+	
+	<style>
+		@media screen and (min-width: 768px) {
+			#cal1 {
+				width: 100%;
+			}
+		}
+
+		#cal1 {
+			width: 100%;
+		}
+		#cal1 td, #cal2 td {
+			text-align: left;
+			padding: 2px;
+		}
+		#cal1 td div, #cal2 td div {
+			text-align: center;
+			min-height: 68px;
+		}
+		#cal1 td div hr, #cal2 td div hr {
+			margin: 0;
+		}
+		#cal1 td div a, #cal2 td div a {
+			color: #FFF;
+		}
+	</style>
+</head>
+<body class="pace-done">
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">Loading</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<th:block th:replace="popup/cal_after"></th:block>
+		<th:block th:replace="popup/cal_registered"></th:block>
+		<!-- end #sidebar -->
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin breadcrumb -->
+			<!-- <ol class="breadcrumb pull-right">
+				<li class="breadcrumb-item"><a href="javascript:;"><i class="fas fa-home fa-fw"></i> Home</a></li>
+				<li class="breadcrumb-item active">Calendar</li>
+			</ol> -->
+			<!-- end breadcrumb -->
+			<!-- begin page-header -->
+			<h1 class="page-header" th:text="#{title.sampleStatus}">Sample status</h1>
+			<!-- end page-header -->
+			
+			<!-- begin fullcalendar-container -->
+		    <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel p-20">
+                    
+    					<div class="row m-b-5">
+							<label class="col-form-label" th:text="#{common.product}">Product</label>
+							<select class="form-control width-150 m-r-5 m-b-5" data-parsley-required="true" id="sel_bundle" name="bundleId">
+								<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+							</select>
+							
+							<div class="width-10"></div>
+							<button class="btn btn-white m-r-5 m-b-5" id="btn_prev" th:text="#{common.prev}">Prev</button>
+							<b id="tit_date" style="display:inline-block; width:150px; text-align: center; font-size: 24px; vertical-align: middle;">
+								2020-01-01
+							</b>
+							<button class="btn btn-white m-r-5 m-b-5" id="btn_next" th:text="#{common.next}">Next</button>
+							<button class="btn btn-default m-r-5 m-b-5 width-60" id="btn_today" th:text="#{common.today}">Today</button>
+							<div class="width-200"></div>
+						</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+				<!-- begin col-3 -->
+				<div class="col-xl-3 col-md-6">
+					<div class="widget widget-stats bg-blue">
+						<div class="stats-icon"><i class="fa fa-users"></i></div>
+						<div class="stats-info">
+							<h4 th:text="#{page.calendar.registered}">REGISTERED</h4>
+							<p id="total1"></p>	
+						</div>
+						<!-- <div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-alt-circle-right"></i></a>
+						</div> -->
+					</div>
+				</div>
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+				<div class="col-xl-3 col-md-6">
+					<div class="widget widget-stats bg-info">
+						<div class="stats-icon"><i class="fa fa-flask"></i></div>
+						<div class="stats-info">
+							<h4 th:text="#{page.calendar.analysis}">ANALYSIS</h4>
+							<p id="total2"></p>	
+						</div>
+					</div>
+				</div>
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+				<div class="col-xl-3 col-md-6">
+					<div class="widget widget-stats bg-orange">
+						<div class="stats-icon"><i class="fa fa-check-circle"></i></div>
+						<div class="stats-info">
+							<h4 th:text="#{page.calendar.completed}">COMPLETED</h4>
+							<p id="total3"></p>	
+						</div>
+					</div>
+				</div>
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+				<div class="col-xl-3 col-md-6">
+					<div class="widget widget-stats bg-red">
+						<div class="stats-icon"><i class="fa fa-file-alt"></i></div>
+						<div class="stats-info">
+							<h4 th:text="#{page.calendar.reported}">REPORTED</h4>
+							<p id="total4"></p>	
+						</div>
+						
+					</div>
+				</div>
+				<!-- end col-3 -->
+			</div>
+			
+		    <!-- <div class="row">
+				<div class="col-lg-6" style="height: 100%;">
+					<div class="widget widget-stats bg-danger">
+						<div class="stats-info">
+							<p><small>Registered : </small><b id="total1"></b></p>	
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6" style="height: 100%;">
+					<div class="widget widget-stats bg-warning">
+						<div class="stats-info">
+							<p><small>Analysis : </small><b id="total2"></b></p>	
+						</div>
+					</div>
+				</div>
+			</div>
+		    <div class="row">
+				<div class="col-lg-6" style="height: 100%;">
+					<div class="widget widget-stats bg-green">
+						<div class="stats-info">
+							<p><small>Complete : </small><b id="total3"></b></p>	
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6" style="height: 100%;">
+					<div class="widget widget-stats bg-info">
+						<div class="stats-info">
+							<p><small>Report : </small><b id="total4"></b></p>	
+						</div>
+					</div>
+				</div>
+			</div> -->
+		    
+		    <div class="row">
+				<div class="col-lg-12" style="height: 100%;">
+				<!-- begin panel -->
+					<div class="table-responsive" style="height: 100%; padding: 0; overflow-y: hidden;">
+						
+						<table id="cal1" class="table table-bordered widget-table widget-table-rounded" height="100%" data-id="widget">
+							<thead>
+	           					<tr>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Sun</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Mon</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Tue</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Wed</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Thu</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Fri</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Sat</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">Total</th>
+	           					</tr>
+							</thead>
+							<tbody>
+	           					<tr>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           					</tr>
+	           					<tr>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           					</tr>
+	           					<tr>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           					</tr>
+	           					<tr>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           					</tr>
+	           					<tr>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           					</tr>
+	           					<tr>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           						<td></td>
+	           					</tr>
+							</tbody>
+           				</table>
+					</div>
+					
+				</div>
+				
+		    </div>
+		        
+			<!-- end panel -->
+		</div>
+		
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+	
+	
+	<script th:inline="javascript">
+	/* <![CDATA[ */       
+	var rdate = moment();
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	var SearchedDate = new Set();
+	//  시작
+	$(document).ready(function() {
+		
+		App.init();
+		
+		writeTitleDate();
+		
+		$('#btn_prev').click(function() {
+			rdate.subtract(1, 'months');
+			writeTitleDate();
+		});
+		
+		$('#btn_next').click(function() {
+			rdate.add(1, 'months');
+			writeTitleDate();
+		});
+
+		$('#btn_today').click(function() {
+			rdate = moment();
+			writeTitleDate();
+		});
+		
+		$('#sel_bundle').on('change', function () {
+
+			writeTitleDate();
+		});
+	});
+	
+	var idate;
+	function writeTitleDate() {
+		$('.fc-title').css('font-size', '1.5em');
+		idate = rdate.format("YYYY-MM");
+		var bundleId = $("#sel_bundle").val();
+		$('#tit_date').text(idate);
+
+		//중복될경우 종료
+		//if (SearchedDate.has(idate)) return;
+		$.ajax({
+			url : "/calendar/get/statistics",
+			type : "GET",
+			data : {
+				yyyymm : idate,
+				bundleId : bundleId
+			},
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (data) {
+				
+				var startWeek = rdate.startOf('month').isoWeekday();
+				startWeek = (startWeek == 7 ? 1 : startWeek + 1);
+				endDay = rdate.endOf('month').format("DD");
+
+				var day = 1, loop = 1, w1 = 0, w2 = 0, w3 = 0, w4 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0;
+				var val1, val2, val3, val4, html;
+				$("#cal1").find('tbody td').each (function() {
+					$(this).empty();
+					
+					if (loop >= startWeek && endDay >= day && (loop % 8 != 0 || loop == 0)) {
+						
+						val1 = parseInt(data.sample[day]);
+						val2 = parseInt(data.analysis[day]);
+						val3 = parseInt(data.complete[day]);
+						val4 = parseInt(data.completePdf[day]);
+						
+						html = '' + day;
+						html += '<div>';
+						if (val1) {
+							w1 += val1; t1 += val1;
+							html += ' <a href="#" onClick="calPopupOnload(\''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
+								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + val1 + '</a>';
+						}
+						if (val2) {
+							w2 += val2; t2 += val2;
+							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
+								+ ' class="btn bg-info btn-xs p-l-10 p-r-10 m-b-5">' + val2 + '</a>';
+						}
+						if (val3) {
+							w3 += val3; t3 += val3;
+							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
+								+ ' class="btn bg-orange btn-xs p-l-10 p-r-10 m-b-5">' + val3 + '</a>';
+						}
+						if (val4) {
+							w4 += val4; t4 += val4;
+							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
+								+ ' class="btn bg-red btn-xs p-l-10 p-r-10 m-b-5">' + val4 + '</a>';
+						}
+						html += '</div>';
+						$(this).append(html);
+						day++;
+					} else if (loop % 8 == 0 && loop != 0) {
+						html = '&nbsp;<div>';
+						if (w1 > 0) {
+							html += '<a href="#" onClick="calPopupOnload(\''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + w1 + '</a>';
+						}
+						if (w2 > 0) {
+							html += '<a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+								+ ' class="btn bg-info btn-xs p-l-10 p-r-10 m-b-5">' + w2 + '</a>';
+						}
+						if (w3 > 0) {
+							html += '<a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+								+ ' class="btn bg-orange btn-xs p-l-10 p-r-10 m-b-5">' + w3 + '</a>';
+						}
+						if (w4 > 0) {
+							html += '<a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+								+ ' class="btn bg-red btn-xs p-l-10 p-r-10 m-b-5">' + w4 + '</a>';
+						}
+						html += '</div>';
+						$(this).append(html);
+						w1 = 0, w2 = 0, w3 = 0, w4 = 0;
+					}
+					loop++;
+				});
+				$("#total1").text('' + t1);
+				$("#total2").text('' + t2);
+				$("#total3").text('' + t3);
+				$("#total4").text('' + t4);
+				
+				
+				
+			},
+			error : function(data) {
+				
+			}
+		});
+	}
+	
+	function dayToDate(day) {
+		return "'" + idate + "-" + fillzero(day, 2) + "'"
+			+ ",'" + idate + "-" + fillzero(day, 2) + "'";
+	}
+	
+	function dayToBetweenDate(day) {
+		return "'" + idate + "-" + fillzero(day - 6, 2) + "'"
+			+ ",'" + idate + "-" + fillzero(day, 2) + "'";
+	}
+	
+	function fillzero(obj, len) {
+		obj = '000000000000000' + obj;
+		return obj.substring(obj.length - len);
+	}
+	
+	function numberWithCommas(x) {
+	    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	
+	/*
+	{
+                title: "All Day Event",
+                start: e + "-" + n + "-01"
+            }, {
+                title: "Long Event",
+                start: e + "-" + n + "-07",
+                end: e + "-" + n + "-10"
+            
+            }, {
+                title: "Meeting",
+                start: e + "-" + n + "-12T10:30:00",
+                end: e + "-" + n + "-12T12:30:00"
+            }, {
+                title: "Birthday Party",
+                start: e + "-" + n + "-13T07:00:00"
+            }
+	*/
+		/* ]]> */
+	</script>
+	<form name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="startDate" id="startDate" value="" />
+		<input type="hidden" name="finishDate" id="finishDate" value="" />
+	</form>
+</body>
+</html>
