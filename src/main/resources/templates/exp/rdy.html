@@ -77,6 +77,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								</div>
 								<div>
 									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
+									<button onClick="startExp();" class="btn btn-success m-l-20">실험시작</button>
 								</div>
 							</div>
 							<hr/>
@@ -186,22 +187,22 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				return '<string>' + (index + 1) + '</string>';
 			}
 		}, {
+			title : "상품",
+			data : "bundle.name"
+		}, {
 			title : "Laboratory",
-			data : "sample.id",
-			render : function(row, data, index) {
-				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
-			}
+			data : "laboratoryId"
 		}, {
 			title : "Barcode",
-			data : "sample.barcode"
+			data : "barcode"
 		}, {
-			title : "Product",
-			data : "sample.bundle.name",
+			title : "검체종류",
+			data : "items.sampleType"
 		}, {
-			title : "Chip Number",
-			data : "chipNumber",
+			title : "검체 채취일",
+			data : "items.sampleCollected"
 		}, {
-			title : "Status",
+			title : "상태",
 			data : "statusCode",
 			render : function(row, data, index) {
 				var value = g_statusCodeInfo[data];
@@ -210,12 +211,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			serverHeader : true
 		}, {
-			title : "Experiment Date",
+			title : "검체 입고일",
 			data : "createdDate",
 			type : "date"
-		}, {
-			title : "Experiment user",
-			data : "member.name",
 		}]);
 	}
 	
@@ -223,21 +221,21 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		UserTable.reload('_rdy_grid');
 	}
 	
-	function createPdf() {
+	function startExp() {
 		var checkedRows = UserTable.getCheckedRows("_rdy_grid");
 		if (checkedRows.length > 0) {
 			CommonMsg.okCancel(function() {
-				var resultIds = [];
+				var sampleIds = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
-					resultIds.push(row.id);
+					sampleIds.push(row.id);
 				}
-				
+				console.log(sampleIds);
 				$.ajax({
-		            url: '/work/complete/recreate/pdf/multi',
+		            url: '/exp/rdy/start',
 			        type : "post",
 			        dataType : 'json',
-			        data : {resultIds : resultIds},
+			        data : {sampleIds : sampleIds},
 			        beforeSend: function(xhr) {
 						xhr.setRequestHeader(header, token);
 					},
