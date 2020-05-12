@@ -34,11 +34,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
 				<li class="breadcrumb-item">Home</li>
-				<li class="breadcrumb-item">Work</li>
-				<li class="breadcrumb-item active">Complete</li>
+				<li class="breadcrumb-item">실험</li>
+				<li class="breadcrumb-item active">STEP1</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header" th:text="#{menu.complete}">Complete</h1>
+			<h1 id="page-header" class="page-header">실험 - STEP1</h1>
 			<!-- end page-header -->
 			
 			<!-- begin content panel -->
@@ -46,9 +46,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				<div class="col-xl-12">
 					<ul class="nav nav-tabs">
 						<li class="nav-item">
-							<a href="#complete-tab-1" data-toggle="tab" class="nav-link active">
+							<a href="#step1-tab-1" data-toggle="tab" class="nav-link active">
 								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none" th:text="#{common.list}">List</span>
+								<span class="d-sm-block d-none">목록</span>
 							</a>
 						</li>
 					</ul>
@@ -56,9 +56,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<!-- begin tab content -->
 					<div class="tab-content">
 						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="complete-tab-1">
+						<div class="tab-pane fade active show" id="step1-tab-1">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
+								<label class="col-form-label col-md-1">상품</label>
 								<div>
 									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
 										<option value="">All</option>
@@ -71,17 +71,27 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span>
 								</div>
-								<label class="col-form-label col-md-1" th:text="#{common.keyword}">Key word</label>
+								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10" th:text="#{common.search}">Search</button>
-									<button onClick="createPdf();" class="btn btn-success m-l-20" th:text="#{page.complete.recreate}">Recreate Report PDF</button>
+									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
 								</div>
 							</div>
 							<hr/>
-							<div id="_complete_sample_grid"></div>
+							<div id="_step1_grid"></div>
+							<hr/>
+							<div class="row">
+								<form id="fileupload" method="POST" enctype="multipart/form-data">
+									<div class="hide">
+										<input type="file" id="file" name="file">
+									</div>
+								</form>
+								<button onClick="excelForm();" class="btn btn-success m-l-20">Excel Download</button>
+								<button onClick="excelUpload();" class="btn btn-warning m-l-20">Excel Upload</button>
+								<button onClick="completeStep1();" class="btn btn-yellow m-l-20">Step1 완료</button>
+							</div>
 						</div>
 						<!-- end tab-1 -->
 					</div>
@@ -142,13 +152,47 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_complete_sample_grid', true, [10, 50] , [10, 50]);
-		drawCompleteSampleGrid();
+		UserTable.init('_step1_grid', true, [10, 50] , [10, 50]);
+		drawStep1Grid();
+
+		$('#file').on('change', function () {
+			if ($("#file").val() == '') return;
+			
+			var form = $('#fileupload')[0];
+			console.log(form);
+			var data = new FormData(form);
+			$.ajax({
+				enctype: 'multipart/form-data',
+	            url: '/exp/step1/excel/import',
+				type: 'post',
+		        data : data,
+		        processData: false,
+		        contentType: false,
+		        beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+			    success: function(data,xhr) {
+			        if (data.result == "00") {
+						CommonMsg.save(function() { });
+					} else if (!data.result.startsWith("0")) {
+						CommonMsg.error(function() { });
+					}
+			    },
+			    error : function(xhr, status, error) {
+			    	CommonMsg.error(function() {});
+				},
+				complete : function() {
+					$("#file").val('');
+					// #. 새로고침
+					UserTable.reload('_step1_grid');
+				}
+			});
+		});
 	});
 	
-	function drawCompleteSampleGrid() {
-		UserTable.draw('_complete_sample_grid', {
-			url : "/work/complete/get",
+	function drawStep1Grid() {
+		UserTable.draw('_step1_grid', {
+			url : "/exp/step1/get",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -171,14 +215,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				name : "checkbox"
 			}
 		}, {
-			title : 'History',
-			data : "sample.id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
-			}
-		}, {
 			title : 'No', 
 			data : 'id',
 			headClassName : 'width-50',
@@ -187,22 +223,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				return '<string>' + (index + 1) + '</string>';
 			}
 		}, {
+			title : "상품",
+			data : "bundle.name"
+		}, {
 			title : "Laboratory",
-			data : "sample.id",
-			render : function(row, data, index) {
-				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
-			}
+			data : "laboratoryId"
 		}, {
-			title : "Barcode",
-			data : "sample.barcode"
+			title : "검체종류",
+			data : "items.sampleType"
 		}, {
-			title : "Product",
-			data : "sample.bundle.name",
+			title : "검체 채취일",
+			data : "items.sampleCollected"
 		}, {
-			title : "Chip Number",
-			data : "chipNumber",
-		}, {
-			title : "Status",
+			title : "상태",
 			data : "statusCode",
 			render : function(row, data, index) {
 				var value = g_statusCodeInfo[data];
@@ -211,34 +244,48 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			serverHeader : true
 		}, {
-			title : "Experiment Date",
+			title : "검체 입고일",
 			data : "createdDate",
 			type : "date"
 		}, {
-			title : "Experiment user",
-			data : "member.name",
+			title : "A 260/280",
+			data : "a260280"
+		}, {
+			title : "농도 (ng/μL)",
+			data : "cncnt"
+		}, {
+			title : "DNA QC",
+			data : "dnaQc"
 		}]);
 	}
 	
 	function search() {
-		UserTable.reload('_complete_sample_grid');
+		UserTable.reload('_step1_grid');
+	}
+
+	function excelForm() {
+		location.href = '/exp/step1/excel/form';
 	}
 	
-	function createPdf() {
-		var checkedRows = UserTable.getCheckedRows("_complete_sample_grid");
+	function excelUpload() {
+		$('#file').trigger('click'); 
+	}
+	
+	function completeStep1() {
+		var checkedRows = UserTable.getCheckedRows("_step1_grid");
 		if (checkedRows.length > 0) {
 			CommonMsg.okCancel(function() {
-				var resultIds = [];
+				var sampleIds = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
-					resultIds.push(row.id);
+					sampleIds.push(row.id);
 				}
 				
 				$.ajax({
-		            url: '/work/complete/recreate/pdf/multi',
+		            url: '/exp/step1/complete',
 			        type : "post",
 			        dataType : 'json',
-			        data : {resultIds : resultIds},
+			        data : {sampleIds : sampleIds},
 			        beforeSend: function(xhr) {
 						xhr.setRequestHeader(header, token);
 					},
@@ -246,7 +293,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    	if (data.result == "00") {
 				    		CommonMsg.save(function() {
 				    			$("#modal-sample-detail").modal('hide');
-				    			UserTable.reload('_complete_sample_grid');
+				    			UserTable.reload('_step1_grid');
 							});
 						} else if (!data.result.startsWith("0")) {
 							CommonMsg.error(function() { });

@@ -77,11 +77,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								</div>
 								<div>
 									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
-									<button onClick="startExp();" class="btn btn-success m-l-20">실험시작</button>
 								</div>
 							</div>
 							<hr/>
 							<div id="_rdy_grid"></div>
+							<hr/>
+							<div class="row">
+								<button onClick="startExp();" class="btn btn-success m-l-20">실험시작</button>
+							</div>
 						</div>
 						<!-- end tab-1 -->
 					</div>
@@ -171,14 +174,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				name : "checkbox"
 			}
 		}, {
-			title : 'History',
-			data : "sample.id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
-			}
-		}, {
 			title : 'No', 
 			data : 'id',
 			headClassName : 'width-50',
@@ -192,9 +187,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			title : "Laboratory",
 			data : "laboratoryId"
-		}, {
-			title : "Barcode",
-			data : "barcode"
 		}, {
 			title : "검체종류",
 			data : "items.sampleType"
@@ -230,7 +222,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					var row = checkedRows[i];
 					sampleIds.push(row.id);
 				}
-				console.log(sampleIds);
+
 				$.ajax({
 		            url: '/exp/rdy/start',
 			        type : "post",
