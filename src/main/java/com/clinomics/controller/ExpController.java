@@ -84,4 +84,9 @@ public class ExpController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return dleeService.completeStep1(sampleIds, userDetails.getUsername());
 	}
+
+	@GetMapping("/step2/get")
+	public Map<String, Object> getStep2(@RequestParam Map<String, String> params) {
+		return dleeService.findSampleByExpStep2Status(params);
+	}
 }

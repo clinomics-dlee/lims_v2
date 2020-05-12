@@ -266,4 +266,33 @@ public class DleeService {
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
+
+	public Map<String, Object> findSampleByExpStep2Status(Map<String, String> params) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+		long total;
+		
+		Specification<Sample> where = Specification
+					.where(DleeSpecification.betweenDate(params))
+					.and(DleeSpecification.bundleId(params))
+					.and(DleeSpecification.keywordLike(params))
+					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.EXP_STEP2)));
+		
+		total = dleeRepository.count(where);
+		Page<Sample> page = dleeRepository.findAll(where, pageable);
+		List<Sample> list = page.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
 }
