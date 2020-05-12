@@ -4869,9 +4869,11 @@ blockquote-reverse, blockquote.pull-right {
 	background-repeat: no-repeat;
     background-position: center center;
     background-size: 50% 50%;
-	position: absolute;
+    position: absolute;
+    /* deleted dlee
 	top: 7px;
-	left: 0;
+    left: 0;
+    */
 	color: #fff;
 	height: 16px;
 	width: 16px;
