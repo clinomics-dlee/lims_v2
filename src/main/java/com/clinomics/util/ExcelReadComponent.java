@@ -103,7 +103,7 @@ public class ExcelReadComponent {
 						if (cell.getCellTypeEnum() == CellType.FORMULA) { // 수식처리한 셀(A1+B1)을 가져올 경우
 							value = cell.getCellFormula();
 						} else if (cell.getCellTypeEnum() == CellType.NUMERIC) { // 숫자형의 경우 ( 기본:double)
-							value = (int) cell.getNumericCellValue() + ""; // int로 반환
+							value = cell.getNumericCellValue() + ""; // int로 반환
 						} else if (cell.getCellTypeEnum() == CellType.STRING) { // 문자형값
 							value = cell.getStringCellValue().trim();
 						} else if (cell.getCellTypeEnum() == CellType.BOOLEAN) { // BOOLEAN형
