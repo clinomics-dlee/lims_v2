@@ -92,49 +92,52 @@ public class SampleSpecification {
 		};
 	}
 	
-	public static Specification<Sample> notExistsResult() {
+	public static Specification<Sample> statusIn(List<StatusCode> statusCodes) {
 		return (root, query, criteriaBuilder) -> {
-			// Subquery<Result> subquery = query.subquery(Result.class);
-			// Root<Result> subqueryRoot = subquery.from(Result.class);
-			// subquery.select(subqueryRoot);
 			
-			// Predicate predicate = criteriaBuilder.equal(subqueryRoot.get("sample").get("id"), root.get("id"));
-			// subquery.select(subqueryRoot).where(predicate);
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
 			
-			// return criteriaBuilder.not(criteriaBuilder.exists(subquery));
-			return null;
+			predicatesAnds.add(criteriaBuilder.and(root.get("statusCode").in(statusCodes)));
+			
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
 		};
 	}
 	
-	public static Specification<Sample> existsResultStatusIn(List<StatusCode> statusCodes) {
+	public static Specification<Sample> equalStatus(StatusCode statusCode) {
 		return (root, query, criteriaBuilder) -> {
-			// Subquery<Result> subquery = query.subquery(Result.class);
-			// Root<Result> subqueryRoot = subquery.from(Result.class);
-			// subquery.select(subqueryRoot);
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
 			
-			// List<Predicate> predicatesAnds = new ArrayList<>();
-			// predicatesAnds.add(criteriaBuilder.equal(subqueryRoot.get("sample").get("id"), root.get("id")));
-			// predicatesAnds.add(subqueryRoot.get("statusCode").in(statusCodes));
-			// subquery.select(subqueryRoot).where(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			predicatesAnds.add(criteriaBuilder.equal(root.get("statusCode"), statusCode));
 			
-			// return criteriaBuilder.exists(subquery);
-			return null;
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
 		};
 	}
 	
-	public static Specification<Sample> notExistsResultNotEqualStatus(StatusCode statusCode) {
+	public static Specification<Sample> notEqualStatus(StatusCode statusCode) {
 		return (root, query, criteriaBuilder) -> {
-			// Subquery<Result> subquery = query.subquery(Result.class);
-			// Root<Result> subqueryRoot = subquery.from(Result.class);
-			// subquery.select(subqueryRoot);
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
 			
-			// List<Predicate> predicatesAnds = new ArrayList<>();
-			// predicatesAnds.add(criteriaBuilder.equal(subqueryRoot.get("sample").get("id"), root.get("id")));
-			// predicatesAnds.add(criteriaBuilder.not(criteriaBuilder.equal(subqueryRoot.get("statusCode"), statusCode)));
-			// subquery.select(subqueryRoot).where(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			predicatesAnds.add(criteriaBuilder.notEqual(root.get("statusCode"), statusCode));
 			
-			// return criteriaBuilder.not(criteriaBuilder.exists(subquery));
-			return null;
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+	
+	public static Specification<Sample> bundleIsActive() {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+			
+			predicatesAnds.add(criteriaBuilder.isTrue(root.get("bundle").get("isActive")));
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			
+			return rtn;
 		};
 	}
 }

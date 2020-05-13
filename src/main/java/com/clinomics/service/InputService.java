@@ -35,7 +35,7 @@ import com.clinomics.util.CustomIndexPublisher;
 import com.google.common.collect.Maps;
 
 @Service
-public class SampleService {
+public class InputService {
 
 	@Autowired
 	SampleRepository sampleRepository;
@@ -87,11 +87,8 @@ public class SampleService {
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(
-						SampleSpecification.notExistsResult()
-//						.or(SampleSpecification.existsResultStatusIn(Arrays.asList(StatusCode.FAIL))
-						.or(SampleSpecification.notExistsResultNotEqualStatus(StatusCode.ANLS_FAIL))
-					);
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.equalStatus(StatusCode.INPUT_READY));
 					
 		
 		total = sampleRepository.count(where);

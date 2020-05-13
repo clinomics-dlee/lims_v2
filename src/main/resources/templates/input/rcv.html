@@ -4,6 +4,14 @@ xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <th:block th:replace="layout/head"></th:block>
+    <style>
+	
+	#table_form td, #table_form th {
+		padding: 2px 10px;
+		border: 0;
+	}
+	
+	</style>
 </head>
 <body class="pace-done">
 	<!-- begin #page-loader -->
@@ -25,83 +33,103 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_history"></th:block>
-		<th:block th:replace="popup/result"></th:block>
 		<th:block th:replace="popup/sample_detail"></th:block>
-		<th:block th:replace="popup/sample_detail_readonly"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">Home</li>
-				<li class="breadcrumb-item">Work</li>
-				<li class="breadcrumb-item active">Complete</li>
+				<li class="breadcrumb-item">입고</li>
+				<li class="breadcrumb-item active">검체입고</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header" th:text="#{menu.complete}">Complete</h1>
-			<!-- end page-header -->
+			<h1 id="page-header" class="page-header">검체입고</h1>
 			
-			<!-- begin content panel -->
 			<div class="row">
 				<div class="col-xl-12">
+					
 					<ul class="nav nav-tabs">
 						<li class="nav-item">
-							<a href="#complete-tab-1" data-toggle="tab" class="nav-link active">
+							<a href="#collect-tab-4" data-toggle="tab" class="nav-link active">
 								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none" th:text="#{common.list}">List</span>
+								<span class="d-sm-block d-none">입고</span>
 							</a>
 						</li>
+						<!-- <li class="nav-item">
+							<a href="#collect-tab-2" data-toggle="tab" class="nav-link">
+								<span class="d-sm-none">Tab 2</span>
+								<span class="d-sm-block d-none">Excel import</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#collect-tab-3" data-toggle="tab" class="nav-link">
+								<span class="d-sm-none">Tab 3</span>
+								<span class="d-sm-block d-none">Single Resistration</span>
+							</a>
+						</li> -->
 					</ul>
 					
-					<!-- begin tab content -->
 					<div class="tab-content">
-						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="complete-tab-1">
+						<!-- begin tab-pane -->
+						<div class="tab-pane fade" id="collect-tab-1">
+					
 							<div class="form-group row m-b-12">
 								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
-								<div>
-									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
-										<option value="">All</option>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_bundle">
+										<option th:text="#{common.all}" value>All</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
-								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
+								
+								<label class="col-form-label" th:text="#{common.createdDate}">Created date</label>
+								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
-								    <span class="input-group-append">
+								    <!-- <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
-									</span>
+									</span> -->
 								</div>
 								<label class="col-form-label col-md-1" th:text="#{common.keyword}">Key word</label>
 								<div class="col-xs-push-0">
+									
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10" th:text="#{common.search}">Search</button>
-									<button onClick="createPdf();" class="btn btn-success m-l-20" th:text="#{page.complete.recreate}">Recreate Report PDF</button>
+									<button onClick="search();" class="btn btn-default m-l-10 " th:text="#{common.search}">Search</button>
 								</div>
 							</div>
 							<hr/>
-							<div id="_complete_sample_grid"></div>
+							<div id="_collect_grid">
+							</div>
 						</div>
-						<!-- end tab-1 -->
 					</div>
-					<!-- end tab content -->
 				</div>
 			</div>
-			<!-- end content panel -->
+			
+			
+			
+			<div class="panel panel-inverse">
+				<!-- begin panel-heading -->
+				
+				<!-- end panel-body -->
+			</div>
+			<!-- end panel -->
 		</div>
 		
 		<!-- end #content -->
 		<!-- begin scroll to top btn -->
 		<!-- end scroll to top btn -->
 	</div>
+	
+	<input type="hidden" name="startDate" id="startDate" value="" />
+	<input type="hidden" name="finishDate" id="finishDate" value="" />
 	<!-- end page container -->
 	
 	
 	<script th:inline="javascript">
-	/* <![CDATA[ */
+	/* <![CDATA[ */       
 
-	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	var tables = [];
+	var count;
 	
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
@@ -110,19 +138,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	$(document).ready(function() {
 		App.init();
 		
-		$('#sel_bundle').on('change', function () {
-			//search();
+		TableManageDefault.init();
+		
+		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
+		
+		$('#sel_bundle3, #sel_bundle4').on('change', function () {
+			initForm($(this).attr('id'));
 		});
 		
-		$("#keyword").keydown(function(key) {
-			if (key.keyCode == 13) {
-				search();
-			}
-		});
-		
-		//set search date
 		$('#default-daterange').daterangepicker({
-			opens: 'left',
+			opens: 'right',
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: moment().subtract(1, 'months'),
@@ -142,13 +167,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_complete_sample_grid', true, [10, 50] , [10, 50]);
-		drawCompleteSampleGrid();
-	});
-	
-	function drawCompleteSampleGrid() {
-		UserTable.draw('_complete_sample_grid', {
-			url : "/work/complete/get",
+		UserTable.draw('_collect_grid', {
+			url : "/input/get",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -159,115 +179,343 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				};
 				return param;
 			},
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
 			beforeSend : function(xhr) {
 				xhr.setRequestHeader(header, token);
 			}
-		}, [{
-			title : ' ',
-			data : "id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			type : {
-				name : "checkbox"
-			}
-		}, {
-			title : 'History',
-			data : "sample.id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
-			}
-		}, {
-			title : 'No', 
-			data : 'id',
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<string>' + (index + 1) + '</string>';
-			}
-		}, {
-			title : "Laboratory",
-			data : "sample.id",
-			render : function(row, data, index) {
-				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
-			}
-		}, {
-			title : "Barcode",
-			data : "sample.barcode"
-		}, {
-			title : "Product",
-			data : "sample.bundle.name",
-		}, {
-			title : "Chip Number",
-			data : "chipNumber",
-		}, {
-			title : "Status",
-			data : "statusCode",
-			render : function(row, data, index) {
-				var value = g_statusCodeInfo[data];
-				return value;
-			}
-		}, {
-			serverHeader : true
-		}, {
-			title : "Experiment Date",
-			data : "createdDate",
-			type : "date"
-		}, {
-			title : "Experiment user",
-			data : "member.name",
-		}]);
-	}
-	
-	function search() {
-		UserTable.reload('_complete_sample_grid');
-	}
-	
-	function createPdf() {
-		var checkedRows = UserTable.getCheckedRows("_complete_sample_grid");
-		if (checkedRows.length > 0) {
-			CommonMsg.okCancel(function() {
-				var resultIds = [];
-				for (var i = 0; i < checkedRows.length; i++) {
-					var row = checkedRows[i];
-					resultIds.push(row.id);
+		}, [ 
+			
+			{
+				title : 'No', 
+				data : 'id',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					return '<string>' + (index + 1) + '</string>';
 				}
-				
-				$.ajax({
-		            url: '/work/complete/recreate/pdf/multi',
-			        type : "post",
-			        dataType : 'json',
-			        data : {resultIds : resultIds},
-			        beforeSend: function(xhr) {
-						xhr.setRequestHeader(header, token);
-					},
-				    success: function(data, xhr) {
-				    	if (data.result == "00") {
-				    		CommonMsg.save(function() {
-				    			$("#modal-sample-detail").modal('hide');
-				    			UserTable.reload('_complete_sample_grid');
-							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
-						}
-					},
-					error : function(data) {
-						CommonMsg.error(function() { });
-					},
-					complete : function() {
+			},
+			{
+				title : '실험실', 
+				data : 'id'
+			},
+			{
+				title : '바코드', 
+				data : 'barcode'
+			},
+			{
+				title : '상품', 
+				data : 'bundle.name'
+			},
+			{
+				serverHeader : true
+			},
+			{
+				title : '검체 등록일자', 
+				data : 'createdDate',
+				type : 'date'
+			},
+			{
+				title : '등록자', 
+				data : 'member.name'
+			}
+		], null);
+			
+		
+		
+		$('#file').on('change', function () {
+			/* var fileValue = $("#file").val().split("\\");
+			var fileName = fileValue[fileValue.length-1]; // 파일명
+			alert(fileName);
+			$('#import_file').text(fileName); */
+			if ($("#file").val() == '') return;
+			$("#frmBundleId").val($("#sel_bundle4").val());
+			
+			var form = $('#fileupload')[0];
+			var data = new FormData(form);
+			
+			$.ajax({
+				enctype: 'multipart/form-data',
+	            url: '/input/excel/import',
+				type: 'post',
+		        data : data,
+		        processData: false,
+		        contentType: false,
+		        beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+			        var percentVal = '0%';
+					$("#progress").show();
+					$("#progress div div").width(percentVal);
+					$("#progress div div").text(percentVal);
+				},
+				/* xhr: function() {
+					var xhr = $.ajaxSettings.xhr();
+					xhr.upload.onprogress = function(e) {
+						var percent = e.loaded * 100 / e.total;
+						var percentVal = percent + '%';
+						$("#progress div div").width(percentVal);
+						$("#progress div div").text(percentVal);
+					};
+					return xhr;
+				}, */
+			    success: function(data,xhr) {
+			        if (data.result == "00") {
+				        var percentVal = '100%';
+						$("#progress div div").width(percentVal);
+						$("#progress div div").text(percentVal);
 						
+						excelImport();
+						
+						CommonMsg.save(function() { });
+					} else if (!data.result.startsWith("0")) {
+						CommonMsg.error(function() { });
 					}
-				});
+			    },
+			    error : function(xhr, status, error) {
+			    	CommonMsg.error(function() {
+						
+					});
+				},
+				complete : function() {
+					$("#file").val('');
+					$("#progress").hide();
+					//$(".progress-bar").width('0%');
+					//$(".progress-bar").text('0%');
+					
+					//excelImport();
+					
+				}
+			});
+		});
+		
+	});
+	
+	function excelForm() {
+		if ($("#sel_bundle4").parsley().validate() != true) return;
+		
+		var bundleId = $("#sel_bundle4").val();
+		//if (bundleId == "") return;
+		
+		location.href = '/input/excel/form?bundleId=' + bundleId;
+	}
+	
+	function excelUpload() {
+		if ($("#sel_bundle4").parsley().validate() != true) return;
+		
+		$('#file').trigger('click'); 
+		
+	}
+	
+	function setDatepicker(aDateInputs) {
+		
+		for (var e in aDateInputs) {
+			
+			$('input[name="' + aDateInputs[e] + '"]').datepicker({
+				dateFormat : 'yy-mm-dd'
 			});
 		}
 	}
 	
+	function save() {
+		if (!$('#frm_new').parsley().validate()) {
+			return;	
+		}
+		
+		$.ajax({
+            url: '/input/save',
+			type: 'post',
+	        data : JSON.stringify($('#frm_new').serializeObject()),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result == "00") {
+					CommonMsg.save(function() {
+						$("#frm_new")[0].reset();
+					});
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function importExcelToTable() {
+		var rows = $('#_import_grid table tbody tr');
+		if (rows.length < 1) {
+			return;
+		}
+		
+		$.ajax({
+            url: '/input/import',
+			type: 'get',
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result == "00") {
+					CommonMsg.save(function() {
+						
+					});
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function initForm(id) {
+		if ($("#" + id).parsley().validate() != true) return;
+		var bundleId = $("#" + id).val();
+		$.ajax({
+			url : "/input/itemby/bundle/" + bundleId,
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (rtn) {
+				
+				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
+				var notnull = false, readonly = '';
+				
+				var data = rtn.sampleItem;
+				var bundle = rtn.bundle;
+								
+				if (data) {
+					
+					html = '<form id="frm_new" data-parsley-validate="true">';
+					html += '<table id="table_form" class="table">';
+					autoComplete = 'autocomplete="off"';
+					for (var r in data) {
+						readonly = '';
+						notnull = data[r].notNull;
+						if ((bundle.autoSequence && data[r].nameCode == "laboratory")
+							|| (bundle.autoBarcode && data[r].nameCode == "barcode")) {
+							
+							readonly = ' readonly';
+							notnull = false;
+						}
+						
+						//html += '<div class="form-group row m-b-15">';
+						if (r % 2 == 0) html += '<tr>'
+						html += '<th>';
+						html += data[r].name;
+						html += ' <th>';
+						html += '<td>';
+						if (data[r].type == "select" && data[r].selectValue) {
+							html += '<select class="form-control form-control-sm"' + (notnull ? parsley : '') + ' name="' + data[r].nameCode + '">';
+							aSplit = data[r].selectValue.split(",");
+							for (var a in aSplit) {
+								html += '<option value="' + aSplit[a] + '">' + aSplit[a] + '</option>';
+							}
+							html += '</select>';
+						} else if (data[r].type == "date") {
+							aDateInputs.push(data[r].nameCode);
+							html += '<div class="input-group" data-provide="datepicker">';
+							html += '<input type="text" class="form-control form-control-sm"'
+								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + '"' : '')
+								+ ' placeholder="click to select the date range" '
+								+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
+							html += '<span class="input-group-append">';
+							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
+							html += '</span>';
+							html += '</div><div id="error_' + data[r].nameCode + '"></div>';
+						} else {
+							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+								+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" ' + autoComplete;
+							
+							html += readonly
+							html += '/>';
+						}
+						
+						html += '</td>';
+						if (r % 2 == 1) html += '</tr>'
+					}
+					
+					html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
+					html += '</table>';
+					html += '</form>';
+					html += '<hr/>';
+					
+					html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
+					
+					$("#add_single_sample" + id.charAt(id.length - 1)).html(html);
+				}
+				
+				setDatepicker(aDateInputs);
+				
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			}
+		});
+	}
+	
+	function search() {
+		UserTable.reload('_collect_grid');
+	}
+	
+	function excelImport() {
+		if ($("#sel_bundle4").parsley().validate() != true) {
+			return;
+		}
+		var bundleId = $("#sel_bundle4").val();
+		
+		
+		UserTable.init('_import_grid', true, [10, 50] , [10, 50]);
+		
+		UserTable.draw('_import_grid', {
+			url : "/input/get/temp",
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			}
+		}, [ ], function(data) {
+			var html = '', headHtml = '<tr>';
+			for (var s in data) {
+				html += '<tr>';
+				var items = data[s].items;
+				var fields = Object.keys(items);
+				for (var r in fields) {
+					var val = items[fields[r]];
+					html += '<td>' + (val ? val : '') + '</td>';
+					if (s == 0) headHtml += '<th>' + (fields[r] ? fields[r] : '') + '</th>';
+				}
+				html += '</tr>';
+			}
+			headHtml += '</tr>';
+			var rtn = {
+				html : html,
+				headHtml : headHtml
+			};
+			return rtn;
+		});
+	}
+	
+	
+	
 	/* ]]> */
 	</script>
 	
-	<input type="hidden" name="startDate" id="startDate" value="" />
-	<input type="hidden" name="finishDate" id="finishDate" value="" />
-
 </body>
 </html>
