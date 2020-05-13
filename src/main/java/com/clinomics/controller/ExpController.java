@@ -89,4 +89,10 @@ public class ExpController {
 	public Map<String, Object> getStep2(@RequestParam Map<String, String> params) {
 		return dleeService.findSampleByExpStep2Status(params);
 	}
+
+	@PostMapping("/step2/qrtPcr/update")
+	public Map<String, String> updateQrtPcr(@RequestParam("sampleIds[]") List<String> sampleIds) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return dleeService.updateQrtPcr(sampleIds, userDetails.getUsername());
+	}
 }

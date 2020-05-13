@@ -20,6 +20,7 @@ import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.entity.lims.SampleItem;
 import com.clinomics.entity.lims.SampleTemp;
+import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
@@ -230,13 +231,21 @@ public class DleeService {
 			}
 			
 			for (Sample sample : samples) {
-				sample.setA260280((String)sht.get("A 260/280"));
-				sample.setCncnt((String)sht.get("농도 (ng/μL)"));
-				sample.setDnaQc((String)sht.get("DNA QC"));
+				String a260280 = (String)sht.get("A 260/280");
+				String cncnt = (String)sht.get("농도 (ng/μL)");
+				String dnaQc = (String)sht.get("DNA QC");
+				
+				if (!NumberUtils.isCreatable(a260280) || !NumberUtils.isCreatable(a260280)) {
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					return rtn;
+				}
+
+				sample.setA260280(a260280);
+				sample.setCncnt(cncnt);
+				sample.setDnaQc(dnaQc);
 				
 				items.add(sample);
 			}
-
 		}
 		
 		dleeRepository.saveAll(items);
@@ -294,5 +303,24 @@ public class DleeService {
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
+	@Transactional
+	public Map<String, String> updateQrtPcr(List<String> sampleIds, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+
+		for (String id : sampleIds) {
+			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
+			Sample sample = oSample.orElseThrow(NullPointerException::new);
+
+			sample.setGenotypingMethodCode(GenotypingMethodCode.QRT_PCR);
+
+			dleeRepository.save(sample);
+		}
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
 	}
 }

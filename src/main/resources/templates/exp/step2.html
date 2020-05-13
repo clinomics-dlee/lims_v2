@@ -58,7 +58,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<!-- begin tab-1 -->
 						<div class="tab-pane fade active show" id="step1-tab-1">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1">상품</label>
+								<label class="col-form-label col-md-1">서비스</label>
 								<div>
 									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
 										<option value="">All</option>
@@ -112,6 +112,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	/* <![CDATA[ */
 
 	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	var g_genotypingMethodCodeInfo = /*[[${genotypingMethodCodes}]]*/ {};
 	
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
@@ -222,7 +223,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				return '<string>' + (index + 1) + '</string>';
 			}
 		}, {
-			title : "상품",
+			title : "서비스",
 			data : "bundle.name"
 		}, {
 			title : "검사실 ID",
@@ -235,7 +236,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			}
 		}, {
 			title : "Genotyping Method",
-			data : "genotypingMethod"
+			data : "genotypingMethodCode",
+			render : function(row, data, index) {
+				var value = g_genotypingMethodCodeInfo[data];
+				return value;
+			}
 		}, {
 			title : "검체종류",
 			data : "items.sampleType"
@@ -272,31 +277,42 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 
 	function updateQrtPcr() {
-		$.ajax({
-			url: '/exp/step2/complete',
-			type : "post",
-			dataType : 'json',
-			data : {sampleIds : sampleIds},
-			beforeSend: function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success: function(data, xhr) {
-				if (data.result == "00") {
-					CommonMsg.save(function() {
-						$("#modal-sample-detail").modal('hide');
-						UserTable.reload('_step2_grid');
-					});
-				} else if (!data.result.startsWith("0")) {
-					CommonMsg.error(function() { });
+		var checkedRows = UserTable.getCheckedRows("_step2_grid");
+		if (checkedRows.length > 0) {
+			CommonMsg.okCancel(function() {
+				var sampleIds = [];
+				for (var i = 0; i < checkedRows.length; i++) {
+					var row = checkedRows[i];
+					sampleIds.push(row.id);
 				}
-			},
-			error : function(data) {
-				CommonMsg.error(function() { });
-			},
-			complete : function() {
 				
-			}
-		});
+				$.ajax({
+		            url: '/exp/step2/qrtPcr/update',
+			        type : "post",
+			        dataType : 'json',
+			        data : {sampleIds : sampleIds},
+			        beforeSend: function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+				    success: function(data, xhr) {
+				    	if (data.result == "00") {
+				    		CommonMsg.save(function() {
+				    			$("#modal-sample-detail").modal('hide');
+				    			UserTable.reload('_step2_grid');
+							});
+						} else if (!data.result.startsWith("0")) {
+							CommonMsg.error(function() { });
+						}
+					},
+					error : function(data) {
+						CommonMsg.error(function() { });
+					},
+					complete : function() {
+						
+					}
+				});
+			});
+		}
 	}
 	
 	function excelUpload() {

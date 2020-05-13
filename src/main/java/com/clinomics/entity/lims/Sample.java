@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.clinomics.config.StringMapConverter;
+import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.StatusCode;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -57,8 +58,8 @@ public class Sample implements Serializable {
 	
 	private String dnaQc;
 	
-	@Column(length = 100)
-	private String genotypingMethod;
+	@Enumerated(EnumType.STRING)
+	private GenotypingMethodCode genotypingMethodCode;
 
 	@Column(length = 100)
 	private String mappingNo;
@@ -245,12 +246,12 @@ public class Sample implements Serializable {
 		this.items = items;
 	}
 
-	public String getGenotypingMethod() {
-		return genotypingMethod;
+	public GenotypingMethodCode getGenotypingMethodCode() {
+		return genotypingMethodCode;
 	}
 
-	public void setGenotypingMethod(String genotypingMethod) {
-		this.genotypingMethod = genotypingMethod;
+	public void setGenotypingMethodCode(GenotypingMethodCode genotypingMethodCode) {
+		this.genotypingMethodCode = genotypingMethodCode;
 	}
 
 	public String getMappingNo() {
