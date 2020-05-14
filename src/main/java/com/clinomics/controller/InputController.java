@@ -25,9 +25,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.clinomics.service.setting.BundleService;
 import com.clinomics.service.InputService;
-import com.clinomics.service.SampleExcelService;
+import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
-import com.clinomics.service.SampleTempService;
 
 @RequestMapping("/input")
 @Controller
@@ -35,15 +34,12 @@ public class InputController {
 
 	@Autowired
 	InputService inputService;
-
-	@Autowired
-	SampleTempService sampleTempService;
 	
 	@Autowired
 	SampleItemService sampleItemService;
 
 	@Autowired
-	SampleExcelService sampleExcelService;
+	InputExcelService inputExcelService;
 
 	@Autowired
 	BundleService bundleService;
@@ -61,12 +57,6 @@ public class InputController {
 		return inputService.findSampleByBundleAndDateResultNullStatusFail(params);
 	}
 	
-	@GetMapping("/get/temp")
-	@ResponseBody
-	public Map<String, Object> getTemp(@RequestParam Map<String, String> params) {
-		return sampleTempService.findAll(params);
-	}
-	
 	@PostMapping("/save")
 	@ResponseBody
 	public Map<String, String> save(@RequestBody Map<String, String> datas) {
@@ -75,13 +65,6 @@ public class InputController {
 		datas.put("memberId", userDetails.getUsername());
 		
 		return inputService.save(datas);
-	}
-	
-	@GetMapping("/import")
-	@ResponseBody
-	public Map<String, Object> importExcelToTable() {
-		
-		return sampleTempService.importExcelToSample();
 	}
 	
 	@GetMapping("/itemby/sample/{id}")
@@ -106,13 +89,13 @@ public class InputController {
 		
 		String bundleId = request.getParameter("bundleId").toString();
 		
-		return sampleExcelService.importExcelSample(multipartFile, bundleId, memberId);
+		return inputExcelService.importExcelSample(multipartFile, bundleId, memberId);
 	}
 	
 	@GetMapping("/excel/form")
 	@ResponseBody
 	public void exportExcelForm(@RequestParam Map<String, String> params, HttpServletResponse response) {
-		XSSFWorkbook xlsx = sampleExcelService.exportExcelForm(params);
+		XSSFWorkbook xlsx = inputExcelService.exportExcelForm(params);
 		requestExcel(xlsx, response);
 	}
 	

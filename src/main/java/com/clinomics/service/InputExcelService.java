@@ -26,26 +26,22 @@ import org.springframework.web.multipart.MultipartFile;
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Product;
+import com.clinomics.entity.lims.Sample;
 import com.clinomics.entity.lims.SampleItem;
-import com.clinomics.entity.lims.SampleTemp;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.ProductRepository;
 import com.clinomics.repository.lims.SampleRepository;
-import com.clinomics.repository.lims.SampleTempRepository;
 import com.clinomics.util.CustomIndexPublisher;
 import com.clinomics.util.ExcelReadComponent;
 import com.google.common.collect.Maps;
 
 @Service
-public class SampleExcelService {
+public class InputExcelService {
 
 	@Autowired
 	SampleRepository sampleRepository;
-	
-	@Autowired
-	SampleTempRepository sampleTempRepository;
 
 	@Autowired
 	BundleRepository bundleRepository;
@@ -138,8 +134,6 @@ public class SampleExcelService {
 			return rtn;
 		}
 		
-		sampleTempRepository.deleteAll();
-		
 		XSSFSheet sheet = workbook.getSheetAt(0);
 		List<Map<String, Object>> sheetList = excelReadComponent.readMapFromSheet(sheet);
 		
@@ -174,9 +168,9 @@ public class SampleExcelService {
 		}
 		
 		Map<String, Object> sampleItem = Maps.newHashMap();
-		List<SampleTemp> items = new ArrayList<SampleTemp>();
+		List<Sample> items = new ArrayList<Sample>();
 		for (Map<String, Object> sht : sheetList) {
-			SampleTemp sampleTemp = new SampleTemp();
+			Sample sampleTemp = new Sample();
 			for (SampleItem itm : sortedSampleItems) {
 				String name = itm.getName();
 //				if (sht.containsKey(name)) {
@@ -190,13 +184,13 @@ public class SampleExcelService {
 			}
 		
 			sampleTemp.setItems(sampleItem);
-			sampleTemp.setBundleId(bundle.getId());
-			sampleTemp.setMemberId(member.getId());
+			sampleTemp.setBundle(bundle);
+			sampleTemp.setCreatedMember(member);
 				
 			items.add(sampleTemp);
 		}
 		
-		sampleTempRepository.saveAll(items);
+		sampleRepository.saveAll(items);
 		
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
