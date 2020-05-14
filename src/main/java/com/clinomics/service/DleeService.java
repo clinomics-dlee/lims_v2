@@ -4,22 +4,14 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
-import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Sample;
-import com.clinomics.entity.lims.SampleItem;
-import com.clinomics.entity.lims.SampleTemp;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
@@ -34,8 +26,10 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -322,5 +316,60 @@ public class DleeService {
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
+	}
+
+	public XSSFWorkbook exportStep2ExcelForm(Map<String, String> params) {
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		CellStyle orange = workbook.createCellStyle();
+		orange.setFillForegroundColor(HSSFColorPredefined.LIGHT_ORANGE.getIndex());
+		orange.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		orange.setAlignment(HorizontalAlignment.CENTER);
+		orange.setBorderBottom(BorderStyle.THIN);
+		orange.setBorderLeft(BorderStyle.THIN);
+		orange.setBorderRight(BorderStyle.THIN);
+		orange.setBorderTop(BorderStyle.THIN);
+
+		CellStyle border = workbook.createCellStyle();
+		border.setAlignment(HorizontalAlignment.CENTER);
+		border.setBorderBottom(BorderStyle.THIN);
+		border.setBorderLeft(BorderStyle.THIN);
+		border.setBorderRight(BorderStyle.THIN);
+		border.setBorderTop(BorderStyle.THIN);
+		
+		XSSFSheet sheet = workbook.createSheet("sample");
+
+		// #. excel header
+		XSSFRow row1 = sheet.createRow(0);
+		XSSFCell cell1_1 = row1.createCell(0);
+		cell1_1.setCellValue("Well Position");
+		cell1_1.setCellStyle(orange);
+		XSSFCell cell1_2 = row1.createCell(1);
+		cell1_2.setCellValue("Genotyping ID");
+		cell1_2.setCellStyle(orange);
+
+		// #. well position 기본값 셋팅
+		List<String> prefixChars = Arrays.asList(new String[] {
+			"A", "C", "E", "G", "I", "K", "M", "O"
+		});
+		
+		int rowCount = 1;
+		for (int i = 1; i < 24; i += 2) {
+			for (String prefixChar : prefixChars) {
+				String wp = prefixChar + String.format("%02d", i);
+				XSSFRow row = sheet.createRow(rowCount);
+				XSSFCell cell = row.createCell(0);
+				XSSFCell cell2 = row.createCell(1);
+				cell.setCellValue(wp);
+				cell.setCellStyle(border);
+				cell2.setCellStyle(border);
+
+				rowCount++;
+			}
+		}
+
+		sheet.setColumnWidth(0, 4000);
+		sheet.setColumnWidth(1, 4000);
+		
+		return workbook;
 	}
 }
