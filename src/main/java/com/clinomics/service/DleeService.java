@@ -19,7 +19,6 @@ import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.entity.lims.SampleItem;
-import com.clinomics.entity.lims.SampleTemp;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
