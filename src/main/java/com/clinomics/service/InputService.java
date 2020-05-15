@@ -217,7 +217,8 @@ public class InputService {
 	}
 
 	private Sample searchExistsSample(String id) {
-		Optional<Sample> oSample = sampleRepository.findById(id);
+		
+		Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
 		
 		Sample news = new Sample();
 		LocalDateTime now = LocalDateTime.now();

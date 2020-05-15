@@ -62,7 +62,7 @@ public class SampleItemService {
 	}
 	
 	public Map<String, Object> findSampleItemBySample(String id) {
-		Optional<Sample> oSample = sampleRepository.findById(id);
+		Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
 		Sample sample = oSample.orElse(new Sample());
 		
 		Optional<Bundle> oBundle = Optional.of(sample.getBundle());

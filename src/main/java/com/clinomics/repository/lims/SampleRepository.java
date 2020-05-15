@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.clinomics.entity.lims.Sample;
 
-public interface SampleRepository extends JpaRepository<Sample, String>, JpaSpecificationExecutor<Sample> {
+public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpecificationExecutor<Sample> {
 
 }
