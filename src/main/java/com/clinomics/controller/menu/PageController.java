@@ -2,6 +2,7 @@ package com.clinomics.controller.menu;
 
 import java.util.Map;
 
+import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.service.setting.BundleService;
@@ -49,8 +50,14 @@ public class PageController {
 		for (GenotypingMethodCode code : GenotypingMethodCode.values()) {
 			genotypingMethodCodeMap.put(code.getKey(), code.getValue());
 		}
+
+		Map<String, String> chipTypeCodeMap = Maps.newHashMap();
+		for (ChipTypeCode code : ChipTypeCode.values()) {
+			chipTypeCodeMap.put(code.getKey(), code.getValue());
+		}
 		model.addAttribute("statusCodes", statusCodeMap);
 		model.addAttribute("genotypingMethodCodes", genotypingMethodCodeMap);
+		model.addAttribute("chipTypeCodes", chipTypeCodeMap);
 		return path1 + "/" + path2;
 	}
 }

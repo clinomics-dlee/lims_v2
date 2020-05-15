@@ -10,7 +10,10 @@ public enum ChipTypeCode {
 	ChipTypeCode(String value) {
 		this.value = value;
 	}
-	public String get() {
+	public String getKey() {
+		return name();
+	}
+	public String getValue() {
 		return value;
 	}
 }
