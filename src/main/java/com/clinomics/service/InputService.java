@@ -135,13 +135,9 @@ public class InputService {
 		Map<String, String> rtn = Maps.newHashMap();
 		
 		String id = datas.getOrDefault("id", "");
-		Optional<Sample> oSample = sampleRepository.findById(id);
 		
-		Sample news = new Sample();
-		LocalDateTime nnow = LocalDateTime.now();
-		news.setCreatedDate(nnow);
-		news.setModifiedDate(nnow);
-		Sample sample = oSample.orElse(news);
+		Sample sample = searchExistsSample(id);
+
 		boolean existsSample = Optional.ofNullable(sample.getId()).isPresent();
 		
 		Bundle bundle;
@@ -150,7 +146,7 @@ public class InputService {
 				saveSampleHistory(sample);
 			}
 			bundle = sample.getBundle();
-			sample.setModifiedDate(nnow);
+			
 		} else {
 			if (!datas.containsKey("bundleId")) {
 				rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
@@ -169,23 +165,14 @@ public class InputService {
 		datas.remove("bundleId");
 		
 		if (!existsSample) {
-			if (bundle.isAutoBarcode()) {
-				String bar = customIndexPublisher.getNextBarcodeByBundle(bundle);
-				if (!bar.isEmpty()) sample.setBarcode(bar);
-			} else {
-				sample.setBarcode(datas.get("barcode"));
-			}
 			
-			// #. TODO
-			// if (bundle.isAutoSequence()) {
-			// 	String seq = customIndexPublisher.getNextSequenceByBundle(bundle);
-			// 	if (!seq.isEmpty()) sample.setId(seq);
-			// } else {
-			// 	sample.setId(datas.get("laboratory"));
-			// }
+			if (bundle.isAutoSequence()) {
+				String seq = customIndexPublisher.getNextSequenceByBundle(bundle);
+				if (!seq.isEmpty()) sample.setLaboratoryId(seq);
+			} else {
+				sample.setLaboratoryId(datas.get("laboratory"));
+			}
 		}
-		datas.remove("laboratory");
-		datas.remove("barcode");
 		datas.remove("id");
 		
 		Map<String, Object> newItems = Maps.newHashMap();
@@ -196,17 +183,54 @@ public class InputService {
 		sampleRepository.save(sample);
 		if (existsSample) {
 			saveSampleHistory(sample);
-			System.out.println(">>");
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
 	
+	@Transactional
+	public Map<String, String> receive(Map<String, String> datas) {
+		Map<String, String> rtn = Maps.newHashMap();
+		
+		String id = datas.getOrDefault("id", "");
+		
+		Sample sample = searchExistsSample(id);
+
+		boolean existsSample = Optional.ofNullable(sample.getId()).isPresent();
+
+		if (existsSample) {
+			Optional<Member> oMember = memberRepository.findById(datas.getOrDefault("memberId", ""));
+			Member member = oMember.orElseThrow(NullPointerException::new);
+
+			sample.setStatusCode(StatusCode.INPUT_RCV);
+			sample.setInputApproveMember(member);
+			sample.setInputApproveDate(LocalDateTime.now());
+			sampleRepository.save(sample);
+
+		} else {
+			rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
+		}
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	private Sample searchExistsSample(String id) {
+		Optional<Sample> oSample = sampleRepository.findById(id);
+		
+		Sample news = new Sample();
+		LocalDateTime now = LocalDateTime.now();
+		news.setCreatedDate(now);
+		Sample sample = oSample.orElse(news);
+		sample.setModifiedDate(now);
+
+		return sample;
+	}
+	
 	private void saveSampleHistory(Sample smpl) {
 		SampleHistory sh = new SampleHistory();
 		sh.setSample(smpl);
-		sh.setBarcode(smpl.getBarcode());
 		sh.setItems(smpl.getItems());
 		sh.setMember(smpl.getCreatedMember());
 		

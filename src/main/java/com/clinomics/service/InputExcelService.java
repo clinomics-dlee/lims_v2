@@ -29,6 +29,7 @@ import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.entity.lims.SampleItem;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.ProductRepository;
@@ -182,10 +183,14 @@ public class InputExcelService {
 				sampleItem = sht;
 //				}
 			}
-		
+			
+			String seq = customIndexPublisher.getNextSequenceByBundle(bundle);
+			if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
+
 			sampleTemp.setItems(sampleItem);
 			sampleTemp.setBundle(bundle);
 			sampleTemp.setCreatedMember(member);
+			sampleTemp.setStatusCode(StatusCode.INPUT_REG);
 				
 			items.add(sampleTemp);
 		}

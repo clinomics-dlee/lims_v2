@@ -1,7 +1,8 @@
 package com.clinomics.enums;
 
 public enum StatusCode {
-	INPUT_READY("입고"),
+	INPUT_REG("등록"),
+	INPUT_RCV("입고"),
 	INPUT_APPROVE("입고승인"),
 	EXP_READY("실험대기"),
 	EXP_STEP1("STEP1"),

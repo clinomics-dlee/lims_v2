@@ -79,6 +79,15 @@ public class InputController {
 		return sampleItemService.findSampleItemByBundle(id);
 	}
 	
+	@PostMapping("/receive")
+	@ResponseBody
+	public Map<String, String> getItemByBundle(@RequestParam Map<String, String> datas) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		datas.put("memberId", userDetails.getUsername());
+		
+		return inputService.receive(datas);
+	}
+	
 	@PostMapping("/excel/import")
 	@ResponseBody
 	public Map<String, Object> importExcelSample(@RequestParam("file") MultipartFile multipartFile, MultipartHttpServletRequest request)

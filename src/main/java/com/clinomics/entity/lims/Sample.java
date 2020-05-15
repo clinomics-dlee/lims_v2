@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.clinomics.config.StringMapConverter;
 import com.clinomics.enums.GenotypingMethodCode;
@@ -38,9 +39,6 @@ public class Sample implements Serializable {
 	
     @Column(length = 30)
     private String laboratoryId;
-	
-	@Column(length = 30)
-	private String barcode;
 
 	private int version;
 
@@ -110,18 +108,29 @@ public class Sample implements Serializable {
 	@ManyToOne(cascade =  CascadeType.ALL)
 	@JoinColumn(name = "inputApproveMemberId")
 	private Member inputApproveMember;
+	
+	@Transient
+	private String inputApproveRole = "INPUT_20";
+
 	// #. 입고 중간관리자 승인일
 	private LocalDateTime inputMngApproveDate;
 	// #. 입고 중간관리자 승인자
 	@ManyToOne(cascade =  CascadeType.ALL)
 	@JoinColumn(name = "inputMngApproveMemberId")
 	private Member inputMngApproveMember;
+	
+	@Transient
+	private String inputMngApproveRole = "INPUT_40";
+
 	// #. 입고 검사실책임자 승인일
 	private LocalDateTime inputDrctApproveDate;
 	// #. 입고 검사실책임자 승인자
 	@ManyToOne(cascade =  CascadeType.ALL)
 	@JoinColumn(name = "inputDrctMemberId")
 	private Member inputDrctMember;
+	
+	@Transient
+	private String inputDrctRole = "EXP_80";
 
 	// #. 실험 시작일
 	private LocalDateTime expStartDate;
@@ -220,14 +229,6 @@ public class Sample implements Serializable {
 
 	public void setLaboratoryId(String laboratoryId) {
 		this.laboratoryId = laboratoryId;
-	}
-
-	public String getBarcode() {
-		return barcode;
-	}
-
-	public void setBarcode(String barcode) {
-		this.barcode = barcode;
 	}
 
 	public Bundle getBundle() {
