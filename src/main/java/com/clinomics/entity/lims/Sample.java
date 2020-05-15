@@ -66,7 +66,7 @@ public class Sample implements Serializable {
 	private String wellPosition;
 
 	@Column(length = 100)
-	private String chipNumber;
+	private String chipBarcode;
 	
 	@Column(length = 50)
 	private String chipType;
@@ -271,12 +271,12 @@ public class Sample implements Serializable {
 		this.wellPosition = wellPosition;
 	}
 
-	public String getChipNumber() {
-		return chipNumber;
+	public String getChipBarcode() {
+		return chipBarcode;
 	}
 
-	public void setChipNumber(String chipNumber) {
-		this.chipNumber = chipNumber;
+	public void setChipBarcode(String chipBarcode) {
+		this.chipBarcode = chipBarcode;
 	}
 
 	public String getChipType() {
