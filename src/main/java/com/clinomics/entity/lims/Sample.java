@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.clinomics.config.StringMapConverter;
+import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.StatusCode;
 
@@ -68,8 +69,8 @@ public class Sample implements Serializable {
 	@Column(length = 100)
 	private String chipBarcode;
 	
-	@Column(length = 50)
-	private String chipType;
+	@Enumerated(EnumType.STRING)
+	private ChipTypeCode chipTypeCode;
 
 	@Enumerated(EnumType.STRING)
 	private StatusCode statusCode;
@@ -279,12 +280,12 @@ public class Sample implements Serializable {
 		this.chipBarcode = chipBarcode;
 	}
 
-	public String getChipType() {
-		return chipType;
+	public ChipTypeCode getChipType() {
+		return chipTypeCode;
 	}
 
-	public void setChipType(String chipType) {
-		this.chipType = chipType;
+	public void setChipType(ChipTypeCode chipTypeCode) {
+		this.chipTypeCode = chipTypeCode;
 	}
 
 	public StatusCode getStatusCode() {
