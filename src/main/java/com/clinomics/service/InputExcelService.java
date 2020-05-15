@@ -190,7 +190,7 @@ public class InputExcelService {
 			sampleTemp.setItems(sampleItem);
 			sampleTemp.setBundle(bundle);
 			sampleTemp.setCreatedMember(member);
-			sampleTemp.setStatusCode(StatusCode.INPUT_REG);
+			sampleTemp.setStatusCode(StatusCode.S000_INPUT_REG);
 				
 			items.add(sampleTemp);
 		}

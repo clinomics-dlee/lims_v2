@@ -88,7 +88,7 @@ public class InputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.equalStatus(StatusCode.INPUT_RCV));
+					.and(SampleSpecification.equalStatus(StatusCode.S000_INPUT_REG));
 					
 		
 		total = sampleRepository.count(where);
@@ -203,7 +203,7 @@ public class InputService {
 			Optional<Member> oMember = memberRepository.findById(datas.getOrDefault("memberId", ""));
 			Member member = oMember.orElseThrow(NullPointerException::new);
 
-			sample.setStatusCode(StatusCode.INPUT_RCV);
+			sample.setStatusCode(StatusCode.S020_INPUT_RCV);
 			sample.setInputApproveMember(member);
 			sample.setInputApproveDate(LocalDateTime.now());
 			sampleRepository.save(sample);
