@@ -70,31 +70,31 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					
 					<div class="tab-content">
 						<!-- begin tab-pane -->
-						<div class="tab-pane fade" id="collect-tab-1">
+						<div class="tab-panel" id="collect-tab-1">
 					
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
+								<label class="col-form-label col-md-1">서비스</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200" id="sel_bundle">
-										<option th:text="#{common.all}" value>All</option>
+										<option value>전체</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
 								
-								<label class="col-form-label" th:text="#{common.createdDate}">Created date</label>
+								<label class="col-form-label">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
-								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
 								    <!-- <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span> -->
 								</div>
-								<label class="col-form-label col-md-1" th:text="#{common.keyword}">Key word</label>
+								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
 									
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10 " th:text="#{common.search}">Search</button>
+									<button onClick="search();" class="btn btn-default m-l-10 ">조회</button>
 								</div>
 							</div>
 							<hr/>

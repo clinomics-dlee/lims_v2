@@ -47,43 +47,22 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			<div class="row">
 				<div class="col-xl-12">
 					
-					<ul class="nav nav-tabs">
-						<li class="nav-item">
-							<a href="#collect-tab-1" data-toggle="tab" class="nav-link active">
-								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none" th:text="#{page.register.new}">등록</span>
-							</a>
-						</li>
-					</ul>
-					
-					<div class="tab-content">
-						<!-- begin tab-pane -->
-						<div class="tab-pane fade" id="collect-tab-1">
-							
-							<div class="form-group row m-b-15">
-								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
-								<div class="col-xs-push-0">
-									<select class="form-control width-200"
-										data-parsley-required="true" data-parsley-errors-container="#error_bundle3" id="sel_bundle3">
-										<option value>please choose</option>
-										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
-									</select>
-								</div>
-								<div class="col-xs-push-0">
-									<div id="error_bundle3"></div>
-								</div>
-							</div>
-							<hr/>
-							<div id="add_single_sample3"></div>
-						</div>
-						<div class="tab-pane fade active show" id="collect-tab-4">
+					<div class="panel panel-inverse">
+
+						<!-- begin panel-heading -->
 						
+						<!-- end panel-heading -->
+
+						<!-- begin panel-body -->
+						<div id="panel-body" class="panel-body">
+							<!-- begin tab-pane -->
+
 							<div class="form-group row m-b-15">
 								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200"
 										data-parsley-required="true" data-parsley-errors-container="#error_bundle4" id="sel_bundle4">
-										<option value>please choose</option>
+										<option value>선택해 주세요</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
@@ -97,13 +76,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<li class="nav-item">
 									<a href="#new-tab-1" data-toggle="tab" class="nav-link active">
 										<span class="d-sm-none">Tab 1</span>
-										<span class="d-sm-block d-none" th:text="#{common.single}">Single</span>
+										<span class="d-sm-block d-none">직접 입력</span>
 									</a>
 								</li>
 								<li class="nav-item">
 									<a href="#new-tab-2" data-toggle="tab" class="nav-link">
 										<span class="d-sm-none">Tab 2</span>
-										<span class="d-sm-block d-none" th:text="#{common.excelImport}">Excel imports</span>
+										<span class="d-sm-block d-none" >대충 붙여넣기</span>
 									</a>
 								</li>
 								
@@ -112,18 +91,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<div class="tab-content">
 								<!-- begin tab-pane -->
 								<div class="tab-pane fade active show" id="new-tab-1">
-									<div id="add_single_sample4"></div>
-								</div>
-								<div class="tab-pane fade" id="new-tab-2">
-									
+
 									<form id="fileupload" method="POST" enctype="multipart/form-data" data-parsley-validate="true">
 										<div class="form-group row m-b-15">
 											
-											<div class="col-md-4">
-												<button type="button" class="btn btn-default m-r-5 m-b-5" th:text="#{common.excelFormDownload}" onclick="excelForm();">Excel Form Download</button>
-												<button type="button" class="btn btn-default m-r-5 m-b-5" th:text="#{common.excelUpload}" onclick="excelUpload();">Excel Upload</button>
-												
-												<button type="button" class="btn btn-success m-r-5 m-b-5" th:text="#{common.saveAll}" onclick="importExcelToTable();">Save All</button>
+											<div class="col-xs-push-0">
+												<button type="button" class="btn btn-default m-r-5 m-b-5" onclick="createRow();">그리드열 생성</button>
+											</div>
+											<div class="col-xs-push-0">
+												<input type="text" id="txt_create_grid" class="form-control width-50"
+													onkeypress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;"/>
+											</div>
+											<div class="col-xs-push-0">
+												<button type="button" class="btn btn-default m-r-5 m-b-5" onclick="excelForm();">엑셀 양식 다운로드</button>
+											</div>
+											<div class="col-xs-push-0">
+												<button type="button" class="btn btn-default m-r-5 m-b-5" onclick="excelUpload();">엑셀 업로드</button>
+											</div>
+											<div class="col-xs-push-0">
+												<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="importExcelToTable();">저장</button>
 											</div>
 											<div class="hide">
 												<input type="file" id="file" name="file">
@@ -136,15 +122,38 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										</div>
 										<input type="hidden" id="frmBundleId" name="bundleId" value=""/>
 									</form>
+									<div>
+										<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+											<div class="dataTables_scroll" style="overflow: auto; width: 100%; margin-bottom: 0;" id="add_single_sample4">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="tab-pane fade" id="new-tab-2">
+									
+									<form id="fileupload" method="POST" enctype="multipart/form-data" data-parsley-validate="true">
+										<div class="form-group row m-b-15">
+											
+											<div class="col-md-4">
+											</div>
+											
+										</div>
+										<input type="hidden" id="frmBundleId2" name="bundleId" value=""/>
+									</form>
 									
 									<div id="_import_grid">
 									</div>
 								</div>
 							</div>
-					
-						
+
+
 						</div>
+
+
+
+
 					</div>
+					
 				</div>
 			</div>
 			
@@ -186,7 +195,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
 		
 		$('#sel_bundle3, #sel_bundle4').on('change', function () {
-			initForm($(this).attr('id'));
+			//initForm($(this).attr('id'));
 		});
 		
 		$('#file').on('change', function () {
@@ -346,9 +355,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		});
 	}
 	
-	function initForm(id) {
-		if ($("#" + id).parsley().validate() != true) return;
-		var bundleId = $("#" + id).val();
+	function createRow() {
+		var bundleId = $("#sel_bundle4").val();
+		if (bundleId == "") return;
+		var id = "sel_bundle4";
+		//if ($("#" + id).parsley().validate() != true) return;
+		//var bundleId = $("#" + id).val();
 		$.ajax({
 			url : "/input/itemby/bundle/" + bundleId,
 			type : "GET",
@@ -358,7 +370,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				xhr.setRequestHeader(header, token);
 			},
 			success: function (rtn) {
-				
+				var headHtml = "", bodyHtml = "";
 				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
 				var notnull = false, readonly = '';
 				
@@ -368,60 +380,75 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				if (data) {
 					
 					html = '<form id="frm_new" data-parsley-validate="true">';
-					html += '<table id="table_form" class="table">';
+					html += '<table id="table_form" class="table table-striped table-bordered">';
 					autoComplete = 'autocomplete="off"';
-					for (var r in data) {
-						readonly = '';
-						notnull = data[r].notNull;
-						if ((bundle.autoSequence && data[r].nameCode == "laboratory")
-							|| (bundle.autoBarcode && data[r].nameCode == "barcode")) {
-							
-							readonly = ' readonly';
-							notnull = false;
-						}
-						
-						//html += '<div class="form-group row m-b-15">';
-						if (r % 2 == 0) html += '<tr>'
-						html += '<th>';
-						html += data[r].name;
-						html += ' <th>';
-						html += '<td>';
-						if (data[r].type == "select" && data[r].selectValue) {
-							html += '<select class="form-control form-control-sm"' + (notnull ? parsley : '') + ' name="' + data[r].nameCode + '">';
-							aSplit = data[r].selectValue.split(",");
-							for (var a in aSplit) {
-								html += '<option value="' + aSplit[a] + '">' + aSplit[a] + '</option>';
+					var max = Number($("#txt_create_grid").val());
+					for (var ii = 0; ii < max; ii++) {
+						bodyHtml += "<tr>";
+						for (var r in data) {
+							readonly = '';
+							notnull = data[r].notNull;
+							if (bundle.autoBarcode && data[r].nameCode == "barcode") {
+								
+								readonly = ' readonly';
+								notnull = false;
 							}
-							html += '</select>';
-						} else if (data[r].type == "date") {
-							aDateInputs.push(data[r].nameCode);
-							html += '<div class="input-group" data-provide="datepicker">';
-							html += '<input type="text" class="form-control form-control-sm"'
-								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + '"' : '')
-								+ ' placeholder="click to select the date range" '
-								+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
-							html += '<span class="input-group-append">';
-							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
-							html += '</span>';
-							html += '</div><div id="error_' + data[r].nameCode + '"></div>';
-						} else {
-							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
-								+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" ' + autoComplete;
 							
-							html += readonly
-							html += '/>';
+							//html += '<div class="form-group row m-b-15">';
+							//if (r % 2 == 0) html += '<tr>'
+								console.log(data[r]);
+							if (ii == 0) {
+								if (data[r].type != "date") {
+									headHtml += '<th style="width:' + ((Number(data[r].width) / 20) - 50) + 'px;">';
+								} else {
+									headHtml += '<th>';
+								}
+								headHtml += data[r].name;
+								headHtml += '</th>';
+							}
+
+							bodyHtml += '<td>';
+							if (data[r].type == "select" && data[r].selectValue) {
+								bodyHtml += '<select class="form-control form-control-sm"' + (notnull ? parsley : '') + ' name="' + data[r].nameCode + '">';
+								aSplit = data[r].selectValue.split(",");
+								for (var a in aSplit) {
+									bodyHtml += '<option value="' + aSplit[a] + '">' + aSplit[a] + '</option>';
+								}
+								bodyHtml += '</select>';
+							} else if (data[r].type == "date") {
+								aDateInputs.push(data[r].nameCode);
+								bodyHtml += '<div class="input-group" data-provide="datepicker" style="width:150px;">';
+								bodyHtml += '<input type="text" class="form-control form-control-sm"'
+									+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + '"' : '')
+									+ ' placeholder="" '
+									+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
+								bodyHtml += '<span class="input-group-append">';
+								bodyHtml += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
+								bodyHtml += '</span>';
+								bodyHtml += '</div><div id="error_' + data[r].nameCode + '"></div>';
+							} else {
+								bodyHtml += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+									+ 'name="' + data[r].nameCode + '" ' + autoComplete;
+								
+								bodyHtml += readonly
+								bodyHtml += '/>';
+							}
+							
+							html += '</td>';
+							//if (r % 2 == 1) html += '</tr>'
 						}
-						
-						html += '</td>';
-						if (r % 2 == 1) html += '</tr>'
+						bodyHtml += "</tr>";
 					}
-					
+					html += '<thead><tr>' + headHtml;
+					html += '</tr></thead>';
+					html += '<tbody>' + bodyHtml;
+					html += '</tbody>';
 					html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
 					html += '</table>';
 					html += '</form>';
-					html += '<hr/>';
+					//html += '<hr/>';
 					
-					html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
+					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
 					
 					$("#add_single_sample" + id.charAt(id.length - 1)).html(html);
 				}
@@ -442,7 +469,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		var bundleId = $("#sel_bundle4").val();
 		
 		
-		UserTable.init('_import_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_import_grid', true, [50, 100] , [50, 100]);
 		
 		UserTable.draw('_import_grid', {
 			url : "/input/get/temp",
