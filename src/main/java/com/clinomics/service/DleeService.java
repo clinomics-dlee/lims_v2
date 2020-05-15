@@ -86,7 +86,7 @@ public class DleeService {
 					.where(DleeSpecification.betweenDate(params))
 					.and(DleeSpecification.bundleId(params))
 					.and(DleeSpecification.keywordLike(params))
-					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.EXP_READY)));
+					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.S200_EXP_READY)));
 					
 		
 		total = dleeRepository.count(where);
@@ -101,7 +101,7 @@ public class DleeService {
 	@Transactional
 	public Map<String, String> startExp(List<String> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		LocalDateTime nnow = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
@@ -109,8 +109,8 @@ public class DleeService {
 			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
-			sample.setStatusCode(StatusCode.EXP_STEP1);
-			sample.setExpStartDate(nnow);
+			sample.setStatusCode(StatusCode.S210_EXP_STEP1);
+			sample.setExpStartDate(now);
 			sample.setExpStartMember(member);
 
 			dleeRepository.save(sample);
@@ -138,7 +138,7 @@ public class DleeService {
 					.where(DleeSpecification.betweenDate(params))
 					.and(DleeSpecification.bundleId(params))
 					.and(DleeSpecification.keywordLike(params))
-					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.EXP_STEP1)));
+					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.S210_EXP_STEP1)));
 		
 		total = dleeRepository.count(where);
 		Page<Sample> page = dleeRepository.findAll(where, pageable);
@@ -180,6 +180,7 @@ public class DleeService {
 		return workbook;
 	}
 
+	@Transactional
 	public Map<String, Object> importStep1Excel(MultipartFile multipartFile, String memberId) {
 		
 		Map<String, Object> rtn = Maps.newHashMap();
@@ -205,9 +206,6 @@ public class DleeService {
 			rtn.put("result", ResultCode.EXCEL_EMPTY.get());
 			return rtn;
 		}
-
-		Optional<Member> oMember = memberRepository.findById(memberId);
-		Member member = oMember.orElse(new Member());
 		
 		int sheetNum = workbook.getNumberOfSheets();
 		if (sheetNum < 1) {
@@ -251,7 +249,7 @@ public class DleeService {
 	@Transactional
 	public Map<String, String> completeStep1(List<String> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		LocalDateTime nnow = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
@@ -259,8 +257,8 @@ public class DleeService {
 			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
-			sample.setStatusCode(StatusCode.EXP_STEP2);
-			sample.setExpStep1Date(nnow);
+			sample.setStatusCode(StatusCode.S220_EXP_STEP2);
+			sample.setExpStep1Date(now);
 			sample.setExpStep1Member(member);
 
 			dleeRepository.save(sample);
@@ -288,7 +286,7 @@ public class DleeService {
 					.where(DleeSpecification.betweenDate(params))
 					.and(DleeSpecification.bundleId(params))
 					.and(DleeSpecification.keywordLike(params))
-					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.EXP_STEP2)));
+					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.S220_EXP_STEP2)));
 		
 		total = dleeRepository.count(where);
 		Page<Sample> page = dleeRepository.findAll(where, pageable);
@@ -371,5 +369,117 @@ public class DleeService {
 		sheet.setColumnWidth(1, 4000);
 		
 		return workbook;
+	}
+
+	@Transactional
+	public Map<String, Object> uploadMapping(MultipartFile multipartFile, Map<String, String> datas) {
+		Map<String, Object> rtn = Maps.newHashMap();
+		
+		XSSFWorkbook workbook = null;
+		try {
+			workbook = excelReadComponent.readWorkbook(multipartFile);
+		} catch (InvalidFormatException e) {
+			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+		} catch (IOException e) {
+			rtn.put("result", ResultCode.FAIL_FILE_READ.get());
+		}
+		
+		if (workbook == null) {
+			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+			return rtn;
+		}
+		
+		XSSFSheet sheet = workbook.getSheetAt(0);
+		List<Map<String, Object>> sheetList = excelReadComponent.readMapFromSheet(sheet);
+		
+		if (sheetList.size() < 1) {
+			rtn.put("result", ResultCode.EXCEL_EMPTY.get());
+			return rtn;
+		}
+
+		Optional<Member> oMember = memberRepository.findById(datas.get("memberId"));
+		Member member = oMember.orElse(new Member());
+		
+		int sheetNum = workbook.getNumberOfSheets();
+		if (sheetNum < 1) {
+			return rtn;
+		}
+		
+		String mappingNo = datas.get("mappingNo");
+		List<Sample> items = new ArrayList<Sample>();
+		for (Map<String, Object> sht : sheetList) {
+			// #. Genotyping ID를 가지고 조회
+			String genotypingId = (String)sht.get("Genotyping ID");
+			String wellPosition = (String)sht.get("Well Position");
+
+			if (genotypingId.length() > 0 && wellPosition.length() > 0) {
+				// #. 둘다 값이 있는 경우 
+				String[] genotypingInfo = genotypingId.split("-V");
+
+				// #. genotypingId양식이 틀린경우
+				if (genotypingInfo.length != 2) {
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					return rtn;
+				}
+
+				String laboratoryId = genotypingInfo[0];
+				// #. version값이 숫자가아닌경우
+				if (!NumberUtils.isCreatable(genotypingInfo[1])) {
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					return rtn;
+				}
+				int version = NumberUtils.toInt(genotypingInfo[1]);
+				
+				Sample s = dleeRepository.findByLaboratoryIdAndVersion(laboratoryId, version);
+				// #. 검사실ID 또는 version이 잘못 입력된 경우
+				if (s == null) {
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					return rtn;
+				}
+				// #. 조회된 검체의 상태가 STEP2가 아닌경우
+				if (!s.getStatusCode().equals(StatusCode.S220_EXP_STEP2)) {
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					return rtn;
+				}
+
+				s.setGenotypingMethodCode(GenotypingMethodCode.CHIP);
+				s.setWellPosition(wellPosition);
+				s.setMappingNo(mappingNo);
+
+				items.add(s);
+			}
+		}
+		
+		dleeRepository.saveAll(items);
+		
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> completeStep2(List<String> sampleIds, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		LocalDateTime now = LocalDateTime.now();
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+
+		for (String id : sampleIds) {
+			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
+			Sample sample = oSample.orElseThrow(NullPointerException::new);
+
+			// #. GenotypingMethodCode 가 chip인 경우 step3으로, QRT_PCR인 경우 분석 성공으로 처리
+			if (GenotypingMethodCode.CHIP.equals(sample.getGenotypingMethodCode())) {
+				sample.setStatusCode(StatusCode.S220_EXP_STEP2);
+			} else if (GenotypingMethodCode.QRT_PCR.equals(sample.getGenotypingMethodCode())) {
+				sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
+			}
+			sample.setExpStep2Date(now);
+			sample.setExpStep2Member(member);
+
+			dleeRepository.save(sample);
+		}
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
 	}
 }
