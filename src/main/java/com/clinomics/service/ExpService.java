@@ -16,9 +16,9 @@ import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
-import com.clinomics.repository.lims.DleeRepository;
 import com.clinomics.repository.lims.MemberRepository;
-import com.clinomics.specification.lims.DleeSpecification;
+import com.clinomics.repository.lims.SampleRepository;
+import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.ExcelReadComponent;
 import com.google.common.collect.Maps;
 
@@ -47,11 +47,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class DleeService {
+public class ExpService {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	DleeRepository dleeRepository;
+	SampleRepository sampleRepository;
 
 	@Autowired
 	BundleRepository bundleRepository;
@@ -83,14 +83,14 @@ public class DleeService {
 		long total;
 		
 		Specification<Sample> where = Specification
-					.where(DleeSpecification.betweenDate(params))
-					.and(DleeSpecification.bundleId(params))
-					.and(DleeSpecification.keywordLike(params))
-					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.S200_EXP_READY)));
+					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.equalStatus(StatusCode.S200_EXP_READY));
 					
 		
-		total = dleeRepository.count(where);
-		Page<Sample> page = dleeRepository.findAll(where, pageable);
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
 		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
 		long filtered = total;
@@ -106,14 +106,14 @@ public class DleeService {
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
 		for (String id : sampleIds) {
-			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
+			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			sample.setStatusCode(StatusCode.S210_EXP_STEP1);
 			sample.setExpStartDate(now);
 			sample.setExpStartMember(member);
 
-			dleeRepository.save(sample);
+			sampleRepository.save(sample);
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());
@@ -135,13 +135,13 @@ public class DleeService {
 		long total;
 		
 		Specification<Sample> where = Specification
-					.where(DleeSpecification.betweenDate(params))
-					.and(DleeSpecification.bundleId(params))
-					.and(DleeSpecification.keywordLike(params))
-					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.S210_EXP_STEP1)));
+					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.equalStatus(StatusCode.S210_EXP_STEP1));
 		
-		total = dleeRepository.count(where);
-		Page<Sample> page = dleeRepository.findAll(where, pageable);
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
 		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
 		long filtered = total;
@@ -215,7 +215,8 @@ public class DleeService {
 		List<Sample> items = new ArrayList<Sample>();
 		for (Map<String, Object> sht : sheetList) {
 			// #. 검사실ID값으로 조회한 모든 검체 업데이트
-			List<Sample> samples = dleeRepository.findByLaboratoryId((String)sht.get("검사실 ID"));
+			Specification<Sample> where = Specification.where(SampleSpecification.equalLaboratoryId((String)sht.get("검사실 ID")));
+			List<Sample> samples = sampleRepository.findAll(where);
 
 			if (samples.size() < 1) {
 				rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
@@ -240,7 +241,7 @@ public class DleeService {
 			}
 		}
 		
-		dleeRepository.saveAll(items);
+		sampleRepository.saveAll(items);
 		
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
@@ -254,14 +255,14 @@ public class DleeService {
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
 		for (String id : sampleIds) {
-			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
+			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			sample.setStatusCode(StatusCode.S220_EXP_STEP2);
 			sample.setExpStep1Date(now);
 			sample.setExpStep1Member(member);
 
-			dleeRepository.save(sample);
+			sampleRepository.save(sample);
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());
@@ -283,13 +284,13 @@ public class DleeService {
 		long total;
 		
 		Specification<Sample> where = Specification
-					.where(DleeSpecification.betweenDate(params))
-					.and(DleeSpecification.bundleId(params))
-					.and(DleeSpecification.keywordLike(params))
-					.and(DleeSpecification.existsStatusIn(Arrays.asList(StatusCode.S220_EXP_STEP2)));
+					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.equalStatus(StatusCode.S220_EXP_STEP2));
 		
-		total = dleeRepository.count(where);
-		Page<Sample> page = dleeRepository.findAll(where, pageable);
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
 		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
 		long filtered = total;
@@ -300,16 +301,14 @@ public class DleeService {
 	@Transactional
 	public Map<String, String> updateQrtPcr(List<String> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		Optional<Member> oMember = memberRepository.findById(userId);
-		Member member = oMember.orElseThrow(NullPointerException::new);
 
 		for (String id : sampleIds) {
-			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
+			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			sample.setGenotypingMethodCode(GenotypingMethodCode.QRT_PCR);
 
-			dleeRepository.save(sample);
+			sampleRepository.save(sample);
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());
@@ -397,9 +396,6 @@ public class DleeService {
 			return rtn;
 		}
 
-		Optional<Member> oMember = memberRepository.findById(datas.get("memberId"));
-		Member member = oMember.orElse(new Member());
-		
 		int sheetNum = workbook.getNumberOfSheets();
 		if (sheetNum < 1) {
 			return rtn;
@@ -430,7 +426,11 @@ public class DleeService {
 				}
 				int version = NumberUtils.toInt(genotypingInfo[1]);
 				
-				Sample s = dleeRepository.findByLaboratoryIdAndVersion(laboratoryId, version);
+				Specification<Sample> where = Specification
+						.where(SampleSpecification.equalLaboratoryId(laboratoryId))
+						.and(SampleSpecification.equalVersion(version));
+				List<Sample> samples = sampleRepository.findAll(where);
+				Sample s = samples.get(0);
 				// #. 검사실ID 또는 version이 잘못 입력된 경우
 				if (s == null) {
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
@@ -450,7 +450,7 @@ public class DleeService {
 			}
 		}
 		
-		dleeRepository.saveAll(items);
+		sampleRepository.saveAll(items);
 		
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
@@ -464,7 +464,7 @@ public class DleeService {
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
 		for (String id : sampleIds) {
-			Optional<Sample> oSample = dleeRepository.findById(NumberUtils.toInt(id));
+			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			// #. GenotypingMethodCode 가 chip인 경우 step3으로, QRT_PCR인 경우 분석 성공으로 처리
@@ -476,7 +476,7 @@ public class DleeService {
 			sample.setExpStep2Date(now);
 			sample.setExpStep2Member(member);
 
-			dleeRepository.save(sample);
+			sampleRepository.save(sample);
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());

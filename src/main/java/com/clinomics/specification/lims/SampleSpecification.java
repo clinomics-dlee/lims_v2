@@ -140,4 +140,18 @@ public class SampleSpecification {
 			return rtn;
 		};
 	}
+
+	public static Specification<Sample> equalLaboratoryId(String laboratoryId) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.equal(root.get("laboratoryId"), laboratoryId);
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> equalVersion(int version) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.equal(root.get("version"), version);
+			return rtn;
+		};
+	}
 }

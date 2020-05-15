@@ -25,10 +25,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_history"></th:block>
-		<th:block th:replace="popup/result"></th:block>
-		<th:block th:replace="popup/sample_detail"></th:block>
-		<th:block th:replace="popup/sample_detail_readonly"></th:block>
+		<th:block th:replace="popup/mapping_upload"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -83,13 +80,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<div id="_step2_grid"></div>
 							<hr/>
 							<div class="row">
-								<form id="fileupload" method="POST" enctype="multipart/form-data">
-									<div class="hide">
-										<input type="file" id="file" name="file">
-									</div>
-								</form>
 								<button onClick="updateQrtPcr();" class="btn btn-success m-l-20">qRT-PCR</button>
-								<button onClick="mapping();" class="btn btn-warning m-l-20">MAPPING</button>
+								<button onClick="excelForm();" class="btn btn-warning m-l-20">Mapping Excel Download</button>
+								<button onClick="mappingUploadPopupOnload();" class="btn btn-warning m-l-20">Mapping</button>
 								<button onClick="completeStep2();" class="btn btn-yellow m-l-20">Step2 완료</button>
 							</div>
 						</div>
@@ -155,39 +148,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		
 		UserTable.init('_step2_grid', true, [10, 50] , [10, 50]);
 		drawStep2Grid();
-
-		$('#file').on('change', function () {
-			if ($("#file").val() == '') return;
-			
-			var form = $('#fileupload')[0];
-			var data = new FormData(form);
-			$.ajax({
-				enctype: 'multipart/form-data',
-	            url: '/exp/step1/excel/import',
-				type: 'post',
-		        data : data,
-		        processData: false,
-		        contentType: false,
-		        beforeSend: function(xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-			    success: function(data,xhr) {
-			        if (data.result == "00") {
-						CommonMsg.save(function() { });
-					} else if (!data.result.startsWith("0")) {
-						CommonMsg.error(function() { });
-					}
-			    },
-			    error : function(xhr, status, error) {
-			    	CommonMsg.error(function() {});
-				},
-				complete : function() {
-					$("#file").val('');
-					// #. 새로고침
-					UserTable.reload('_step2_grid');
-				}
-			});
-		});
 	});
 	
 	function drawStep2Grid() {
@@ -238,7 +198,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			title : "Genotyping Method",
 			data : "genotypingMethodCode",
 			render : function(row, data, index) {
-				var value = g_genotypingMethodCodeInfo[data];
+				var value = "";
+				if (data != null && data.length > 0) {
+					value = g_genotypingMethodCodeInfo[data];
+				}
 				return value;
 			}
 		}, {
@@ -313,6 +276,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				});
 			});
 		}
+	}
+
+	function excelForm() {
+		location.href = '/exp/step2/excel/form';
 	}
 	
 	function excelUpload() {
