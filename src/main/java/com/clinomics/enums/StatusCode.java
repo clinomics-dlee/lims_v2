@@ -1,26 +1,26 @@
 package com.clinomics.enums;
 
 public enum StatusCode {
-	INPUT_REG("등록"),
-	INPUT_RCV("입고"),
-	INPUT_APPROVE("입고승인"),
-	EXP_READY("실험대기"),
-	EXP_STEP1("STEP1"),
-	EXP_STEP2("STEP2"),
-	EXP_STEP3("STEP3"),
-	EXP_APPROVE("실험승인"),
-	ANLS_READY("분석대기"),
-	ANLS_RUNNING("분석중"),
-	ANLS_SUCC("분석성공"),
-	ANLS_SUCC_CMPL("분석성공"),
-	ANLS_FAIL("분석실패"),
-	ANLS_FAIL_CMPL("분석실패"),
-	ANLS_CMPL("분석완료"),
-	JDGM_APPROVE("판정완료"),
-	OUTPUT_WAIT("출고대기"),
-	OUTPUT_CMPL("출고완료"),
-	RE_OUTPUT_WAIT("재발행대기"),
-	RE_OUTPUT_CMPL("재발행완료")
+	S000("등록"),
+	S020("입고"),
+	S040("입고승인"),
+	S200("실험대기"),
+	S210("STEP1"),
+	S220("STEP2"),
+	S230("STEP3"),
+	S250("실험승인"),
+	S400("분석대기"),
+	S410("분석중"),
+	S420("분석성공"),
+	S430("분석성공완료"),
+	S440("분석실패"),
+	S450("분석실패완료"),
+	S460("분석최종완료"),
+	S600("판정완료"),
+	S700("출고대기"),
+	S710("출고완료"),
+	S800("재발행대기"),
+	S810("재발행완료")
 	;
 
 	private final String value;
