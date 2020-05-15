@@ -88,7 +88,7 @@ public class InputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.equalStatus(StatusCode.INPUT_READY));
+					.and(SampleSpecification.equalStatus(StatusCode.INPUT_RCV));
 					
 		
 		total = sampleRepository.count(where);

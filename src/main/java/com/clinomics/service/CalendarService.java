@@ -202,7 +202,7 @@ public class CalendarService {
 		return Specification
 				.where(SampleSpecification.createdDateOneMonth(params))
 				.and(SampleSpecification.bundleId(params))
-				.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.INPUT_READY, StatusCode.INPUT_APPROVE})));
+				.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.INPUT_RCV, StatusCode.INPUT_APPROVE})));
 	}
 	
 	private Specification<Sample> getAnalysisWhere(Map<String, String> params) {
