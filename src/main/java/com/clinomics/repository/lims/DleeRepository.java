@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface DleeRepository extends JpaRepository<Sample, Integer>, JpaSpecificationExecutor<Sample> {
     List<Sample> findByLaboratoryId(String laboratoryId);
+    Sample findByLaboratoryIdAndVersion(String laboratoryId, int version);
 }
