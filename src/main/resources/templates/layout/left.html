@@ -124,22 +124,22 @@
                     <li th:class="${#strings.contains(path,'/set/mbr/mng')} ? active : ''">
                     	<a href="/p/set/mmbr">사용자</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/prd/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/prd/mng')} ? active : ''">
                     	<a href="/p/set/prd">상품</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/bnd/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/bnd/mng')} ? active : ''">
                     	<a href="/p/set/bndl">묶음상품</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/item/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/item/mng')} ? active : ''">
                     	<a href="/p/set/item">검체 항목 관리</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/ritem/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/ritem/mng')} ? active : ''">
                     	<a href="/p/set/ritem">결과 항목 관리</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/prd/item')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/prd/item')} ? active : ''">
                     	<a href="/p/set/prd_item">검체 연결 설정</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:class="${#strings.contains(path,'/set/pritem/mng')} ? active : ''" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/pritem/mng')} ? active : ''">
                     	<a href="/p/set/prd_ritem">결과 연결 설정</a>
                     </li>
                 </ul>
