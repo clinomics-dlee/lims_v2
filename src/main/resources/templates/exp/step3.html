@@ -55,19 +55,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<!-- begin tab-1 -->
 						<div class="tab-pane fade active show" id="step1-tab-1">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1">서비스</label>
-								<div>
-									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
-										<option value="">All</option>
-										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
-									</select>
-								</div>
-								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
-								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
-								    <span class="input-group-append">
-								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
-									</span>
-								</div>
 								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>

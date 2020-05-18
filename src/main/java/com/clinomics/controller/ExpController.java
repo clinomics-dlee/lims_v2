@@ -8,6 +8,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import com.clinomics.service.ExpService;
+import com.clinomics.service.SampleDbService;
 import com.google.common.collect.Maps;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -33,6 +34,9 @@ public class ExpController {
 	
     @Autowired
     ExpService expService;
+
+	@Autowired
+    SampleDbService sampleDbService;
 
 	@GetMapping("/rdy/get")
 	public Map<String, Object> getRdy(@RequestParam Map<String, String> params) {
@@ -129,6 +133,11 @@ public class ExpController {
 	public Map<String, String> completeStep3(@RequestParam("mappingNos[]") List<String> mappingNos) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return expService.completeStep3(mappingNos, userDetails.getUsername());
+	}
+
+	@GetMapping("/db/sample/get")
+	public Map<String, Object> getSampleDb(@RequestParam Map<String, String> params) {
+		return sampleDbService.find(params, 400);
 	}
 
 	// ############################ private

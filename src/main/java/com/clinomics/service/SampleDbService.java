@@ -124,4 +124,35 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
 	}
 
+	public Map<String, Object> find(Map<String, String> params, int statusCodeNumber) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+		long total;
+		
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.statusCodeGt(statusCodeNumber));
+					
+		
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
+		
+		List<Sample> list = page.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
 }
