@@ -153,31 +153,38 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> equalLaboratoryId(String laboratoryId) {
+	public static Specification<Sample> laboratoryIdEqual(String laboratoryId) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.equal(root.get("laboratoryId"), laboratoryId);
 			return rtn;
 		};
 	}
 
-	public static Specification<Sample> equalVersion(int version) {
+	public static Specification<Sample> versionEqual(int version) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.equal(root.get("version"), version);
 			return rtn;
 		};
 	}
 
-	public static Specification<Sample> equalMappingNo(String mappingNo) {
+	public static Specification<Sample> mappingNoEqual(String mappingNo) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.equal(root.get("mappingNo"), mappingNo);
 			return rtn;
 		};
 	}
 
-	public static Specification<Sample> groupByMappingInfo() {
+	public static Specification<Sample> mappingInfoGroupBy() {
 		return (root, query, criteriaBuilder) -> {
 			root = query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode")).from(Sample.class);
 			Predicate rtn = criteriaBuilder.conjunction();
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> statusCodeGt(int number) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.greaterThanOrEqualTo(criteriaBuilder.substring(root.get("statusCode"), 2, 3).as(Integer.class), number);
 			return rtn;
 		};
 	}
