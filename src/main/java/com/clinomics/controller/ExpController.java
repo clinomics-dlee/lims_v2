@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -119,7 +120,7 @@ public class ExpController {
 	}
 
 	@PostMapping("/step3/chipInfos/update")
-	public Map<String, String> updateChipInfos(@RequestParam List<Map<String, String>> params) {
+	public Map<String, String> updateChipInfos(@RequestBody List<Map<String, String>> params) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return expService.updateChipInfos(params, userDetails.getUsername());
 	}
