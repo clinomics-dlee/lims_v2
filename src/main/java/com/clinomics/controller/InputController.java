@@ -55,13 +55,13 @@ public class InputController {
 	
 	@GetMapping("/rvc")
 	@ResponseBody
-	public Map<String, Object> get(@RequestParam Map<String, String> params) {
-		return inputService.find(params);
+	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
+		return inputService.find(params, StatusCode.S040_INPUT_APPROVE);
 	}
 	
 	@GetMapping("/db")
 	@ResponseBody
-	public Map<String, Object> get(@RequestParam Map<String, String> params) {
+	public Map<String, Object> db(@RequestParam Map<String, String> params) {
 		return inputService.find(params, StatusCode.S040_INPUT_APPROVE);
 	}
 	
