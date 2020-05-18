@@ -216,7 +216,7 @@ public class ExpService {
 		List<Sample> items = new ArrayList<Sample>();
 		for (Map<String, Object> sht : sheetList) {
 			// #. 검사실ID값으로 조회한 모든 검체 업데이트
-			Specification<Sample> where = Specification.where(SampleSpecification.equalLaboratoryId((String)sht.get("검사실 ID")));
+			Specification<Sample> where = Specification.where(SampleSpecification.laboratoryIdEqual((String)sht.get("검사실 ID")));
 			List<Sample> samples = sampleRepository.findAll(where);
 
 			if (samples.size() < 1) {
@@ -433,8 +433,8 @@ public class ExpService {
 				int version = NumberUtils.toInt(genotypingInfo[1]);
 				
 				Specification<Sample> where = Specification
-						.where(SampleSpecification.equalLaboratoryId(laboratoryId))
-						.and(SampleSpecification.equalVersion(version));
+						.where(SampleSpecification.laboratoryIdEqual(laboratoryId))
+						.and(SampleSpecification.versionEqual(version));
 				List<Sample> samples = sampleRepository.findAll(where);
 				Sample s = samples.get(0);
 				// #. 검사실ID 또는 version이 잘못 입력된 경우
@@ -503,8 +503,7 @@ public class ExpService {
 		}
 		long total;
 		
-		Specification<Sample> where = Specification
-					.where(SampleSpecification.groupByMappingInfo());
+		Specification<Sample> where = Specification.where(SampleSpecification.mappingInfoGroupBy());
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -529,7 +528,7 @@ public class ExpService {
 			}
 		}
 
-		Specification<Sample> where = Specification.where(SampleSpecification.equalMappingNo(mappingNo));
+		Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 		List<Sample> samples = sampleRepository.findAll(where);
 
 		for (Sample sample : samples) {
@@ -557,7 +556,7 @@ public class ExpService {
 				}
 			}
 	
-			Specification<Sample> where = Specification.where(SampleSpecification.equalMappingNo(mappingNo));
+			Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 			List<Sample> samples = sampleRepository.findAll(where);
 	
 			for (Sample sample : samples) {
@@ -580,7 +579,7 @@ public class ExpService {
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
 		for (String mappingNo : mappingNos) {
-			Specification<Sample> where = Specification.where(SampleSpecification.equalMappingNo(mappingNo));
+			Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 			List<Sample> samples = sampleRepository.findAll(where);
 
 			for (Sample sample : samples) {
@@ -613,7 +612,7 @@ public class ExpService {
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusEqual(StatusCode.S200_EXP_READY));
+					.and(SampleSpecification.statusCodeGt(400));
 					
 		
 		total = sampleRepository.count(where);
