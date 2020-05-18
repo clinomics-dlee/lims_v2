@@ -134,15 +134,15 @@ public class InputService {
 	public Map<String, String> save(Map<String, String> datas) {
 		Map<String, String> rtn = Maps.newHashMap();
 		
-		String id = datas.getOrDefault("id", "");
+		String id = datas.getOrDefault("id", "0");
 		
 		Sample sample = searchExistsSample(id);
-
-		boolean existsSample = Optional.ofNullable(sample.getId()).isPresent();
+		
+		boolean existsSample = sample.getId() > 0;
 		
 		Bundle bundle;
 		if (existsSample) {
-			if (!sampleHistoryRepository.existsBySample_Id(id)) {
+			if (!sampleRepository.existsById(NumberUtils.toInt(id))) {
 				saveSampleHistory(sample);
 			}
 			bundle = sample.getBundle();
@@ -206,7 +206,7 @@ public class InputService {
 	public Map<String, String> receive(Map<String, String> datas) {
 		Map<String, String> rtn = Maps.newHashMap();
 		
-		String id = datas.getOrDefault("id", "");
+		String id = datas.getOrDefault("id", "0");
 		
 		Sample sample = searchExistsSample(id);
 

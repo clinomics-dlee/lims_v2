@@ -290,9 +290,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		for (var r = 0; r < rows; r++) {
 			var map = {};
 			for (const [key, value] of Object.entries(frmData)) {
-				map[key] = value[r];
+				if (rows > 1) {
+					map[key] = value[r];
+				} else {
+					map[key] = value;
+				}
 			}
-			map.bundle = $("#sel_bundle").val();
+			map.bundleId = $("#sel_bundle").val();
 			data.push(map);
 		}
 		
