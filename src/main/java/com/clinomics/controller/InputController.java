@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.clinomics.service.setting.BundleService;
 import com.clinomics.service.InputService;
+import com.clinomics.enums.StatusCode;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
 
@@ -52,10 +53,16 @@ public class InputController {
 		return "work/register";
 	}
 	
-	@GetMapping("/get")
+	@GetMapping("/rvc")
 	@ResponseBody
 	public Map<String, Object> get(@RequestParam Map<String, String> params) {
 		return inputService.find(params);
+	}
+	
+	@GetMapping("/db")
+	@ResponseBody
+	public Map<String, Object> get(@RequestParam Map<String, String> params) {
+		return inputService.find(params, StatusCode.S040_INPUT_APPROVE);
 	}
 	
 	@PostMapping("/save")
@@ -91,11 +98,10 @@ public class InputController {
 	
 	@PostMapping("/receive")
 	@ResponseBody
-	public Map<String, String> getItemByBundle(@RequestParam Map<String, String> datas) {
+	public Map<String, String> receive(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		datas.put("memberId", userDetails.getUsername());
 		
-		return inputService.receive(datas);
+		return inputService.receive(ids, userDetails.getUsername());
 	}
 	
 	@PostMapping("/excel/import")

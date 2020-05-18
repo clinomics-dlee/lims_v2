@@ -4,6 +4,14 @@ xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <th:block th:replace="layout/head"></th:block>
+    <style>
+	
+	#table_form td, #table_form th {
+		padding: 2px 10px;
+		border: 0;
+	}
+	
+	</style>
 </head>
 <body class="pace-done">
 	<!-- begin #page-loader -->
@@ -25,83 +33,91 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_history"></th:block>
-		<th:block th:replace="popup/result"></th:block>
 		<th:block th:replace="popup/sample_detail"></th:block>
-		<th:block th:replace="popup/sample_detail_readonly"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">Home</li>
-				<li class="breadcrumb-item">Work</li>
-				<li class="breadcrumb-item active">Complete</li>
+				<li class="breadcrumb-item">입고</li>
+				<li class="breadcrumb-item active">입고DB</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header" th:text="#{menu.complete}">Complete</h1>
-			<!-- end page-header -->
+			<h1 id="page-header" class="page-header">입고DB</h1>
 			
-			<!-- begin content panel -->
 			<div class="row">
 				<div class="col-xl-12">
+					
 					<ul class="nav nav-tabs">
 						<li class="nav-item">
-							<a href="#complete-tab-1" data-toggle="tab" class="nav-link active">
+							<a href="#collect-tab-1" data-toggle="tab" class="nav-link active">
 								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none" th:text="#{common.list}">List</span>
+								<span class="d-sm-block d-none">입고</span>
 							</a>
 						</li>
 					</ul>
 					
-					<!-- begin tab content -->
 					<div class="tab-content">
-						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="complete-tab-1">
+						<!-- begin tab-pane -->
+						<div class="tab-panel" id="collect-tab-1">
+					
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
-								<div>
-									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
-										<option value="">All</option>
+								<label class="col-form-label col-md-1">서비스</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_bundle">
+										<option value>전체</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
-								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
-								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
-								    <span class="input-group-append">
+								
+								<label class="col-form-label">조회일자</label>
+								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
+								    <!-- <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
-									</span>
+									</span> -->
 								</div>
-								<label class="col-form-label col-md-1" th:text="#{common.keyword}">Key word</label>
+								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
+									
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10" th:text="#{common.search}">Search</button>
-									<button onClick="createPdf();" class="btn btn-success m-l-20" th:text="#{page.complete.recreate}">Recreate Report PDF</button>
+									<button onClick="search();" class="btn btn-default m-l-10 ">조회</button>
 								</div>
 							</div>
 							<hr/>
-							<div id="_complete_sample_grid"></div>
+							<div id="_collect_grid">
+							</div>
 						</div>
-						<!-- end tab-1 -->
 					</div>
-					<!-- end tab content -->
 				</div>
 			</div>
-			<!-- end content panel -->
+			
+			
+			
+			<div class="panel panel-inverse">
+				<!-- begin panel-heading -->
+				
+				<!-- end panel-body -->
+			</div>
+			<!-- end panel -->
 		</div>
 		
 		<!-- end #content -->
 		<!-- begin scroll to top btn -->
 		<!-- end scroll to top btn -->
 	</div>
+	
+	<input type="hidden" name="startDate" id="startDate" value="" />
+	<input type="hidden" name="finishDate" id="finishDate" value="" />
 	<!-- end page container -->
 	
 	
 	<script th:inline="javascript">
-	/* <![CDATA[ */
+	/* <![CDATA[ */       
 
-	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	var tables = [];
+	var count;
 	
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
@@ -110,19 +126,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	$(document).ready(function() {
 		App.init();
 		
-		$('#sel_bundle').on('change', function () {
-			//search();
-		});
+		TableManageDefault.init();
 		
-		$("#keyword").keydown(function(key) {
-			if (key.keyCode == 13) {
-				search();
-			}
-		});
+		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
 		
-		//set search date
 		$('#default-daterange').daterangepicker({
-			opens: 'left',
+			opens: 'right',
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: moment().subtract(1, 'months'),
@@ -142,13 +151,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_complete_sample_grid', true, [10, 50] , [10, 50]);
-		drawCompleteSampleGrid();
-	});
-	
-	function drawCompleteSampleGrid() {
-		UserTable.draw('_complete_sample_grid', {
-			url : "/work/complete/get",
+		UserTable.draw('_collect_grid', {
+			url : "/input/get",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -159,115 +163,97 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				};
 				return param;
 			},
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
 			beforeSend : function(xhr) {
 				xhr.setRequestHeader(header, token);
 			}
-		}, [{
-			title : ' ',
-			data : "id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			type : {
-				name : "checkbox"
-			}
-		}, {
-			title : 'History',
-			data : "sample.id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
-			}
-		}, {
-			title : 'No', 
-			data : 'id',
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<string>' + (index + 1) + '</string>';
-			}
-		}, {
-			title : "Laboratory",
-			data : "sample.id",
-			render : function(row, data, index) {
-				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
-			}
-		}, {
-			title : "Barcode",
-			data : "sample.barcode"
-		}, {
-			title : "Product",
-			data : "sample.bundle.name",
-		}, {
-			title : "Chip Number",
-			data : "chipNumber",
-		}, {
-			title : "Status",
-			data : "statusCode",
-			render : function(row, data, index) {
-				var value = g_statusCodeInfo[data];
-				return value;
-			}
-		}, {
-			serverHeader : true
-		}, {
-			title : "Experiment Date",
-			data : "createdDate",
-			type : "date"
-		}, {
-			title : "Experiment user",
-			data : "member.name",
-		}]);
-	}
-	
-	function search() {
-		UserTable.reload('_complete_sample_grid');
-	}
-	
-	function createPdf() {
-		var checkedRows = UserTable.getCheckedRows("_complete_sample_grid");
-		if (checkedRows.length > 0) {
-			CommonMsg.okCancel(function() {
-				var resultIds = [];
-				for (var i = 0; i < checkedRows.length; i++) {
-					var row = checkedRows[i];
-					resultIds.push(row.id);
+		}, [ 
+			
+			{
+				title : ' ', 
+				data : 'id',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				type : {
+					name : "checkbox"
 				}
-				
-				$.ajax({
-		            url: '/work/complete/recreate/pdf/multi',
-			        type : "post",
-			        dataType : 'json',
-			        data : {resultIds : resultIds},
-			        beforeSend: function(xhr) {
-						xhr.setRequestHeader(header, token);
-					},
-				    success: function(data, xhr) {
-				    	if (data.result == "00") {
-				    		CommonMsg.save(function() {
-				    			$("#modal-sample-detail").modal('hide');
-				    			UserTable.reload('_complete_sample_grid');
-							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
-						}
-					},
-					error : function(data) {
-						CommonMsg.error(function() { });
-					},
-					complete : function() {
-						
-					}
-				});
+			},
+			{
+				title : '실험실', 
+				data : 'laboratoryId'
+			},
+			{
+				title : '서비스', 
+				data : 'bundle.name'
+			},
+			{
+				serverHeader : true
+			},
+			{
+				title : '검체 등록일자', 
+				data : 'createdDate',
+				type : 'date'
+			},
+			{
+				title : '등록자', 
+				data : 'member.name'
+			}
+		], null);
+			
+	});
+	
+	function setDatepicker(aDateInputs) {
+		
+		for (var e in aDateInputs) {
+			
+			$('input[name="' + aDateInputs[e] + '"]').datepicker({
+				dateFormat : 'yy-mm-dd'
 			});
 		}
 	}
 	
+	function receive() {
+		var checkedRows = UserTable.getCheckedRows('_collect_grid');
+		var data = [];
+		for (var cr in checkedRows) {
+			data.push(checkedRows[cr].id);
+		}
+		$.ajax({
+            url: '/input/save',
+			type: 'post',
+	        data : JSON.stringify(data),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result == "00") {
+					CommonMsg.save(function() {
+						$("#frm_new")[0].reset();
+					});
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function search() {
+		UserTable.reload('_collect_grid');
+	}
+	
+	
+	
 	/* ]]> */
 	</script>
 	
-	<input type="hidden" name="startDate" id="startDate" value="" />
-	<input type="hidden" name="finishDate" id="finishDate" value="" />
-
 </body>
 </html>

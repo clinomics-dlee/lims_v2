@@ -184,7 +184,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'laboratoryId'
 			},
 			{
-				title : '상품', 
+				title : '서비스', 
 				data : 'bundle.name'
 			},
 			{
@@ -214,11 +214,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function receive() {
-		
+		var checkedRows = UserTable.getCheckedRows('_collect_grid');
+		var data = [];
+		for (var cr in checkedRows) {
+			data.push(checkedRows[cr].id);
+		}
 		$.ajax({
             url: '/input/save',
 			type: 'post',
-	        data : JSON.stringify($('#frm_new').serializeObject()),
+	        data : JSON.stringify(data),
 	        dataType : 'json',
 	        contentType : "application/json;charset=utf-8",
 	        beforeSend: function(xhr) {

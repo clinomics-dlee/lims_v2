@@ -105,7 +105,19 @@ public class SampleSpecification {
 		};
 	}
 	
-	public static Specification<Sample> equalStatus(StatusCode statusCode) {
+	public static Specification<Sample> statusNotIn(List<StatusCode> statusCodes) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+			
+			predicatesAnds.add(criteriaBuilder.not(root.get("statusCode").in(statusCodes)));
+			
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+	
+	public static Specification<Sample> statusEqual(StatusCode statusCode) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
@@ -117,7 +129,7 @@ public class SampleSpecification {
 		};
 	}
 	
-	public static Specification<Sample> notEqualStatus(StatusCode statusCode) {
+	public static Specification<Sample> statusNotEqual(StatusCode statusCode) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();

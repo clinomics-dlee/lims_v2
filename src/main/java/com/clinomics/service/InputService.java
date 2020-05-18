@@ -69,7 +69,7 @@ public class InputService {
 		return dataTableService.getDataTableMap(draw, draw, total, total, list);
 	}
 	
-	public Map<String, Object> find(Map<String, String> params) {
+	public Map<String, Object> find(Map<String, String> params, StatusCode statusCode) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
@@ -88,7 +88,7 @@ public class InputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.equalStatus(StatusCode.S000_INPUT_REG));
+					.and(SampleSpecification.statusEqual(statusCode));
 					
 		
 		total = sampleRepository.count(where);
@@ -204,27 +204,13 @@ public class InputService {
 	}
 	
 	@Transactional
-	public Map<String, String> receive(Map<String, String> datas) {
+	public Map<String, String> receive(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		
-		String id = datas.getOrDefault("id", "0");
-		
-		Sample sample = searchExistsSample(id);
+		List<Sample> samples = sampleRepository.findByIdIn(ids);
 
-		boolean existsSample = Optional.ofNullable(sample.getId()).isPresent();
+		samples.stream().forEach(s -> s.setStatusCode(StatusCode.S020_INPUT_RCV));
 
-		if (existsSample) {
-			Optional<Member> oMember = memberRepository.findById(datas.getOrDefault("memberId", ""));
-			Member member = oMember.orElseThrow(NullPointerException::new);
-
-			sample.setStatusCode(StatusCode.S020_INPUT_RCV);
-			sample.setInputApproveMember(member);
-			sample.setInputApproveDate(LocalDateTime.now());
-			sampleRepository.save(sample);
-
-		} else {
-			rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
-		}
+		sampleRepository.saveAll(samples);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
