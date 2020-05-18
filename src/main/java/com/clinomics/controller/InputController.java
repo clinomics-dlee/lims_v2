@@ -74,7 +74,7 @@ public class InputController {
 		
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return inputService.save(datas, userDetails.getUsername());
+		return inputService.saveFromList(datas, userDetails.getUsername());
 	}
 	
 	@GetMapping("/itemby/sample/{id}")
