@@ -3,7 +3,8 @@
 xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <th:block th:replace="layout/head"></th:block>
+	<th:block th:replace="layout/head"></th:block>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
     <style>
 	
 	#table_form td, #table_form th {
@@ -56,12 +57,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<!-- begin panel-body -->
 						<div id="panel-body" class="panel-body">
 							<!-- begin tab-pane -->
-
+							
 							<div class="form-group row m-b-15">
 								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200"
-										data-parsley-required="true" data-parsley-errors-container="#error_bundle4" id="sel_bundle4">
+										data-parsley-required="true" data-parsley-errors-container="#error_bundle4" id="sel_bundle" name="bundle">
 										<option value>선택해 주세요</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
@@ -99,7 +100,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 												<button type="button" class="btn btn-default m-r-5 m-b-5" onclick="createRow();">그리드열 생성</button>
 											</div>
 											<div class="col-xs-push-0">
-												<input type="text" id="txt_create_grid" class="form-control width-50"
+												<input type="text" id="txt_create_grid" class="form-control width-50" style = "text-align:right;"
 													onkeypress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;"/>
 											</div>
 											<div class="col-xs-push-0">
@@ -109,7 +110,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 												<button type="button" class="btn btn-default m-r-5 m-b-5" onclick="excelUpload();">엑셀 업로드</button>
 											</div>
 											<div class="col-xs-push-0">
-												<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="importExcelToTable();">저장</button>
+												<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">저장</button>
 											</div>
 											<div class="hide">
 												<input type="file" id="file" name="file">
@@ -122,25 +123,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										</div>
 										<input type="hidden" id="frmBundleId" name="bundleId" value=""/>
 									</form>
-									<div>
-										<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-											<div class="dataTables_scroll" style="overflow: auto; width: 100%; margin-bottom: 0;" id="add_single_sample4">
-											</div>
+									<form id="frm_new" data-parsley-validate="true">
+										<div id="_input_grid">
 										</div>
-									</div>
+									</form>
 								</div>
 								<div class="tab-pane fade" id="new-tab-2">
-									
-									<form id="fileupload" method="POST" enctype="multipart/form-data" data-parsley-validate="true">
-										<div class="form-group row m-b-15">
-											
-											<div class="col-md-4">
-											</div>
-											
-										</div>
-										<input type="hidden" id="frmBundleId2" name="bundleId" value=""/>
-									</form>
-									
 									<div id="_import_grid">
 									</div>
 								</div>
@@ -192,9 +180,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		
 		TableManageDefault.init();
 		
-		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_input_grid', false);
 		
-		$('#sel_bundle3, #sel_bundle4').on('change', function () {
+		$('#sel_bundle3, #sel_bundle').on('change', function () {
 			//initForm($(this).attr('id'));
 		});
 		
@@ -204,7 +192,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			alert(fileName);
 			$('#import_file').text(fileName); */
 			if ($("#file").val() == '') return;
-			$("#frmBundleId").val($("#sel_bundle4").val());
+			$("#frmBundleId").val($("#sel_bundle").val());
 			
 			var form = $('#fileupload')[0];
 			var data = new FormData(form);
@@ -266,16 +254,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	});
 	
 	function excelForm() {
-		if ($("#sel_bundle4").parsley().validate() != true) return;
+		if ($("#sel_bundle").parsley().validate() != true) return;
 		
-		var bundleId = $("#sel_bundle4").val();
+		var bundleId = $("#sel_bundle").val();
 		//if (bundleId == "") return;
 		
 		location.href = '/input/excel/form?bundleId=' + bundleId;
 	}
 	
 	function excelUpload() {
-		if ($("#sel_bundle4").parsley().validate() != true) return;
+		if ($("#sel_bundle").parsley().validate() != true) return;
 		
 		$('#file').trigger('click'); 
 		
@@ -295,11 +283,23 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		if (!$('#frm_new').parsley().validate()) {
 			return;	
 		}
+		if ($("#sel_bundle").parsley().validate() != true) return;
+		var frmData = $('#frm_new').serializeObject();
+		var data = [];
+		var rows = $("#_input_grid table tbody tr").length;
+		for (var r = 0; r < rows; r++) {
+			var map = {};
+			for (const [key, value] of Object.entries(frmData)) {
+				map[key] = value[r];
+			}
+			map.bundle = $("#sel_bundle").val();
+			data.push(map);
+		}
 		
 		$.ajax({
             url: '/input/save',
 			type: 'post',
-	        data : JSON.stringify($('#frm_new').serializeObject()),
+	        data : JSON.stringify(data),
 	        dataType : 'json',
 	        contentType : "application/json;charset=utf-8",
 	        beforeSend: function(xhr) {
@@ -308,7 +308,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		    success: function(data, xhr) {
 		    	if (data.result == "00") {
 					CommonMsg.save(function() {
-						$("#frm_new")[0].reset();
+						UserTable.clear('_input_grid');
 					});
 				} else if (!data.result.startsWith("0")) {
 					CommonMsg.error(function() { });
@@ -356,10 +356,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function createRow() {
-		var bundleId = $("#sel_bundle4").val();
-		if (bundleId == "") return;
-		var id = "sel_bundle4";
-		//if ($("#" + id).parsley().validate() != true) return;
+		
+		if ($("#sel_bundle").parsley().validate() != true) return;
+		var bundleId = $("#sel_bundle").val();
+		//if (bundleId == "") return;
+		var id = "sel_bundle";
+		
 		//var bundleId = $("#" + id).val();
 		$.ajax({
 			url : "/input/itemby/bundle/" + bundleId,
@@ -379,9 +381,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								
 				if (data) {
 					
-					html = '<form id="frm_new" data-parsley-validate="true">';
-					html += '<table id="table_form" class="table table-striped table-bordered">';
-					autoComplete = 'autocomplete="off"';
+					html = '';
+					//html += '<table id="table_form" class="table table-striped table-bordered">';
+					autoComplete = 'autocomplete="off" ';
 					var max = Number($("#txt_create_grid").val());
 					for (var ii = 0; ii < max; ii++) {
 						bodyHtml += "<tr>";
@@ -398,11 +400,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							//if (r % 2 == 0) html += '<tr>'
 								console.log(data[r]);
 							if (ii == 0) {
-								if (data[r].type != "date") {
-									headHtml += '<th style="width:' + ((Number(data[r].width) / 20) - 50) + 'px;">';
-								} else {
-									headHtml += '<th>';
-								}
+								
+								headHtml += '<th>';
 								headHtml += data[r].name;
 								headHtml += '</th>';
 							}
@@ -419,17 +418,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								aDateInputs.push(data[r].nameCode);
 								bodyHtml += '<div class="input-group" data-provide="datepicker" style="width:150px;">';
 								bodyHtml += '<input type="text" class="form-control form-control-sm"'
-									+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + '"' : '')
+									+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + "_" + ii + '"' : '')
 									+ ' placeholder="" '
 									+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
 								bodyHtml += '<span class="input-group-append">';
 								bodyHtml += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
 								bodyHtml += '</span>';
-								bodyHtml += '</div><div id="error_' + data[r].nameCode + '"></div>';
+								bodyHtml += '</div><div id="error_' + data[r].nameCode + "_" + ii + '"></div>';
 							} else {
 								bodyHtml += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
-									+ 'name="' + data[r].nameCode + '" ' + autoComplete;
-								
+									+ 'name="' + data[r].nameCode + '" ' + autoComplete
+									+ 'style="width:' + ((Number(data[r].width) / 10) - 50) + 'px;" ';
 								bodyHtml += readonly
 								bodyHtml += '/>';
 							}
@@ -443,14 +442,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</tr></thead>';
 					html += '<tbody>' + bodyHtml;
 					html += '</tbody>';
-					html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
-					html += '</table>';
-					html += '</form>';
+					//html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
+					//html += '</table>';
+					html += '';
 					//html += '<hr/>';
 					
 					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
 					
-					$("#add_single_sample" + id.charAt(id.length - 1)).html(html);
+					$("#_input_grid table").html(html);
 				}
 				
 				setDatepicker(aDateInputs);
@@ -463,42 +462,42 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function excelImport() {
-		if ($("#sel_bundle4").parsley().validate() != true) {
+		if ($("#sel_bundle").parsley().validate() != true) {
 			return;
 		}
-		var bundleId = $("#sel_bundle4").val();
+		var bundleId = $("#sel_bundle").val();
 		
 		
-		UserTable.init('_import_grid', true, [50, 100] , [50, 100]);
+		// UserTable.init('_import_grid', true, [50, 100] , [50, 100]);
 		
-		UserTable.draw('_import_grid', {
-			url : "/input/get/temp",
-			type : "GET",
-			dataType : "json",
-			contentType : "application/json; charset=utf-8",
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			}
-		}, [ ], function(data) {
-			var html = '', headHtml = '<tr>';
-			for (var s in data) {
-				html += '<tr>';
-				var items = data[s].items;
-				var fields = Object.keys(items);
-				for (var r in fields) {
-					var val = items[fields[r]];
-					html += '<td>' + (val ? val : '') + '</td>';
-					if (s == 0) headHtml += '<th>' + (fields[r] ? fields[r] : '') + '</th>';
-				}
-				html += '</tr>';
-			}
-			headHtml += '</tr>';
-			var rtn = {
-				html : html,
-				headHtml : headHtml
-			};
-			return rtn;
-		});
+		// UserTable.draw('_import_grid', {
+		// 	url : "/input/get/temp",
+		// 	type : "GET",
+		// 	dataType : "json",
+		// 	contentType : "application/json; charset=utf-8",
+		// 	beforeSend : function(xhr) {
+		// 		xhr.setRequestHeader(header, token);
+		// 	}
+		// }, [ ], function(data) {
+		// 	var html = '', headHtml = '<tr>';
+		// 	for (var s in data) {
+		// 		html += '<tr>';
+		// 		var items = data[s].items;
+		// 		var fields = Object.keys(items);
+		// 		for (var r in fields) {
+		// 			var val = items[fields[r]];
+		// 			html += '<td>' + (val ? val : '') + '</td>';
+		// 			if (s == 0) headHtml += '<th>' + (fields[r] ? fields[r] : '') + '</th>';
+		// 		}
+		// 		html += '</tr>';
+		// 	}
+		// 	headHtml += '</tr>';
+		// 	var rtn = {
+		// 		html : html,
+		// 		headHtml : headHtml
+		// 	};
+		// 	return rtn;
+		// });
 	}
 	
 	

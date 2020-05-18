@@ -189,6 +189,19 @@ public class InputService {
 		return rtn;
 	}
 	
+	public Map<String, String> saveFromList(List<Map<String, String>> list, String memberId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		for (Map<String, String> l : list) {
+			l.put("memberId", memberId);
+			Map<String, String> tmp = this.save(l);
+			if (ResultCode.SUCCESS.get().equals(tmp.getOrDefault("result", "AA"))) {
+				return tmp;
+			}
+			rtn.putAll(tmp);
+		}
+		return rtn;
+	}
+	
 	@Transactional
 	public Map<String, String> receive(Map<String, String> datas) {
 		Map<String, String> rtn = Maps.newHashMap();

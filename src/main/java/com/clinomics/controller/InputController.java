@@ -1,6 +1,7 @@
 package com.clinomics.controller;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
@@ -65,6 +66,15 @@ public class InputController {
 		datas.put("memberId", userDetails.getUsername());
 		
 		return inputService.save(datas);
+	}
+	
+	@PostMapping("/save")
+	@ResponseBody
+	public Map<String, String> saveFromList(@RequestBody List<Map<String, String>> datas) {
+		
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return inputService.save(datas, userDetails.getUsername());
 	}
 	
 	@GetMapping("/itemby/sample/{id}")
