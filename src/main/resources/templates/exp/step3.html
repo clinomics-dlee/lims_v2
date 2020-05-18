@@ -25,20 +25,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_history"></th:block>
-		<th:block th:replace="popup/result"></th:block>
-		<th:block th:replace="popup/sample_detail"></th:block>
-		<th:block th:replace="popup/sample_detail_readonly"></th:block>
+		<th:block th:replace="popup/mapping_upload"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
 				<li class="breadcrumb-item">Home</li>
-				<li class="breadcrumb-item">Work</li>
-				<li class="breadcrumb-item active">Complete</li>
+				<li class="breadcrumb-item">실험</li>
+				<li class="breadcrumb-item active">STEP3</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header" th:text="#{menu.complete}">Complete</h1>
+			<h1 id="page-header" class="page-header">실험 - STEP3</h1>
 			<!-- end page-header -->
 			
 			<!-- begin content panel -->
@@ -46,9 +43,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				<div class="col-xl-12">
 					<ul class="nav nav-tabs">
 						<li class="nav-item">
-							<a href="#complete-tab-1" data-toggle="tab" class="nav-link active">
+							<a href="#step1-tab-1" data-toggle="tab" class="nav-link active">
 								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none" th:text="#{common.list}">List</span>
+								<span class="d-sm-block d-none">목록</span>
 							</a>
 						</li>
 					</ul>
@@ -56,9 +53,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<!-- begin tab content -->
 					<div class="tab-content">
 						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="complete-tab-1">
+						<div class="tab-pane fade active show" id="step1-tab-1">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
+								<label class="col-form-label col-md-1">서비스</label>
 								<div>
 									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
 										<option value="">All</option>
@@ -71,17 +68,21 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span>
 								</div>
-								<label class="col-form-label col-md-1" th:text="#{common.keyword}">Key word</label>
+								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10" th:text="#{common.search}">Search</button>
-									<button onClick="createPdf();" class="btn btn-success m-l-20" th:text="#{page.complete.recreate}">Recreate Report PDF</button>
+									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
 								</div>
 							</div>
 							<hr/>
-							<div id="_complete_sample_grid"></div>
+							<div id="_step3_grid"></div>
+							<hr/>
+							<div class="row">
+								<button onClick="updateChipInfo();" class="btn btn-success m-l-20">Chip Barcode 입력</button>
+								<button onClick="completeStep3();" class="btn btn-yellow m-l-20">Step3 완료</button>
+							</div>
 						</div>
 						<!-- end tab-1 -->
 					</div>
@@ -102,6 +103,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	/* <![CDATA[ */
 
 	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	var g_genotypingMethodCodeInfo = /*[[${genotypingMethodCodes}]]*/ {};
+	var g_chipTypeCodeInfo = /*[[${chipTypeCodes}]]*/ {};
 	
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
@@ -142,13 +145,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_complete_sample_grid', true, [10, 50] , [10, 50]);
-		drawCompleteSampleGrid();
+		UserTable.init('_step3_grid', true, [10, 50] , [10, 50]);
+		drawStep3Grid();
 	});
 	
-	function drawCompleteSampleGrid() {
-		UserTable.draw('_complete_sample_grid', {
-			url : "/work/complete/get",
+	function drawStep3Grid() {
+		UserTable.draw('_step3_grid', {
+			url : "/exp/step3/get",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -171,14 +174,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				name : "checkbox"
 			}
 		}, {
-			title : 'History',
-			data : "sample.id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
-			}
-		}, {
 			title : 'No', 
 			data : 'id',
 			headClassName : 'width-50',
@@ -187,58 +182,105 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				return '<string>' + (index + 1) + '</string>';
 			}
 		}, {
-			title : "Laboratory",
-			data : "sample.id",
+			title : "Mapping No",
+			data : "mappingNo"
+		}, {
+			title : "Chip Barcode",
+			data : "chipBarcode",
 			render : function(row, data, index) {
-				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
-			}
-		}, {
-			title : "Barcode",
-			data : "sample.barcode"
-		}, {
-			title : "Product",
-			data : "sample.bundle.name",
-		}, {
-			title : "Chip Number",
-			data : "chipNumber",
-		}, {
-			title : "Status",
-			data : "statusCode",
-			render : function(row, data, index) {
-				var value = g_statusCodeInfo[data];
+				var value = '<input type="text" class="form-control" style="width:100%;" id="chipBarcode_' + row.mappingNo + '" value="' + (data != null ? data : "") + '">';
 				return value;
 			}
 		}, {
-			serverHeader : true
+			title : "Chip Type",
+			data : "chipTypeCode",
+			headClassName : 'width-300',
+			render : function(row, data, index) {
+				var value = '<select class="form-control" style="width:100%;" id="chipTypeCode_' + row.mappingNo + '">';
+				for (var key in g_chipTypeCodeInfo) {
+					var selected = "";
+					if (data == key) {
+						selected = "selected";
+					}
+					value += '<option value="' + key + '" ' + selected + '>' + g_chipTypeCodeInfo[key] + '</option>';
+				}
+				value += '</select>';
+				return value;
+			}
 		}, {
-			title : "Experiment Date",
-			data : "createdDate",
-			type : "date"
-		}, {
-			title : "Experiment user",
-			data : "member.name",
+			title : " ",
+			data : "mappingNo",
+			headClassName : 'width-50',
+			render : function(row, data, index) {
+				return '<a href="javascript:editChipInfo(\'' + data + '\')" class="btn btn-sm btn-success width-60 m-r-2">Edit</a>';
+			}
 		}]);
 	}
 	
 	function search() {
-		UserTable.reload('_complete_sample_grid');
+		UserTable.reload('_step3_grid');
 	}
-	
-	function createPdf() {
-		var checkedRows = UserTable.getCheckedRows("_complete_sample_grid");
+
+	function editChipInfo(mappingNo) {
+		CommonMsg.okCancel(function() {
+			var chipBarcode = $('#chipBarcode_' + mappingNo).val();
+			var chipTypeCode = $('#chipTypeCode_' + mappingNo).val();
+			
+			$.ajax({
+				url: '/exp/step3/chipInfo/update',
+				type : "post",
+				dataType : 'json',
+				data : {
+					mappingNo : mappingNo,
+					chipBarcode : chipBarcode,
+					chipTypeCode : chipTypeCode
+				},
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function(data, xhr) {
+					if (data.result == "00") {
+						CommonMsg.save(function() {
+							$("#modal-sample-detail").modal('hide');
+							UserTable.reload('_step3_grid');
+						});
+					} else if (!data.result.startsWith("0")) {
+						CommonMsg.error(function() { });
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() { });
+				},
+				complete : function() {
+					
+				}
+			});
+		});
+	}
+
+	function updateChipInfo() {
+		var checkedRows = UserTable.getCheckedRows("_step3_grid");
+		console.log(checkedRows);
 		if (checkedRows.length > 0) {
 			CommonMsg.okCancel(function() {
-				var resultIds = [];
+				var mappingInfos = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
-					resultIds.push(row.id);
+
+					var mappingInfo = {
+						mappingNo : row.mappingNo,
+						chipBarcode :  $('#chipBarcode_' + row.mappingNo).val(),
+						mappingNo : $('#chipTypeCode_' + row.mappingNo).val()
+					};
+
+					mappingInfos.push(mappingInfo);
 				}
 				
 				$.ajax({
-		            url: '/work/complete/recreate/pdf/multi',
+		            url: '/exp/step3/chipInfos/update',
 			        type : "post",
 			        dataType : 'json',
-			        data : {resultIds : resultIds},
+			        data : {mappingInfos : mappingInfos},
 			        beforeSend: function(xhr) {
 						xhr.setRequestHeader(header, token);
 					},
@@ -246,7 +288,45 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    	if (data.result == "00") {
 				    		CommonMsg.save(function() {
 				    			$("#modal-sample-detail").modal('hide');
-				    			UserTable.reload('_complete_sample_grid');
+				    			UserTable.reload('_step3_grid');
+							});
+						} else if (!data.result.startsWith("0")) {
+							CommonMsg.error(function() { });
+						}
+					},
+					error : function(data) {
+						CommonMsg.error(function() { });
+					},
+					complete : function() {
+						
+					}
+				});
+			});
+		}
+	}
+
+	function completeStep3() {
+		var checkedRows = UserTable.getCheckedRows("_step3_grid");
+		if (checkedRows.length > 0) {
+			CommonMsg.okCancel(function() {
+				var sampleIds = [];
+				for (var i = 0; i < checkedRows.length; i++) {
+					var row = checkedRows[i];
+					sampleIds.push(row.id);
+				}
+				
+				$.ajax({
+		            url: '/exp/step3/complete',
+			        type : "post",
+			        dataType : 'json',
+			        data : {sampleIds : sampleIds},
+			        beforeSend: function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+				    success: function(data, xhr) {
+				    	if (data.result == "00") {
+				    		CommonMsg.save(function() {
+				    			UserTable.reload('_step3_grid');
 							});
 						} else if (!data.result.startsWith("0")) {
 							CommonMsg.error(function() { });

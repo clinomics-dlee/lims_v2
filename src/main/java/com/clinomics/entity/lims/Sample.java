@@ -280,11 +280,11 @@ public class Sample implements Serializable {
 		this.chipBarcode = chipBarcode;
 	}
 
-	public ChipTypeCode getChipType() {
+	public ChipTypeCode getChipTypeCode() {
 		return chipTypeCode;
 	}
 
-	public void setChipType(ChipTypeCode chipTypeCode) {
+	public void setChipTypeCode(ChipTypeCode chipTypeCode) {
 		this.chipTypeCode = chipTypeCode;
 	}
 

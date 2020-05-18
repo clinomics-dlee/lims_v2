@@ -155,6 +155,13 @@ public class SampleSpecification {
 		};
 	}
 
+	public static Specification<Sample> equalMappingNo(String mappingNo) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.equal(root.get("mappingNo"), mappingNo);
+			return rtn;
+		};
+	}
+
 	public static Specification<Sample> groupByMappingInfo() {
 		return (root, query, criteriaBuilder) -> {
 			root = query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode")).from(Sample.class);

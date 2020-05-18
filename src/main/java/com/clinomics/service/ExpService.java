@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Sample;
+import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
@@ -402,11 +403,16 @@ public class ExpService {
 		}
 		
 		String mappingNo = datas.get("mappingNo");
+
+		// #. TODO Mapping No 중복 체크
+
 		List<Sample> items = new ArrayList<Sample>();
 		for (Map<String, Object> sht : sheetList) {
 			// #. Genotyping ID를 가지고 조회
 			String genotypingId = (String)sht.get("Genotyping ID");
 			String wellPosition = (String)sht.get("Well Position");
+
+			// #. TODO 중복된 Genotyping ID값 확인 필요
 
 			if (genotypingId.length() > 0 && wellPosition.length() > 0) {
 				// #. 둘다 값이 있는 경우 
@@ -469,7 +475,7 @@ public class ExpService {
 
 			// #. GenotypingMethodCode 가 chip인 경우 step3으로, QRT_PCR인 경우 분석 성공으로 처리
 			if (GenotypingMethodCode.CHIP.equals(sample.getGenotypingMethodCode())) {
-				sample.setStatusCode(StatusCode.S220_EXP_STEP2);
+				sample.setStatusCode(StatusCode.S230_EXP_STEP3);
 			} else if (GenotypingMethodCode.QRT_PCR.equals(sample.getGenotypingMethodCode())) {
 				sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
 			}
@@ -477,6 +483,112 @@ public class ExpService {
 			sample.setExpStep2Member(member);
 
 			sampleRepository.save(sample);
+		}
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	public Map<String, Object> findMappingInfos(Map<String, String> params) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+		long total;
+		
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.groupByMappingInfo());
+		
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
+		List<Sample> list = page.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
+	@Transactional
+	public Map<String, String> updateChipInfo(Map<String, String> datas, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+
+		String mappingNo = datas.get("mappingNo");
+		String chipBarcode = datas.get("chipBarcode");
+		String chipTypeCodeKey = datas.get("chipTypeCode");
+		ChipTypeCode chipTypeCode = null;
+		for (ChipTypeCode code : ChipTypeCode.values()) {
+			if (chipTypeCodeKey.equals(code.getKey())) {
+				chipTypeCode = code;
+			}
+		}
+
+		Specification<Sample> where = Specification.where(SampleSpecification.equalMappingNo(mappingNo));
+		List<Sample> samples = sampleRepository.findAll(where);
+
+		for (Sample sample : samples) {
+			sample.setChipBarcode(chipBarcode);
+			sample.setChipTypeCode(chipTypeCode);
+		}
+		sampleRepository.saveAll(samples);
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> updateChipInfos(List<Map<String, String>> datas, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+
+		for (Map<String, String> data : datas) {
+			String mappingNo = data.get("mappingNo");
+			String chipBarcode = data.get("chipBarcode");
+			String chipTypeCodeKey = data.get("chipTypeCode");
+			ChipTypeCode chipTypeCode = null;
+			for (ChipTypeCode code : ChipTypeCode.values()) {
+				if (chipTypeCodeKey.equals(code.getKey())) {
+					chipTypeCode = code;
+				}
+			}
+	
+			Specification<Sample> where = Specification.where(SampleSpecification.equalMappingNo(mappingNo));
+			List<Sample> samples = sampleRepository.findAll(where);
+	
+			for (Sample sample : samples) {
+				sample.setChipBarcode(chipBarcode);
+				sample.setChipTypeCode(chipTypeCode);
+			}
+
+			sampleRepository.saveAll(samples);
+		}
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> completeStep3(List<String> mappingNos, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		LocalDateTime now = LocalDateTime.now();
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+
+		for (String mappingNo : mappingNos) {
+			Specification<Sample> where = Specification.where(SampleSpecification.equalMappingNo(mappingNo));
+			List<Sample> samples = sampleRepository.findAll(where);
+
+			for (Sample sample : samples) {
+				sample.setExpStep3Date(now);
+				sample.setExpStep3Member(member);
+				sample.setStatusCode(StatusCode.S400_ANLS_READY);
+			}
+			sampleRepository.saveAll(samples);
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());

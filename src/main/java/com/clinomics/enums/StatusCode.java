@@ -8,7 +8,6 @@ public enum StatusCode {
 	S210_EXP_STEP1("STEP1"),
 	S220_EXP_STEP2("STEP2"),
 	S230_EXP_STEP3("STEP3"),
-	S250_EXP_APPROVE("실험승인"),
 	S400_ANLS_READY("분석대기"),
 	S410_ANLS_RUNNING("분석중"),
 	S420_ANLS_SUCC("분석성공"),

@@ -107,6 +107,29 @@ public class ExpController {
 		return expService.completeStep2(sampleIds, userDetails.getUsername());
 	}
 
+	@GetMapping("/step3/get")
+	public Map<String, Object> getStep3(@RequestParam Map<String, String> params) {
+		return expService.findMappingInfos(params);
+	}
+
+	@PostMapping("/step3/chipInfo/update")
+	public Map<String, String> updateChipInfo(@RequestParam Map<String, String> params) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return expService.updateChipInfo(params, userDetails.getUsername());
+	}
+
+	@PostMapping("/step3/chipInfos/update")
+	public Map<String, String> updateChipInfos(@RequestParam List<Map<String, String>> params) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return expService.updateChipInfos(params, userDetails.getUsername());
+	}
+
+	@PostMapping("/step3/complete")
+	public Map<String, String> completeStep3(@RequestParam("mappingNos[]") List<String> mappingNos) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return expService.completeStep3(mappingNos, userDetails.getUsername());
+	}
+
 	// ############################ private
 	private void requestExcel(XSSFWorkbook xlsx, String fileName, HttpServletResponse response) {
 		if (fileName == null || fileName.trim().length() < 1) {

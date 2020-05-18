@@ -307,7 +307,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    success: function(data, xhr) {
 				    	if (data.result == "00") {
 				    		CommonMsg.save(function() {
-				    			$("#modal-sample-detail").modal('hide');
 				    			UserTable.reload('_step2_grid');
 							});
 						} else if (!data.result.startsWith("0")) {
