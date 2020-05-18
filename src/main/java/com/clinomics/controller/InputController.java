@@ -68,7 +68,7 @@ public class InputController {
 		return inputService.save(datas);
 	}
 	
-	@PostMapping("/save")
+	@PostMapping("/saveall")
 	@ResponseBody
 	public Map<String, String> saveFromList(@RequestBody List<Map<String, String>> datas) {
 		
