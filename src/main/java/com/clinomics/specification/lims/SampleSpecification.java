@@ -154,4 +154,12 @@ public class SampleSpecification {
 			return rtn;
 		};
 	}
+
+	public static Specification<Sample> groupByMappingInfo() {
+		return (root, query, criteriaBuilder) -> {
+			root = query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode")).from(Sample.class);
+			Predicate rtn = criteriaBuilder.conjunction();
+			return rtn;
+		};
+	}
 }
