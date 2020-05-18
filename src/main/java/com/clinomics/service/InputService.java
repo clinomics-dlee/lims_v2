@@ -101,7 +101,7 @@ public class InputService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
-	public Map<String, Object> findSampleByBundleAndDate(Map<String, String> params) {
+	public Map<String, Object> findDb(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
@@ -118,16 +118,25 @@ public class InputService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params));
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.statusNotIn(
+							Arrays.asList(new StatusCode[] {
+								StatusCode.S000_INPUT_REG,
+								StatusCode.S020_INPUT_RCV
+							})
+						)
+					);
 					
+		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		
 		List<Sample> list = page.getContent();
-		sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
 		long filtered = total;
 		
-		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
 	@Transactional
@@ -212,6 +221,11 @@ public class InputService {
 
 		sampleRepository.saveAll(samples);
 
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	public Map<String, String> approve() {
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}

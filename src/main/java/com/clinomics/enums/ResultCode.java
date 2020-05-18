@@ -3,6 +3,7 @@ package com.clinomics.enums;
 public enum ResultCode {
 	SUCCESS("00"),
 	SUCCESS_NOT_USE_ALERT("01"),
+	SUCCESS_APPROVED("02"),
 	EXCEL_EMPTY("71"),
 	EXCEL_FILE_TYPE("72"),
 	FAIL_UPLOAD("81"),

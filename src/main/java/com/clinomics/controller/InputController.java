@@ -46,23 +46,16 @@ public class InputController {
 	@Autowired
 	BundleService bundleService;
 	
-	@GetMapping()
-	public String add(Model model) {
-		model.addAttribute("bundles", bundleService.selectAll());
-		
-		return "work/register";
-	}
-	
 	@GetMapping("/rvc")
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
-		return inputService.find(params, StatusCode.S040_INPUT_APPROVE);
+		return inputService.find(params, StatusCode.S000_INPUT_REG);
 	}
 	
 	@GetMapping("/db")
 	@ResponseBody
 	public Map<String, Object> db(@RequestParam Map<String, String> params) {
-		return inputService.find(params, StatusCode.S040_INPUT_APPROVE);
+		return inputService.findDb(params);
 	}
 	
 	@PostMapping("/save")
@@ -77,11 +70,27 @@ public class InputController {
 	
 	@PostMapping("/saveall")
 	@ResponseBody
-	public Map<String, String> saveFromList(@RequestBody List<Map<String, String>> datas) {
+	public Map<String, String> saveall(@RequestBody List<Map<String, String>> datas) {
 		
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		return inputService.saveFromList(datas, userDetails.getUsername());
+	}
+	
+	@PostMapping("/receive")
+	@ResponseBody
+	public Map<String, String> receive(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return inputService.receive(ids, userDetails.getUsername());
+	}
+	
+	@PostMapping("/approve")
+	@ResponseBody
+	public Map<String, String> approve(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return inputService.approve(ids, userDetails.getUsername());
 	}
 	
 	@GetMapping("/itemby/sample/{id}")
@@ -94,27 +103,6 @@ public class InputController {
 	@ResponseBody
 	public Map<String, Object> getItemByBundle(@PathVariable String id) {
 		return sampleItemService.findSampleItemByBundle(id);
-	}
-	
-	@PostMapping("/receive")
-	@ResponseBody
-	public Map<String, String> receive(@RequestBody List<Integer> ids) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		return inputService.receive(ids, userDetails.getUsername());
-	}
-	
-	@PostMapping("/excel/import")
-	@ResponseBody
-	public Map<String, Object> importExcelSample(@RequestParam("file") MultipartFile multipartFile, MultipartHttpServletRequest request)
-			throws InvalidFormatException, IOException {
-		
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String memberId = userDetails.getUsername();
-		
-		String bundleId = request.getParameter("bundleId").toString();
-		
-		return inputExcelService.importExcelSample(multipartFile, bundleId, memberId);
 	}
 	
 	@GetMapping("/excel/form")
