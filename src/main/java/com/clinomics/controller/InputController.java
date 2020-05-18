@@ -55,7 +55,7 @@ public class InputController {
 	@GetMapping("/get")
 	@ResponseBody
 	public Map<String, Object> get(@RequestParam Map<String, String> params) {
-		return inputService.findSampleByBundleAndDateResultNullStatusFail(params);
+		return inputService.find(params);
 	}
 	
 	@PostMapping("/save")

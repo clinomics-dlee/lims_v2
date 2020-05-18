@@ -54,18 +54,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<span class="d-sm-block d-none">입고</span>
 							</a>
 						</li>
-						<!-- <li class="nav-item">
-							<a href="#collect-tab-2" data-toggle="tab" class="nav-link">
-								<span class="d-sm-none">Tab 2</span>
-								<span class="d-sm-block d-none">Excel import</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="#collect-tab-3" data-toggle="tab" class="nav-link">
-								<span class="d-sm-none">Tab 3</span>
-								<span class="d-sm-block d-none">Single Resistration</span>
-							</a>
-						</li> -->
 					</ul>
 					
 					<div class="tab-content">
@@ -142,10 +130,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		
 		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
 		
-		$('#sel_bundle3, #sel_bundle4').on('change', function () {
-			initForm($(this).attr('id'));
-		});
-		
 		$('#default-daterange').daterangepicker({
 			opens: 'right',
 			format : 'YYYY/MM/DD',
@@ -187,7 +171,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, [ 
 			
 			{
-				title : 'No', 
+				title : ' ', 
 				data : 'id',
 				headClassName : 'width-50',
 				bodyClassName : 'text-center',
@@ -197,11 +181,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			},
 			{
 				title : '실험실', 
-				data : 'id'
-			},
-			{
-				title : '바코드', 
-				data : 'barcode'
+				data : 'laboratoryId'
 			},
 			{
 				title : '상품', 
@@ -221,90 +201,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			}
 		], null);
 			
-		
-		
-		$('#file').on('change', function () {
-			/* var fileValue = $("#file").val().split("\\");
-			var fileName = fileValue[fileValue.length-1]; // 파일명
-			alert(fileName);
-			$('#import_file').text(fileName); */
-			if ($("#file").val() == '') return;
-			$("#frmBundleId").val($("#sel_bundle4").val());
-			
-			var form = $('#fileupload')[0];
-			var data = new FormData(form);
-			
-			$.ajax({
-				enctype: 'multipart/form-data',
-	            url: '/input/excel/import',
-				type: 'post',
-		        data : data,
-		        processData: false,
-		        contentType: false,
-		        beforeSend: function(xhr) {
-					xhr.setRequestHeader(header, token);
-			        var percentVal = '0%';
-					$("#progress").show();
-					$("#progress div div").width(percentVal);
-					$("#progress div div").text(percentVal);
-				},
-				/* xhr: function() {
-					var xhr = $.ajaxSettings.xhr();
-					xhr.upload.onprogress = function(e) {
-						var percent = e.loaded * 100 / e.total;
-						var percentVal = percent + '%';
-						$("#progress div div").width(percentVal);
-						$("#progress div div").text(percentVal);
-					};
-					return xhr;
-				}, */
-			    success: function(data,xhr) {
-			        if (data.result == "00") {
-				        var percentVal = '100%';
-						$("#progress div div").width(percentVal);
-						$("#progress div div").text(percentVal);
-						
-						excelImport();
-						
-						CommonMsg.save(function() { });
-					} else if (!data.result.startsWith("0")) {
-						CommonMsg.error(function() { });
-					}
-			    },
-			    error : function(xhr, status, error) {
-			    	CommonMsg.error(function() {
-						
-					});
-				},
-				complete : function() {
-					$("#file").val('');
-					$("#progress").hide();
-					//$(".progress-bar").width('0%');
-					//$(".progress-bar").text('0%');
-					
-					//excelImport();
-					
-				}
-			});
-		});
-		
 	});
-	
-	function excelForm() {
-		if ($("#sel_bundle4").parsley().validate() != true) return;
-		
-		var bundleId = $("#sel_bundle4").val();
-		//if (bundleId == "") return;
-		
-		location.href = '/input/excel/form?bundleId=' + bundleId;
-	}
-	
-	function excelUpload() {
-		if ($("#sel_bundle4").parsley().validate() != true) return;
-		
-		$('#file').trigger('click'); 
-		
-	}
 	
 	function setDatepicker(aDateInputs) {
 		
@@ -316,10 +213,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}
 	}
 	
-	function save() {
-		if (!$('#frm_new').parsley().validate()) {
-			return;	
-		}
+	function receive() {
 		
 		$.ajax({
             url: '/input/save',
@@ -348,168 +242,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		});
 	}
 	
-	function importExcelToTable() {
-		var rows = $('#_import_grid table tbody tr');
-		if (rows.length < 1) {
-			return;
-		}
-		
-		$.ajax({
-            url: '/input/import',
-			type: 'get',
-	        dataType : 'json',
-	        contentType : "application/json;charset=utf-8",
-	        beforeSend: function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-		    success: function(data, xhr) {
-		    	if (data.result == "00") {
-					CommonMsg.save(function() {
-						
-					});
-				} else if (!data.result.startsWith("0")) {
-					CommonMsg.error(function() { });
-				}
-			},
-			error : function(data) {
-				CommonMsg.error(function() { });
-			},
-			complete : function() {
-				
-			}
-		});
-	}
-	
-	function initForm(id) {
-		if ($("#" + id).parsley().validate() != true) return;
-		var bundleId = $("#" + id).val();
-		$.ajax({
-			url : "/input/itemby/bundle/" + bundleId,
-			type : "GET",
-			dataType : "json",
-			contentType : "application/json; charset=utf-8",
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success: function (rtn) {
-				
-				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
-				var notnull = false, readonly = '';
-				
-				var data = rtn.sampleItem;
-				var bundle = rtn.bundle;
-								
-				if (data) {
-					
-					html = '<form id="frm_new" data-parsley-validate="true">';
-					html += '<table id="table_form" class="table">';
-					autoComplete = 'autocomplete="off"';
-					for (var r in data) {
-						readonly = '';
-						notnull = data[r].notNull;
-						if ((bundle.autoSequence && data[r].nameCode == "laboratory")
-							|| (bundle.autoBarcode && data[r].nameCode == "barcode")) {
-							
-							readonly = ' readonly';
-							notnull = false;
-						}
-						
-						//html += '<div class="form-group row m-b-15">';
-						if (r % 2 == 0) html += '<tr>'
-						html += '<th>';
-						html += data[r].name;
-						html += ' <th>';
-						html += '<td>';
-						if (data[r].type == "select" && data[r].selectValue) {
-							html += '<select class="form-control form-control-sm"' + (notnull ? parsley : '') + ' name="' + data[r].nameCode + '">';
-							aSplit = data[r].selectValue.split(",");
-							for (var a in aSplit) {
-								html += '<option value="' + aSplit[a] + '">' + aSplit[a] + '</option>';
-							}
-							html += '</select>';
-						} else if (data[r].type == "date") {
-							aDateInputs.push(data[r].nameCode);
-							html += '<div class="input-group" data-provide="datepicker">';
-							html += '<input type="text" class="form-control form-control-sm"'
-								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + '"' : '')
-								+ ' placeholder="click to select the date range" '
-								+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
-							html += '<span class="input-group-append">';
-							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
-							html += '</span>';
-							html += '</div><div id="error_' + data[r].nameCode + '"></div>';
-						} else {
-							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
-								+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" ' + autoComplete;
-							
-							html += readonly
-							html += '/>';
-						}
-						
-						html += '</td>';
-						if (r % 2 == 1) html += '</tr>'
-					}
-					
-					html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
-					html += '</table>';
-					html += '</form>';
-					html += '<hr/>';
-					
-					html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
-					
-					$("#add_single_sample" + id.charAt(id.length - 1)).html(html);
-				}
-				
-				setDatepicker(aDateInputs);
-				
-			},
-			error : function(data) {
-				CommonMsg.error(function() { });
-			}
-		});
-	}
-	
 	function search() {
 		UserTable.reload('_collect_grid');
-	}
-	
-	function excelImport() {
-		if ($("#sel_bundle4").parsley().validate() != true) {
-			return;
-		}
-		var bundleId = $("#sel_bundle4").val();
-		
-		
-		UserTable.init('_import_grid', true, [10, 50] , [10, 50]);
-		
-		UserTable.draw('_import_grid', {
-			url : "/input/get/temp",
-			type : "GET",
-			dataType : "json",
-			contentType : "application/json; charset=utf-8",
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			}
-		}, [ ], function(data) {
-			var html = '', headHtml = '<tr>';
-			for (var s in data) {
-				html += '<tr>';
-				var items = data[s].items;
-				var fields = Object.keys(items);
-				for (var r in fields) {
-					var val = items[fields[r]];
-					html += '<td>' + (val ? val : '') + '</td>';
-					if (s == 0) headHtml += '<th>' + (fields[r] ? fields[r] : '') + '</th>';
-				}
-				html += '</tr>';
-			}
-			headHtml += '</tr>';
-			var rtn = {
-				html : html,
-				headHtml : headHtml
-			};
-			return rtn;
-		});
 	}
 	
 	

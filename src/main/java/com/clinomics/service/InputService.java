@@ -69,7 +69,7 @@ public class InputService {
 		return dataTableService.getDataTableMap(draw, draw, total, total, list);
 	}
 	
-	public Map<String, Object> findSampleByBundleAndDateResultNullStatusFail(Map<String, String> params) {
+	public Map<String, Object> find(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
@@ -159,6 +159,7 @@ public class InputService {
 			Optional<Member> oMember = memberRepository.findById(datas.getOrDefault("memberId", ""));
 			Member member = oMember.orElseThrow(NullPointerException::new);
 			sample.setCreatedMember(member);
+			sample.setStatusCode(StatusCode.S000_INPUT_REG);
 		}
 		
 		datas.remove("memberId");
@@ -194,7 +195,7 @@ public class InputService {
 		for (Map<String, String> l : list) {
 			l.put("memberId", memberId);
 			Map<String, String> tmp = this.save(l);
-			if (ResultCode.SUCCESS.get().equals(tmp.getOrDefault("result", "AA"))) {
+			if (!ResultCode.SUCCESS.get().equals(tmp.getOrDefault("result", "AA"))) {
 				return tmp;
 			}
 			rtn.putAll(tmp);
