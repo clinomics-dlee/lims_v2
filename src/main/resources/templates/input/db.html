@@ -152,7 +152,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
 		UserTable.draw('_collect_grid', {
-			url : "/input/get",
+			url : "/input/db",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -197,7 +197,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			},
 			{
 				title : '등록자', 
-				data : 'member.name'
+				data : 'createdMember.name'
 			}
 		], null);
 			
@@ -211,39 +211,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				dateFormat : 'yy-mm-dd'
 			});
 		}
-	}
-	
-	function receive() {
-		var checkedRows = UserTable.getCheckedRows('_collect_grid');
-		var data = [];
-		for (var cr in checkedRows) {
-			data.push(checkedRows[cr].id);
-		}
-		$.ajax({
-            url: '/input/save',
-			type: 'post',
-	        data : JSON.stringify(data),
-	        dataType : 'json',
-	        contentType : "application/json;charset=utf-8",
-	        beforeSend: function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-		    success: function(data, xhr) {
-		    	if (data.result == "00") {
-					CommonMsg.save(function() {
-						$("#frm_new")[0].reset();
-					});
-				} else if (!data.result.startsWith("0")) {
-					CommonMsg.error(function() { });
-				}
-			},
-			error : function(data) {
-				CommonMsg.error(function() { });
-			},
-			complete : function() {
-				
-			}
-		});
 	}
 	
 	function search() {

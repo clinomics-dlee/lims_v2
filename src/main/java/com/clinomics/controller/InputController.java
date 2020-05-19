@@ -1,6 +1,7 @@
 package com.clinomics.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.clinomics.service.setting.BundleService;
 import com.clinomics.service.InputService;
+import com.clinomics.service.SampleDbService;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
@@ -44,18 +46,27 @@ public class InputController {
 	InputExcelService inputExcelService;
 
 	@Autowired
+	SampleDbService sampleDbService;
+	
+	@Autowired
 	BundleService bundleService;
 	
 	@GetMapping("/rvc")
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
-		return inputService.find(params, StatusCode.S000_INPUT_REG);
+		return inputService.find(params, Arrays.asList(new StatusCode[] { StatusCode.S000_INPUT_REG }));
+	}
+	
+	@GetMapping("/aprv")
+	@ResponseBody
+	public Map<String, Object> aprv(@RequestParam Map<String, String> params) {
+		return inputService.find(params, Arrays.asList(new StatusCode[] { StatusCode.S020_INPUT_RCV }));
 	}
 	
 	@GetMapping("/db")
 	@ResponseBody
 	public Map<String, Object> db(@RequestParam Map<String, String> params) {
-		return inputService.findDb(params);
+		return sampleDbService.find(params, 0);
 	}
 	
 	@PostMapping("/save")
@@ -77,20 +88,20 @@ public class InputController {
 		return inputService.saveFromList(datas, userDetails.getUsername());
 	}
 	
-	@PostMapping("/receive")
-	@ResponseBody
-	public Map<String, String> receive(@RequestBody List<Integer> ids) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	// @PostMapping("/receive")
+	// @ResponseBody
+	// public Map<String, String> receive(@RequestBody List<Integer> ids) {
+	// 	UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return inputService.receive(ids, userDetails.getUsername());
-	}
+	// 	return inputService.receive(ids, userDetails.getUsername());
+	// }
 	
 	@PostMapping("/approve")
 	@ResponseBody
-	public Map<String, String> approve(@RequestBody int id) {
+	public Map<String, String> approve(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return inputService.approve(id, userDetails.getUsername());
+		return inputService.approve(ids, userDetails.getUsername());
 	}
 	
 	@GetMapping("/itemby/sample/{id}")

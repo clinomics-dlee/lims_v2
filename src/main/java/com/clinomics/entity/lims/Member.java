@@ -14,6 +14,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * The persistent class for the admin_user database table.
@@ -28,6 +30,7 @@ public class Member implements Serializable {
 	@Column(length = 40)
 	private String id;
 
+	@JsonIgnore
 	@Column(length = 100)
 	private String password;
 
@@ -40,9 +43,11 @@ public class Member implements Serializable {
 	@Column(length = 80)
 	private String dept;
 	
+	@JsonIgnore
 	@Column(columnDefinition = "boolean default true")
 	private boolean inUse;
 
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade =  CascadeType.ALL)
 	@JoinTable(name="member_role",
 				joinColumns = @JoinColumn(name = "memberId", referencedColumnName = "id"),

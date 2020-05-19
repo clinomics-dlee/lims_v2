@@ -109,9 +109,6 @@ public class Sample implements Serializable {
 	@ManyToOne(cascade =  CascadeType.ALL)
 	@JoinColumn(name = "inputApproveMemberId")
 	private Member inputApproveMember;
-	
-	@Transient
-	private String inputApproveRole = "INPUT_20";
 
 	// #. 입고 중간관리자 승인일
 	private LocalDateTime inputMngApproveDate;
@@ -119,9 +116,6 @@ public class Sample implements Serializable {
 	@ManyToOne(cascade =  CascadeType.ALL)
 	@JoinColumn(name = "inputMngApproveMemberId")
 	private Member inputMngApproveMember;
-	
-	@Transient
-	private String inputMngApproveRole = "INPUT_40";
 
 	// #. 입고 검사실책임자 승인일
 	private LocalDateTime inputDrctApproveDate;
@@ -129,9 +123,6 @@ public class Sample implements Serializable {
 	@ManyToOne(cascade =  CascadeType.ALL)
 	@JoinColumn(name = "inputDrctMemberId")
 	private Member inputDrctMember;
-	
-	@Transient
-	private String inputDrctRole = "EXP_80";
 
 	// #. 실험 시작일
 	private LocalDateTime expStartDate;

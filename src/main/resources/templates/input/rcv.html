@@ -152,7 +152,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
 		UserTable.draw('_collect_grid', {
-			url : "/input/get",
+			url : "/input/rvc",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -220,7 +220,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data.push(checkedRows[cr].id);
 		}
 		$.ajax({
-            url: '/input/save',
+            url: '/input/approve',
 			type: 'post',
 	        data : JSON.stringify(data),
 	        dataType : 'json',

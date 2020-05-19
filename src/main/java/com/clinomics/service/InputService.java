@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.checkerframework.checker.units.qual.s;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,9 +22,11 @@ import org.springframework.stereotype.Service;
 
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.entity.lims.SampleHistory;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
@@ -69,10 +72,10 @@ public class InputService {
 		return dataTableService.getDataTableMap(draw, draw, total, total, list);
 	}
 	
-	public Map<String, Object> find(Map<String, String> params, StatusCode statusCode) {
+	public Map<String, Object> find(Map<String, String> params, List<StatusCode> statusCodes) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
@@ -88,39 +91,7 @@ public class InputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusEqual(statusCode));
-					
-		
-		total = sampleRepository.count(where);
-		Page<Sample> page = sampleRepository.findAll(where, pageable);
-		
-		List<Sample> list = page.getContent();
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
-		long filtered = total;
-		
-		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
-	}
-	
-	public Map<String, Object> findDb(Map<String, String> params) {
-		int draw = 1;
-		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
-		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
-		// #. paging 관련 객체
-		Pageable pageable = Pageable.unpaged();
-		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
-		}
-		long total;
-		
-		Specification<Sample> where = Specification
-					.where(SampleSpecification.betweenDate(params))
-					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusCodeGt(40));
+					.and(SampleSpecification.statusIn(statusCodes));
 					
 		
 		total = sampleRepository.count(where);
@@ -206,32 +177,69 @@ public class InputService {
 		return rtn;
 	}
 	
+	// @Transactional
+	// public Map<String, String> receive(List<Integer> ids, String memberId) {
+	// 	Map<String, String> rtn = Maps.newHashMap();
+	// 	List<Sample> samples = sampleRepository.findByIdIn(ids);
+
+	// 	samples.stream().forEach(s -> s.setStatusCode(StatusCode.S020_INPUT_RCV));
+
+	// 	sampleRepository.saveAll(samples);
+
+	// 	rtn.put("result", ResultCode.SUCCESS.get());
+	// 	return rtn;
+	// }
+
 	@Transactional
-	public Map<String, String> receive(List<Integer> ids, String memberId) {
+	public Map<String, String> approve(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		List<Sample> samples = sampleRepository.findByIdIn(ids);
-
-		samples.stream().forEach(s -> s.setStatusCode(StatusCode.S020_INPUT_RCV));
-
-		sampleRepository.saveAll(samples);
-
-		rtn.put("result", ResultCode.SUCCESS.get());
-		return rtn;
-	}
-
-	public Map<String, String> approve(int id, String memberId) {
-		Map<String, String> rtn = Maps.newHashMap();
-		Sample sample = searchExistsSample(id);
 		
-		boolean existsSample = sample.getId() > 0;
-		
-		if (existsSample) {
-			// sample.set
-			// rtn.put("result", ResultCode.SUCCESS.get());
-			
-		} else {
-			rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
+		// sample.set
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.get();
+		for (Role r : member.getRole()) {
+			LocalDateTime now = LocalDateTime.now();
+
+			if (RoleCode.ROLE_INPUT_20.getValue().equals(r.getCode())) {
+				
+				samples.stream().forEach(s -> {
+					s.setInputApproveDate(now);
+					s.setInputApproveMember(member);
+					s.setStatusCode(StatusCode.S020_INPUT_RCV);
+				});
+
+				break;
+
+			} else if (RoleCode.ROLE_INPUT_40.getValue().equals(r.getCode())) {
+				
+				samples.stream().forEach(s -> {
+					s.setInputMngApproveDate(now);
+					s.setInputMngApproveMember(member);
+					if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
+						s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
+					}
+				});
+
+				break;
+
+			} else if (RoleCode.ROLE_EXP_80.getValue().equals(r.getCode())) {
+				
+				samples.stream().forEach(s -> {
+					s.setInputDrctApproveDate(now);
+					s.setInputDrctMember(member);
+					if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
+						s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
+					}
+				});
+				
+				break;
+			}
+
 		}
+		
+		sampleRepository.saveAll(samples);
+		rtn.put("result", ResultCode.SUCCESS.get());
 
 		return rtn;
 	}
