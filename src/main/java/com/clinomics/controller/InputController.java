@@ -87,10 +87,10 @@ public class InputController {
 	
 	@PostMapping("/approve")
 	@ResponseBody
-	public Map<String, String> approve(@RequestBody List<Integer> ids) {
+	public Map<String, String> approve(@RequestBody int id) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return inputService.approve(ids, userDetails.getUsername());
+		return inputService.approve(id, userDetails.getUsername());
 	}
 	
 	@GetMapping("/itemby/sample/{id}")

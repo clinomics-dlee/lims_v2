@@ -120,13 +120,7 @@ public class InputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusNotIn(
-							Arrays.asList(new StatusCode[] {
-								StatusCode.S000_INPUT_REG,
-								StatusCode.S020_INPUT_RCV
-							})
-						)
-					);
+					.and(SampleSpecification.statusCodeGt(40));
 					
 		
 		total = sampleRepository.count(where);
@@ -145,7 +139,7 @@ public class InputService {
 		
 		String id = datas.getOrDefault("id", "0");
 		
-		Sample sample = searchExistsSample(id);
+		Sample sample = searchExistsSample(NumberUtils.toInt(id));
 		
 		boolean existsSample = sample.getId() > 0;
 		
@@ -225,14 +219,26 @@ public class InputService {
 		return rtn;
 	}
 
-	public Map<String, String> approve() {
-		rtn.put("result", ResultCode.SUCCESS.get());
+	public Map<String, String> approve(int id, String memberId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		Sample sample = searchExistsSample(id);
+		
+		boolean existsSample = sample.getId() > 0;
+		
+		if (existsSample) {
+			// sample.set
+			// rtn.put("result", ResultCode.SUCCESS.get());
+			
+		} else {
+			rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
+		}
+
 		return rtn;
 	}
 
-	private Sample searchExistsSample(String id) {
+	private Sample searchExistsSample(int id) {
 		
-		Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		Optional<Sample> oSample = sampleRepository.findById(id);
 		
 		Sample news = new Sample();
 		LocalDateTime now = LocalDateTime.now();
