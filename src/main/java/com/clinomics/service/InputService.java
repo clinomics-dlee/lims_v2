@@ -101,7 +101,7 @@ public class InputService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
-	public Map<String, Object> findSampleByBundleAndDate(Map<String, String> params) {
+	public Map<String, Object> findDb(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
@@ -118,16 +118,19 @@ public class InputService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params));
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.statusCodeGt(40));
 					
+		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		
 		List<Sample> list = page.getContent();
-		sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
 		long filtered = total;
 		
-		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
 	@Transactional
@@ -136,7 +139,7 @@ public class InputService {
 		
 		String id = datas.getOrDefault("id", "0");
 		
-		Sample sample = searchExistsSample(id);
+		Sample sample = searchExistsSample(NumberUtils.toInt(id));
 		
 		boolean existsSample = sample.getId() > 0;
 		
@@ -216,9 +219,26 @@ public class InputService {
 		return rtn;
 	}
 
-	private Sample searchExistsSample(String id) {
+	public Map<String, String> approve(int id, String memberId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		Sample sample = searchExistsSample(id);
 		
-		Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		boolean existsSample = sample.getId() > 0;
+		
+		if (existsSample) {
+			// sample.set
+			// rtn.put("result", ResultCode.SUCCESS.get());
+			
+		} else {
+			rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
+		}
+
+		return rtn;
+	}
+
+	private Sample searchExistsSample(int id) {
+		
+		Optional<Sample> oSample = sampleRepository.findById(id);
 		
 		Sample news = new Sample();
 		LocalDateTime now = LocalDateTime.now();
