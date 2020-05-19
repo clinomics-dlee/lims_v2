@@ -114,7 +114,7 @@ public class ExpController {
 
 	@GetMapping("/step3/get")
 	public Map<String, Object> getStep3(@RequestParam Map<String, String> params) {
-		return expService.findMappingInfos(params);
+		return expService.findMappingInfosByExpStep3Status(params);
 	}
 
 	@PostMapping("/step3/chipInfo/update")
@@ -138,6 +138,11 @@ public class ExpController {
 	@GetMapping("/db/sample/get")
 	public Map<String, Object> getSampleDb(@RequestParam Map<String, String> params) {
 		return sampleDbService.find(params, 400);
+	}
+
+	@GetMapping("/db/mapping/get")
+	public Map<String, Object> getMappingDb(@RequestParam Map<String, String> params) {
+		return expService.findMappingInfosForDb(params);
 	}
 
 	// ############################ private

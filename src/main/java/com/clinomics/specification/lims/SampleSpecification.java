@@ -79,8 +79,7 @@ public class SampleSpecification {
 				String text = "%" + params.get("keyword") + "%";
 				predicateLikes.add(criteriaBuilder.like(criteriaBuilder.function("JSON_EXTRACT", String.class, root.get("items"), criteriaBuilder.literal("$.*")), text));
 				
-				predicateLikes.add(criteriaBuilder.like(root.get("id"), text));
-				predicateLikes.add(criteriaBuilder.like(root.get("barcode"), text));
+				predicateLikes.add(criteriaBuilder.like(root.get("laboratoryId"), text));
 				predicateLikes.add(criteriaBuilder.like(root.get("bundle").get("name"), text));
 				//predicates.add(criteriaBuilder.like(root.get("member"), "%" + text + "%"));
 				

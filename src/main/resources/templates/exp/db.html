@@ -25,20 +25,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_history"></th:block>
-		<th:block th:replace="popup/result"></th:block>
-		<th:block th:replace="popup/sample_detail"></th:block>
-		<th:block th:replace="popup/sample_detail_readonly"></th:block>
+		<th:block th:replace="popup/mapping_upload"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
 				<li class="breadcrumb-item">Home</li>
-				<li class="breadcrumb-item">Work</li>
-				<li class="breadcrumb-item active">Complete</li>
+				<li class="breadcrumb-item">실험</li>
+				<li class="breadcrumb-item active">실험DB</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header" th:text="#{menu.complete}">Complete</h1>
+			<h1 id="page-header" class="page-header">실험 - 실험DB</h1>
 			<!-- end page-header -->
 			
 			<!-- begin content panel -->
@@ -46,9 +43,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				<div class="col-xl-12">
 					<ul class="nav nav-tabs">
 						<li class="nav-item">
-							<a href="#complete-tab-1" data-toggle="tab" class="nav-link active">
+							<a href="#db-tab-1" data-toggle="tab" class="nav-link active">
 								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none" th:text="#{common.list}">List</span>
+								<span class="d-sm-block d-none">실험 DB</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#db-tab-2" data-toggle="tab" class="nav-link">
+								<span class="d-sm-none">Tab 2</span>
+								<span class="d-sm-block d-none">Mapping DB</span>
 							</a>
 						</li>
 					</ul>
@@ -56,9 +59,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<!-- begin tab content -->
 					<div class="tab-content">
 						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="complete-tab-1">
+						<div class="tab-pane fade active show" id="db-tab-1">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
+								<label class="col-form-label col-md-1">서비스</label>
 								<div>
 									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
 										<option value="">All</option>
@@ -71,19 +74,42 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span>
 								</div>
-								<label class="col-form-label col-md-1" th:text="#{common.keyword}">Key word</label>
+								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10" th:text="#{common.search}">Search</button>
-									<button onClick="createPdf();" class="btn btn-success m-l-20" th:text="#{page.complete.recreate}">Recreate Report PDF</button>
+									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
 								</div>
 							</div>
 							<hr/>
-							<div id="_complete_sample_grid"></div>
+							<div id="_sample_db_grid"></div>
+							<hr/>
+							<div class="row">
+								<button onClick="downloadExcel();" class="btn btn-success m-l-20">Excel Download</button>
+							</div>
 						</div>
 						<!-- end tab-1 -->
+
+						<!-- begin tab-2 -->
+						<div class="tab-pane fade" id="db-tab-2">
+							<div class="form-group row m-b-12">
+								<label class="col-form-label col-md-1">검색어</label>
+								<div class="col-xs-push-0">
+								    <input type="text" id="keyword" class="form-control"/>
+								</div>
+								<div>
+									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
+								</div>
+							</div>
+							<hr/>
+							<div id="_mapping_db_grid"></div>
+							<hr/>
+							<div class="row">
+								<button onClick="downloadExcel();" class="btn btn-success m-l-20">Excel Download</button>
+							</div>
+						</div>
+						<!-- end tab-2 -->
 					</div>
 					<!-- end tab content -->
 				</div>
@@ -102,6 +128,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	/* <![CDATA[ */
 
 	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	var g_genotypingMethodCodeInfo = /*[[${genotypingMethodCodes}]]*/ {};
+	var g_chipTypeCodeInfo = /*[[${chipTypeCodes}]]*/ {};
 	
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
@@ -142,13 +170,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_complete_sample_grid', true, [10, 50] , [10, 50]);
-		drawCompleteSampleGrid();
+		UserTable.init('_sample_db_grid', true, [10, 50] , [10, 50]);
+		drawSampleDbGrid();
+
+		UserTable.init('_mapping_db_grid', true, [10, 50] , [10, 50]);
+		drawMappingGrid();
 	});
 	
-	function drawCompleteSampleGrid() {
-		UserTable.draw('_complete_sample_grid', {
-			url : "/work/complete/get",
+	function drawSampleDbGrid() {
+		UserTable.draw('_sample_db_grid', {
+			url : "/exp/db/sample/get",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -171,12 +202,93 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				name : "checkbox"
 			}
 		}, {
-			title : 'History',
-			data : "sample.id",
+			title : 'No', 
+			data : 'id',
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
 			render : function(row, data, index) {
-				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
+				return '<string>' + (index + 1) + '</string>';
+			}
+		}, {
+			title : "서비스",
+			data : "bundle.name"
+		}, {
+			title : "검사실 ID",
+			data : "laboratoryId"
+		}, {
+			title : "Genotyping ID",
+			data : "laboratoryId",
+			render : function(row, data, index) {
+				return data + '-V' + row.version;
+			}
+		}, {
+			title : "Genotyping Method",
+			data : "genotypingMethodCode",
+			render : function(row, data, index) {
+				var value = "";
+				if (data != null && data.length > 0) {
+					value = g_genotypingMethodCodeInfo[data];
+				}
+				return value;
+			}
+		}, {
+			title : "검체종류",
+			data : "items.sampleType"
+		}, {
+			title : "검체 채취일",
+			data : "items.sampleCollected"
+		}, {
+			title : "상태",
+			data : "statusCode",
+			render : function(row, data, index) {
+				var value = g_statusCodeInfo[data];
+				return value;
+			}
+		}, {
+			serverHeader : true
+		}, {
+			title : "검체 입고일",
+			data : "createdDate",
+			type : "date"
+		}, {
+			title : "A 260/280",
+			data : "a260280"
+		}, {
+			title : "농도 (ng/μL)",
+			data : "cncnt"
+		}, {
+			title : "DNA QC",
+			data : "dnaQc"
+		}]);
+	}
+	
+	function search() {
+		UserTable.reload('_sample_db_grid');
+	}
+
+	function drawMappingGrid() {
+		UserTable.draw('_mapping_db_grid', {
+			url : "/exp/db/mapping/get",
+			type : "GET",
+			data : function() {
+				var param = {
+					bundleId : $("#sel_bundle").val(),
+					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
+					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val(),
+					keyword : $("#keyword").val()
+				};
+				return param;
+			},
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			}
+		}, [{
+			title : ' ',
+			data : "id",
+			headClassName : 'width-50',
+			bodyClassName : 'text-center',
+			type : {
+				name : "checkbox"
 			}
 		}, {
 			title : 'No', 
@@ -187,82 +299,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				return '<string>' + (index + 1) + '</string>';
 			}
 		}, {
-			title : "Laboratory",
-			data : "sample.id",
+			title : "Mapping No",
+			data : "mappingNo"
+		}, {
+			title : "Chip Barcode",
+			data : "chipBarcode"
+		}, {
+			title : "Chip Type",
+			data : "chipTypeCode",
+			headClassName : 'width-300',
 			render : function(row, data, index) {
-				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
-			}
-		}, {
-			title : "Barcode",
-			data : "sample.barcode"
-		}, {
-			title : "Product",
-			data : "sample.bundle.name",
-		}, {
-			title : "Chip Number",
-			data : "chipNumber",
-		}, {
-			title : "Status",
-			data : "statusCode",
-			render : function(row, data, index) {
-				var value = g_statusCodeInfo[data];
+				var value = '';
+				if (data != null && data.length > 0) {
+					value = g_chipTypeCodeInfo[data];
+				}
 				return value;
 			}
-		}, {
-			serverHeader : true
-		}, {
-			title : "Experiment Date",
-			data : "createdDate",
-			type : "date"
-		}, {
-			title : "Experiment user",
-			data : "member.name",
 		}]);
 	}
-	
-	function search() {
-		UserTable.reload('_complete_sample_grid');
-	}
-	
-	function createPdf() {
-		var checkedRows = UserTable.getCheckedRows("_complete_sample_grid");
-		if (checkedRows.length > 0) {
-			CommonMsg.okCancel(function() {
-				var resultIds = [];
-				for (var i = 0; i < checkedRows.length; i++) {
-					var row = checkedRows[i];
-					resultIds.push(row.id);
-				}
-				
-				$.ajax({
-		            url: '/work/complete/recreate/pdf/multi',
-			        type : "post",
-			        dataType : 'json',
-			        data : {resultIds : resultIds},
-			        beforeSend: function(xhr) {
-						xhr.setRequestHeader(header, token);
-					},
-				    success: function(data, xhr) {
-				    	if (data.result == "00") {
-				    		CommonMsg.save(function() {
-				    			$("#modal-sample-detail").modal('hide');
-				    			UserTable.reload('_complete_sample_grid');
-							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
-						}
-					},
-					error : function(data) {
-						CommonMsg.error(function() { });
-					},
-					complete : function() {
-						
-					}
-				});
-			});
-		}
-	}
-	
+
 	/* ]]> */
 	</script>
 	
