@@ -85,6 +85,7 @@ public class ExpService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.statusEqual(StatusCode.S200_EXP_READY));
@@ -137,6 +138,7 @@ public class ExpService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.statusEqual(StatusCode.S210_EXP_STEP1));
@@ -286,6 +288,7 @@ public class ExpService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.statusEqual(StatusCode.S220_EXP_STEP2));
@@ -613,6 +616,34 @@ public class ExpService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.mappingInfoLike(params));
+		
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
+		List<Sample> list = page.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
+	public Map<String, Object> findMappingSample(Map<String, String> params, String mappingNo) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+		long total;
+		
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.mappingNoEqual(mappingNo))
 					.and(SampleSpecification.bundleIsActive());
 		
 		total = sampleRepository.count(where);

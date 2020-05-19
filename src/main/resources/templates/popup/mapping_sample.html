@@ -1,0 +1,124 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+
+#history_popup_table th {
+	min-width: 100px;
+	white-space: nowrap;
+    word-break: nowrap;
+}
+
+#history_popup_table td {
+	white-space: nowrap;
+	word-break: nowrap;
+}
+
+</style>
+<div class="modal fade" id="modal-mapping-sample">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Mapping List <small id="popup_history_title"></small></h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="_mapping_sample_popup">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+var _mapping_sample_popup_table;
+
+
+function mappingSamplePopupOnload(sampleId, bundleId) {
+	$("#modal-mapping-sample").modal();
+	$("#_mapping_sample_popup").empty();
+	
+	UserTable.init('_mapping_sample_popup', true);
+	drawMappingSample(sampleId);
+}
+
+function drawMappingSample(mappingNo) {
+	UserTable.draw('_mapping_sample_popup', {
+		url : "/exp/mapping/sample/get/" + mappingNo,
+		type : "GET",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+	}, [{
+			title : 'No', 
+			data : 'id',
+			headClassName : 'width-50',
+			bodyClassName : 'text-center',
+			render : function(row, data, index) {
+				return '<string>' + (index + 1) + '</string>';
+			}
+		}, {
+			title : "서비스",
+			data : "bundle.name"
+		}, {
+			title : "검사실 ID",
+			data : "laboratoryId"
+		}, {
+			title : "Genotyping ID",
+			data : "laboratoryId",
+			render : function(row, data, index) {
+				return data + '-V' + row.version;
+			}
+		}, {
+			title : "Genotyping Method",
+			data : "genotypingMethodCode",
+			render : function(row, data, index) {
+				var value = "";
+				if (data != null && data.length > 0) {
+					value = g_genotypingMethodCodeInfo[data];
+				}
+				return value;
+			}
+		}, {
+			title : "검체종류",
+			data : "items.sampleType"
+		}, {
+			title : "검체 채취일",
+			data : "items.sampleCollected"
+		}, {
+			title : "상태",
+			data : "statusCode",
+			render : function(row, data, index) {
+				var value = g_statusCodeInfo[data];
+				return value;
+			}
+		}, {
+			serverHeader : true
+		}, {
+			title : "검체 입고일",
+			data : "createdDate",
+			type : "date"
+		}, {
+			title : "A 260/280",
+			data : "a260280"
+		}, {
+			title : "농도 (ng/μL)",
+			data : "cncnt"
+		}, {
+			title : "DNA QC",
+			data : "dnaQc"
+		}]);
+}
+
+/* ]]> */
+</script>

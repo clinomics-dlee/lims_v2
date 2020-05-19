@@ -14,6 +14,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.clinomics.entity.lims.Sample;
+import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.StatusCode;
 
 public class SampleSpecification {
@@ -185,6 +186,38 @@ public class SampleSpecification {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.greaterThanOrEqualTo(criteriaBuilder.substring(root.get("statusCode"), 2, 3).as(Integer.class), number);
 			return rtn;
+		};
+	}
+
+	public static Specification<Sample> mappingInfoLike(Map<String, String> params) {
+		
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicateLikes = new ArrayList<>();
+			
+			if (params.containsKey("keyword") && !params.get("keyword").isEmpty()) {
+				String text = "%" + params.get("keyword") + "%";
+				
+				predicateLikes.add(criteriaBuilder.like(root.get("mappingNo"), text));
+				predicateLikes.add(criteriaBuilder.like(root.get("chipBarcode"), text));
+
+				List<ChipTypeCode> codes = new ArrayList<ChipTypeCode>();
+				for (ChipTypeCode code : ChipTypeCode.values()) {
+					String value = code.getValue();
+					if (value.toUpperCase().indexOf(params.get("keyword").trim().toUpperCase()) > -1) {
+						codes.add(code);
+					}
+				}
+				
+				if (codes.size() > 0) {
+					predicateLikes.add(criteriaBuilder.or(root.get("chipTypeCode").in(codes)));
+				}
+				
+				rtn = criteriaBuilder.or(predicateLikes.toArray(new Predicate[predicateLikes.size()]));
+			}
+			
+			return rtn;
+			
 		};
 	}
 }

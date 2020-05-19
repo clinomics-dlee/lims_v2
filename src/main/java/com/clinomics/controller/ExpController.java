@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -143,6 +144,11 @@ public class ExpController {
 	@GetMapping("/db/mapping/get")
 	public Map<String, Object> getMappingDb(@RequestParam Map<String, String> params) {
 		return expService.findMappingInfosForDb(params);
+	}
+
+	@GetMapping("/mapping/sample/get/{mappingNo}")
+	public Map<String, Object> getMappingSample(@RequestParam Map<String, String> params, @PathVariable String mappingNo) {
+		return expService.findMappingSample(params, mappingNo);
 	}
 
 	// ############################ private
