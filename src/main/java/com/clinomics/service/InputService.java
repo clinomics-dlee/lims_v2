@@ -176,19 +176,6 @@ public class InputService {
 		}
 		return rtn;
 	}
-	
-	// @Transactional
-	// public Map<String, String> receive(List<Integer> ids, String memberId) {
-	// 	Map<String, String> rtn = Maps.newHashMap();
-	// 	List<Sample> samples = sampleRepository.findByIdIn(ids);
-
-	// 	samples.stream().forEach(s -> s.setStatusCode(StatusCode.S020_INPUT_RCV));
-
-	// 	sampleRepository.saveAll(samples);
-
-	// 	rtn.put("result", ResultCode.SUCCESS.get());
-	// 	return rtn;
-	// }
 
 	@Transactional
 	public Map<String, String> approve(List<Integer> ids, String memberId) {
@@ -198,49 +185,47 @@ public class InputService {
 		// sample.set
 		Optional<Member> oMember = memberRepository.findById(memberId);
 		Member member = oMember.get();
+		LocalDateTime now = LocalDateTime.now();
+		String roles = "";
 		for (Role r : member.getRole()) {
-			LocalDateTime now = LocalDateTime.now();
-
-			if (RoleCode.ROLE_INPUT_20.getValue().equals(r.getCode())) {
-				
-				samples.stream().forEach(s -> {
-					s.setInputApproveDate(now);
-					s.setInputApproveMember(member);
-					s.setStatusCode(StatusCode.S020_INPUT_RCV);
-				});
-
-				break;
-
-			} else if (RoleCode.ROLE_INPUT_40.getValue().equals(r.getCode())) {
-				
-				samples.stream().forEach(s -> {
-					s.setInputMngApproveDate(now);
-					s.setInputMngApproveMember(member);
-					if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
-						s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
-					}
-				});
-
-				break;
-
-			} else if (RoleCode.ROLE_EXP_80.getValue().equals(r.getCode())) {
-				
-				samples.stream().forEach(s -> {
-					s.setInputDrctApproveDate(now);
-					s.setInputDrctMember(member);
-					if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
-						s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
-					}
-				});
-				
-				break;
-			}
-
+			roles += "," + r.getCode();
 		}
-		
-		sampleRepository.saveAll(samples);
-		rtn.put("result", ResultCode.SUCCESS.get());
+		roles = roles.substring(1);
 
+		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+
+		if (roles.contains(RoleCode.ROLE_EXP_80.getValue())) {
+			
+			samples.stream().forEach(s -> {
+				s.setInputDrctApproveDate(now);
+				s.setInputDrctMember(member);
+				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
+					s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
+				}
+			});
+
+		} else if (roles.contains(RoleCode.ROLE_INPUT_40.getValue())) {
+			
+			samples.stream().forEach(s -> {
+				s.setInputMngApproveDate(now);
+				s.setInputMngApproveMember(member);
+				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
+					s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
+				}
+			});
+
+		} else if (roles.contains(RoleCode.ROLE_INPUT_20.getValue())) {
+			
+			samples.stream().forEach(s -> {
+				s.setInputApproveDate(now);
+				s.setInputApproveMember(member);
+				s.setStatusCode(StatusCode.S020_INPUT_RCV);
+			});
+		} else {
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+		}
+		sampleRepository.saveAll(samples);
+		
 		return rtn;
 	}
 

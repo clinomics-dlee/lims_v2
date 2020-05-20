@@ -47,18 +47,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			<div class="row">
 				<div class="col-xl-12">
 					
-					<ul class="nav nav-tabs">
-						<li class="nav-item">
-							<a href="#collect-tab-1" data-toggle="tab" class="nav-link active">
-								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none">입고</span>
-							</a>
-						</li>
-					</ul>
 					
-					<div class="tab-content">
-						<!-- begin tab-pane -->
-						<div class="tab-panel" id="collect-tab-1">
+					<div class="panel panel-inverse">
+
+						<!-- begin panel-heading -->
+						
+						<!-- end panel-heading -->
+
+						<!-- begin panel-body -->
+						<div id="panel-body" class="panel-body">
 					
 							<div class="form-group row m-b-12">
 								<label class="col-form-label col-md-1">서비스</label>
@@ -72,9 +69,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<label class="col-form-label">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
-								    <!-- <span class="input-group-append">
+								    <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
-									</span> -->
+									</span>
 								</div>
 								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
@@ -82,11 +79,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10 ">조회</button>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
 								</div>
 							</div>
 							<hr/>
 							<div id="_collect_grid">
+							</div>
+							<hr/>
+							<div class="form-group row m-b-12">
+								
+								<div>
+									<button onClick="approve();" class="btn btn-primary p-l-20 p-r-20 m-l-10">승인</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -168,7 +172,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				xhr.setRequestHeader(header, token);
 			}
 		}, [ 
-			
+			{
+				title : ' ', 
+				data : 'id',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				type : {
+					name : "checkbox"
+				}
+			},
 			{
 				title : 'No',
 				headClassName : 'width-50',
@@ -183,28 +195,41 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			},
 			{
+				title : '실험실', 
+				data : 'laboratoryId'
+			},
+			{
 				title : '서비스', 
 				data : 'bundle.name'
 			},
 			{
 				title : '입고담당자', 
 				data : 'inputApproveDate',
+				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					return moment(data).isBefore('2000-01-01', 'year');
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
 				}
 			},
 			{
 				title : '중간관리자', 
 				data : 'inputMngApproveDate',
+				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					return moment(data).isBefore('2000-01-01', 'year');
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
 				}
 			},
 			{
 				title : '검사실책임자', 
 				data : 'inputDrctApproveDate',
+				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					return moment(data).isBefore('2000-01-01', 'year');
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
 				}
 			}
 		], null);
@@ -237,11 +262,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				xhr.setRequestHeader(header, token);
 			},
 		    success: function(data, xhr) {
-		    	if (data.result == "00") {
-					CommonMsg.save(function() {
-						$("#frm_new")[0].reset();
-					});
-				} else if (!data.result.startsWith("0")) {
+					
+				if (data.result.startsWith("0")) {
+					CommonMsg.save(function() { });
+				} else {
 					CommonMsg.error(function() { });
 				}
 			},

@@ -47,19 +47,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			<div class="row">
 				<div class="col-xl-12">
 					
-					<ul class="nav nav-tabs">
-						<li class="nav-item">
-							<a href="#collect-tab-1" data-toggle="tab" class="nav-link active">
-								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none">입고</span>
-							</a>
-						</li>
-					</ul>
-					
-					<div class="tab-content">
-						<!-- begin tab-pane -->
-						<div class="tab-panel" id="collect-tab-1">
-					
+					<div class="panel panel-inverse">
+
+						<!-- begin panel-heading -->
+						
+						<!-- end panel-heading -->
+
+						<!-- begin panel-body -->
+						<div id="panel-body" class="panel-body">
+							
 							<div class="form-group row m-b-12">
 								<label class="col-form-label col-md-1">서비스</label>
 								<div class="col-xs-push-0">
@@ -71,15 +67,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								
 								<label class="col-form-label">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
-								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
-								    <!-- <span class="input-group-append">
-								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
-									</span> -->
+									<input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
+									<span class="input-group-append">
+										<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+									</span>
 								</div>
 								<label class="col-form-label col-md-1">검색어</label>
 								<div class="col-xs-push-0">
 									
-								    <input type="text" id="keyword" class="form-control"/>
+									<input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
 									<button onClick="search();" class="btn btn-default m-l-10 ">조회</button>
@@ -87,6 +83,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							</div>
 							<hr/>
 							<div id="_collect_grid">
+							</div>
+							<hr/>
+							<div class="form-group row m-b-12">
+								<div>
+									<button onClick="receive();" class="btn btn-primary m-l-10 ">승인</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -214,35 +216,39 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function receive() {
-		var checkedRows = UserTable.getCheckedRows('_collect_grid');
-		var data = [];
-		for (var cr in checkedRows) {
-			data.push(checkedRows[cr].id);
-		}
-		$.ajax({
-            url: '/input/approve',
-			type: 'post',
-	        data : JSON.stringify(data),
-	        dataType : 'json',
-	        contentType : "application/json;charset=utf-8",
-	        beforeSend: function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-		    success: function(data, xhr) {
-		    	if (data.result == "00") {
-					CommonMsg.save(function() {
-						$("#frm_new")[0].reset();
-					});
-				} else if (!data.result.startsWith("0")) {
-					CommonMsg.error(function() { });
-				}
-			},
-			error : function(data) {
-				CommonMsg.error(function() { });
-			},
-			complete : function() {
-				
+
+		CommonMsg.okCancel(function() {
+
+			var checkedRows = UserTable.getCheckedRows('_collect_grid');
+			var data = [];
+			for (var cr in checkedRows) {
+				data.push(checkedRows[cr].id);
 			}
+			$.ajax({
+				url: '/input/approve',
+				type: 'post',
+				data : JSON.stringify(data),
+				dataType : 'json',
+				contentType : "application/json;charset=utf-8",
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function(data, xhr) {
+					if (data.result.startsWith("0")) {
+						CommonMsg.save(function() { }, "승인이 완료되었습니다.");
+					} else if (data.result == "61") {
+						CommonMsg.info(function() { }, "권한이 없습니다.");
+					} else {
+						CommonMsg.error(function() { });
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() { });
+				},
+				complete : function() {
+					
+				}
+			});
 		});
 	}
 	
