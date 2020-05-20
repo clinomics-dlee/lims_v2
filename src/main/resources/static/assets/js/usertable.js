@@ -221,7 +221,7 @@ var UserTable = function() {
 						html += '<li class="paginate_button previous' + disabled + '" id="' + uid + '_previous">'
 							+ '<a href="#" aria-controls="' + uid + '_ctrl" data-dt-idx="' + (n - 1) + '" tabindex="0">Previous</a>'
 							+ '</li>';
-						var max = Math.round(t / p) + 1;
+						var max = Math.ceil(t / p);
 						
 						var i = 0;
 						if (n == i) active = ' active';
@@ -256,7 +256,8 @@ var UserTable = function() {
 							
 						}
 						disabled = '';
-						if (n == max) disabled = ' disabled';
+						console.log(n, max);
+						if (n == max - 1) disabled = ' disabled';
 						html += '<li class="paginate_button next' + disabled + '" id="' + uid + '_next">'
 							+ '<a href="#" aria-controls="' + uid + '_ctrl" data-dt-idx="' + (n + 1) + '" tabindex="0">Next</a>'
 							+ '</li>';
