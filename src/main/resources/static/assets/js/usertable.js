@@ -5,7 +5,7 @@ var UserTable = function() {
 	var pageInfo = {};
 	
 	return {
-		init : function (uid, pageable, pagesView, pagesVal) {
+		init : function (uid, pageable, pagesView, pagesVal, isDownloadExcel) {
 			//var uid = id.substring(1);
 			var h = '<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">';
 			h += '<div class="dataTables_length m-b-10" id="' + uid + '_length">';
@@ -22,7 +22,10 @@ var UserTable = function() {
 			}
 			
 			h += '</div>';
-			h += '<div class="dt-buttons btn-group">';
+			h += '<div class="dt-buttons btn-group pull-right">';
+			if (isDownloadExcel) {
+				h += '<button id="' + uid + '_excel_btn" class="btn btn-success">Download</button>';
+			}
 			h += '</div>';
 			h += '<div style="clear:both;"></div>';
 			h += '<div class="dataTables_scroll" style="overflow: auto;">';
@@ -103,6 +106,9 @@ var UserTable = function() {
 					var rows = rtn.data;
 					var html = '';
 					var headHtml = '';
+
+					var excelDatas = [];
+
 					if (custom_func) {
 						var htmls = custom_func(rows);
 						html = htmls.html;
@@ -126,6 +132,7 @@ var UserTable = function() {
 						
 						var rowIndex = 0;
 						for (var s in rows) {
+							var excelData = {};
 							html += '<tr>';
 							for (var r in columns) {
 								var val = '';
@@ -144,9 +151,39 @@ var UserTable = function() {
 								if (columns[r].bodyClassName) {
 									bodyClassName = ' class="' + columns[r].bodyClassName + '"';
 								}
+
+								// #. header settings
+								if (s == 0 && columns[r].title) {
+									if (columns[r].type != null && columns[r].type.constructor == Object) {
+										if (columns[r].type.name == 'checkbox') {
+											headHtml += '<th' + width + headClassName + '>'
+												+ columns[r].title
+												+ '<div class="checkbox checkbox-css text-center">'
+												+ '<input type="checkbox" value="" id="' + uid + '_checkbox_all" name="' + uid + '_checkbox_all" data="">'
+												+ '<label for="' + uid + '_checkbox_all"></label>'
+												+ '</div>'
+												+ '</th>';
+										} else {
+											// #. default header
+											headHtml += '<th' + width + headClassName + '>' + columns[r].title + '</th>';
+										}
+									} else {
+										// #. default header
+										headHtml += '<th' + width + headClassName + '>' + columns[r].title + '</th>';
+									}
+
+									if (!columns[r].hideExcel) {
+										excelData[columns[r].title] = "";
+									}
+								}
 								
 								if (columns[r].render) {
-									html += '<td' + bodyClassName + '>' + columns[r].render(rows[Number(s)], val, Number(s)) + '</td>';
+									var renderValue = columns[r].render(rows[Number(s)], val, Number(s));
+									html += '<td' + bodyClassName + '>' + renderValue + '</td>';
+									if (!columns[r].hideExcel) {
+										// #. rendering 한 값에 tag 제거
+										excelData[columns[r].title] = renderValue.replace(/(<([^>]+)>)/ig,"");;
+									}
 								} else {
 									if (columns[r].type == 'date') {
 										val = moment(val).format('YYYY-MM-DD');
@@ -171,30 +208,15 @@ var UserTable = function() {
 										}
 									}
 									html += '<td' + bodyClassName + '>' + (val ? val : '') + '</td>';
-								}
-								// #. header settings
-								if (s == 0 && columns[r].title) {
-									if (columns[r].type != null && columns[r].type.constructor == Object) {
-										if (columns[r].type.name == 'checkbox') {
-											headHtml += '<th' + width + headClassName + '>'
-												+ columns[r].title
-												+ '<div class="checkbox checkbox-css text-center">'
-												+ '<input type="checkbox" value="" id="' + uid + '_checkbox_all" name="' + uid + '_checkbox_all" data="">'
-												+ '<label for="' + uid + '_checkbox_all"></label>'
-												+ '</div>'
-												+ '</th>';
-										} else {
-											// #. default header
-											headHtml += '<th' + width + headClassName + '>' + columns[r].title + '</th>';
-										}
-									} else {
-										// #. default header
-										headHtml += '<th' + width + headClassName + '>' + columns[r].title + '</th>';
+									if (!columns[r].hideExcel) {
+										excelData[columns[r].title] = (val ? val : '');
 									}
 								}
+								
 							}
 							html += '</tr>';
 							rowIndex++;
+							excelDatas.push(excelData);
 						}
 					}
 					headHtml += '</tr>';
@@ -256,7 +278,6 @@ var UserTable = function() {
 							
 						}
 						disabled = '';
-						console.log(n, max);
 						if (n == max - 1) disabled = ' disabled';
 						html += '<li class="paginate_button next' + disabled + '" id="' + uid + '_next">'
 							+ '<a href="#" aria-controls="' + uid + '_ctrl" data-dt-idx="' + (n + 1) + '" tabindex="0">Next</a>'
@@ -292,6 +313,20 @@ var UserTable = function() {
 					drawnTableFunc[uid] = function () {
 						UserTable.draw(uid, ajax, columns, custom_func);
 					}
+
+					$("#" + uid + "_excel_btn").click(function() {
+						// step 1. workbook 생성
+						var wb = XLSX.utils.book_new();
+						// step 2. 시트 만들기 
+						var newWorksheet = XLSX.utils.json_to_sheet(excelDatas);
+						// var newWorksheet = XLSX.utils.table_to_sheet(html);
+						// step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
+						XLSX.utils.book_append_sheet(wb, newWorksheet, "sheet1");
+						// step 4. 엑셀 파일 만들기 
+						var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+						// step 5. 엑셀 파일 내보내기 
+						saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Sample.xlsx");
+					});
 					
 					$("#" + uid + "_checkbox_all").change(function() {
 						var rowCount = UserTable.getRowCount(uid);

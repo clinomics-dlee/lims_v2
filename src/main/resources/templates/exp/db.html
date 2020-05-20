@@ -4,8 +4,6 @@ xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 	<th:block th:replace="layout/head"></th:block>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
 </head>
 <body class="pace-done">
 	<!-- begin #page-loader -->
@@ -178,10 +176,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_sample_db_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_sample_db_grid', true, [10, 50] , [10, 50], true);
 		drawSampleDbGrid();
 
-		UserTable.init('_mapping_db_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_mapping_db_grid', true, [10, 50] , [10, 50], true);
 		drawMappingGrid();
 	});
 	
@@ -191,6 +189,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : function() {
 				var param = {
+					all : "true",
 					bundleId : $("#sel_bundle").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
 					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val(),
@@ -206,7 +205,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "id",
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
-			displayExcel : false,
+			hideExcel : true,
 			type : {
 				name : "checkbox"
 			}
@@ -215,7 +214,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : 'id',
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
-			displayExcel : false,
+			hideExcel : true,
 			render : function(row, data, index) {
 				return '<string>' + (index + 1) + '</string>';
 			}
@@ -294,6 +293,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "id",
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
+			hideExcel : true,
 			type : {
 				name : "checkbox"
 			}
@@ -302,6 +302,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : 'id',
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
+			hideExcel : true,
 			render : function(row, data, index) {
 				return '<string>' + (index + 1) + '</string>';
 			}
