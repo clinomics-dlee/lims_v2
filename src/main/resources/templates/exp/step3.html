@@ -175,31 +175,23 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			title : "Chip Barcode",
 			data : "chipBarcode",
 			render : function(row, data, index) {
-				var value = '<input type="text" class="form-control" style="width:100%;" id="chipBarcode_' + row.mappingNo + '" value="' + (data != null ? data : "") + '">';
+				var value = '<input type="text" class="form-control" style="width:100%;" id="chipBarcode_' + index + '" value="' + (data != null ? data : "") + '">';
 				return value;
 			}
 		}, {
 			title : "Chip Type",
 			data : "chipTypeCode",
 			headClassName : 'width-300',
-			render : function(row, data, index) {
-				var value = '<select class="form-control" style="width:100%;" id="chipTypeCode_' + row.mappingNo + '">';
-				for (var key in g_chipTypeCodeInfo) {
-					var selected = "";
-					if (data == key) {
-						selected = "selected";
-					}
-					value += '<option value="' + key + '" ' + selected + '>' + g_chipTypeCodeInfo[key] + '</option>';
-				}
-				value += '</select>';
-				return value;
+			type : {
+				name : "combo",
+				items : g_chipTypeCodeInfo
 			}
 		}, {
 			title : " ",
 			data : "mappingNo",
 			headClassName : 'width-50',
 			render : function(row, data, index) {
-				return '<a href="javascript:editChipInfo(\'' + data + '\')" class="btn btn-sm btn-success width-60 m-r-2">Edit</a>';
+				return '<a href="javascript:editChipInfo(' + index + ')" class="btn btn-sm btn-success width-60 m-r-2">Edit</a>';
 			}
 		}]);
 	}
@@ -208,17 +200,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		UserTable.reload('_step3_grid');
 	}
 
-	function editChipInfo(mappingNo) {
+	function editChipInfo(index) {
 		CommonMsg.okCancel(function() {
-			var chipBarcode = $('#chipBarcode_' + mappingNo).val();
-			var chipTypeCode = $('#chipTypeCode_' + mappingNo).val();
+			var editRow = UserTable.getRowAt("_step3_grid", index);
+			var chipBarcode = $('#chipBarcode_' + index).val();
+			var chipTypeCode = $("#_step3_grid_combo_" + index).val();
 			
 			$.ajax({
 				url: '/exp/step3/chipInfo/update',
 				type : "post",
 				dataType : 'json',
 				data : {
-					mappingNo : mappingNo,
+					mappingNo : editRow.mappingNo,
 					chipBarcode : chipBarcode,
 					chipTypeCode : chipTypeCode
 				},
@@ -247,16 +240,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 	function updateChipInfo() {
 		var checkedRows = UserTable.getCheckedRows("_step3_grid");
+		console.log(checkedRows);
 		if (checkedRows.length > 0) {
 			CommonMsg.okCancel(function() {
 				var mappingInfos = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
-
 					var mappingInfo = {
 						mappingNo : row.mappingNo,
-						chipBarcode :  $('#chipBarcode_' + row.mappingNo).val(),
-						chipTypeCode : $('#chipTypeCode_' + row.mappingNo).val()
+						chipBarcode :  $('#chipBarcode_' + row.index).val(),
+						chipTypeCode : $('#_step3_grid_combo_' + row.index).val()
 					};
 
 					mappingInfos.push(mappingInfo);

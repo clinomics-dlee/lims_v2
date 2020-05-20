@@ -64,6 +64,7 @@ var UserTable = function() {
 			if (items[uid].length > 0) {
 				for (var i = 0; i < items[uid].length; i++) {
 					if ($("#" + uid + "_checkbox_" + i).is(":checked")) {
+						items[uid][i]["index"] = i;
 						checkedItems.push(items[uid][i]);
 					}
 				}
@@ -199,10 +200,14 @@ var UserTable = function() {
 												+ '<label for="' + uid + '_radio_'+ rowIndex +'"></label>'
 												+ '</div>';
 										} else if (columns[r].type.name == "combo") {
-											val = '<select class="form-control" id="' + uid + '_combo_'+ rowIndex +'" name="' + uid + '_combo">';
-											for (var i = 0; i < columns[r].type.items.length; i++) {
-												var comboItem = columns[r].type.items[i];
-												val += '<option value="' + comboItem.value + '">' + comboItem.name + '</option>';
+											var selectValue = val;
+											val = '<select class="form-control" style="width:100%;" id="' + uid + '_combo_'+ rowIndex +'" name="' + uid + '_combo">';
+											for (var key in columns[r].type.items) {
+												var selected = "";
+												if (selectValue == key) {
+													selected = "selected";
+												}
+												val += '<option value="' + key + '" ' + selected + '>' + columns[r].type.items[key] + '</option>';
 											}
 											val += '</select>';
 										}
