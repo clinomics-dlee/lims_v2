@@ -87,9 +87,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<hr/>
 							<div id="_sample_db_grid"></div>
 							<hr/>
-							<div class="row">
+							<!-- <div class="row">
 								<button onClick="downloadExcel();" class="btn btn-success m-l-20">Excel Download</button>
-							</div>
+							</div> -->
 						</div>
 						<!-- end tab-1 -->
 
@@ -206,6 +206,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "id",
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
+			displayExcel : false,
 			type : {
 				name : "checkbox"
 			}
@@ -214,6 +215,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : 'id',
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
+			displayExcel : false,
 			render : function(row, data, index) {
 				return '<string>' + (index + 1) + '</string>';
 			}
@@ -328,30 +330,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 	function searchMapping() {
 		UserTable.reload('_mapping_db_grid');
-	}
-
-	function s2ab(s) { 
-		var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-		var view = new Uint8Array(buf);  //create uint8array as viewer
-		for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-		return buf;    
-	}
-	
-	function downloadExcel() {
-		var rows = UserTable.getRows("_sample_db_grid");
-		if (rows.length > 0) {
-			// step 1. workbook 생성
-			var wb = XLSX.utils.book_new();
-			// step 2. 시트 만들기 
-			var newWorksheet = XLSX.utils.json_to_sheet(rows);
-			// var newWorksheet = XLSX.utils.table_to_sheet(document.getElementById('_sample_db_grid_table'));
-			// step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
-			XLSX.utils.book_append_sheet(wb, newWorksheet, "sheet1");
-			// step 4. 엑셀 파일 만들기 
-			var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-			// step 5. 엑셀 파일 내보내기 
-			saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Sample.xlsx");
-		}
 	}
 
 	/* ]]> */
