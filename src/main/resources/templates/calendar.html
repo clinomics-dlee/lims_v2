@@ -370,19 +370,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					} else if (loop % 8 == 0 && loop != 0) {
 						html = '&nbsp;<div>';
 						if (w1 > 0) {
-							html += '<a href="#" onClick="calPopupOnload(\''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="calPopupOnload(\''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
 								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + w1 + '</a>';
 						}
 						if (w2 > 0) {
-							html += '<a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
 								+ ' class="btn bg-info btn-xs p-l-10 p-r-10 m-b-5">' + w2 + '</a>';
 						}
 						if (w3 > 0) {
-							html += '<a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
 								+ ' class="btn bg-orange btn-xs p-l-10 p-r-10 m-b-5">' + w3 + '</a>';
 						}
 						if (w4 > 0) {
-							html += '<a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
 								+ ' class="btn bg-red btn-xs p-l-10 p-r-10 m-b-5">' + w4 + '</a>';
 						}
 						html += '</div>';

@@ -258,7 +258,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		for (var e in aDateInputs) {
 			
 			$('input[name="' + aDateInputs[e] + '"]').datepicker({
-				dateFormat : 'yy-mm-dd',
+				autoclose : true,
+				format: "yyyy-mm-dd",
 				changeMonth : true,
             	changeYear : true
 			});
@@ -331,8 +332,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		    success: function(data, xhr) {
 		    	if (data.result == "00") {
 					CommonMsg.save(function() {
-						
-					});
+						UserTable.clear('_input_grid');
+					}, data.message);
 				} else if (!data.result.startsWith("0")) {
 					CommonMsg.error(function() { });
 				}
@@ -415,14 +416,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								bodyHtml += '</select>';
 							} else if (data[r].type == "date") {
 								aDateInputs.push(data[r].nameCode);
-								bodyHtml += '<div class="input-group" data-provide="datepicker" style="width:150px;">';
-								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm"'
+								//bodyHtml += '<div class="input-group" data-provide="datepicker" style="width:150px;">';
+								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm width-100"'
 									+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + "_" + ii + '"' : '')
 									+ ' placeholder="" '
 									+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
-								bodyHtml += '<span class="input-group-append">';
-								bodyHtml += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
-								bodyHtml += '</span>';
+								//bodyHtml += '<span class="input-group-append">';
+								//bodyHtml += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
+								//bodyHtml += '</span>';
 								bodyHtml += '</div><div id="error_' + data[r].nameCode + "_" + ii + '"></div>';
 							} else {
 								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '

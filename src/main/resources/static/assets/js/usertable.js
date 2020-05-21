@@ -347,6 +347,11 @@ var UserTable = function() {
 						}
 					});
 					
+					$("#" + uid + "_page").change(function() {
+						$("#" + uid + "_page_start").val(0);
+						drawnTableFunc[uid]();
+					});
+					
 					$("input[name=" + uid + "_checkbox]").change(function(e) {
 						var rowCount = UserTable.getRowCount(uid);
 						if (rowCount > 0) {

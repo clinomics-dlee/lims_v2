@@ -182,7 +182,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : '실험실', 
+				title : '검사실ID', 
 				data : 'laboratoryId'
 			},
 			{
@@ -235,9 +235,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				},
 				success: function(data, xhr) {
 					if (data.result.startsWith("0")) {
-						CommonMsg.save(function() { }, "승인이 완료되었습니다.");
+						CommonMsg.save(function() {
+							UserTable.reload('_collect_grid');
+						}, data.message);
 					} else if (data.result == "61") {
-						CommonMsg.info(function() { }, "권한이 없습니다.");
+						CommonMsg.info(function() { }, data.message);
 					} else {
 						CommonMsg.error(function() { });
 					}

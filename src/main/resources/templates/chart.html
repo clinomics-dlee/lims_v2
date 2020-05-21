@@ -44,60 +44,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	                    <div class="panel p-20">
 	    					<div class="row m-b-5">
 								
-								
-								
+										
 								<label class="col-form-label">기간</label>
-								<select class="form-control width-80 m-r-5 m-b-5" id="startYear" name="startYear">
-									<option value="2020">2020</option>
-									<option value="2021">2021</option>
-									<option value="2022">2022</option>
-									<option value="2023">2023</option>
-									<option value="2024">2024</option>
-									<option value="2025">2025</option>
-									<option value="2026">2026</option>
-									<option value="2027">2027</option>
-								</select>
-								<select class="form-control width-80 m-r-5 m-b-5" id="startMonth" name="startMonth">
-									<option value="01">1</option>
-									<option value="02">2</option>
-									<option value="03">3</option>
-									<option value="04">4</option>
-									<option value="05">5</option>
-									<option value="06">6</option>
-									<option value="07">7</option>
-									<option value="08">8</option>
-									<option value="09">9</option>
-									<option value="10">10</option>
-									<option value="11">11</option>
-									<option value="12">12</option>
-								</select>
-								
+								<div class="col-xs-push-0">
+									<input type="text" class="form-control width-80" data-parsley-required="true" id="startDate" placeholder="" autocomplete="off" />
+								</div>
+
 								<label class="col-form-label">~</label>
-								<select class="form-control width-80 m-r-5 m-b-5" id="endYear" name="endYear">
-									<option value="2020">2020</option>
-									<option value="2021">2021</option>
-									<option value="2022">2022</option>
-									<option value="2023">2023</option>
-									<option value="2024">2024</option>
-									<option value="2025">2025</option>
-									<option value="2026">2026</option>
-									<option value="2027">2027</option>
-								</select>
-								<select class="form-control width-80 m-r-5 m-b-5" id="endMonth" name="endMonth">
-									<option value="01">1</option>
-									<option value="02">2</option>
-									<option value="03">3</option>
-									<option value="04">4</option>
-									<option value="05">5</option>
-									<option value="06">6</option>
-									<option value="07">7</option>
-									<option value="08">8</option>
-									<option value="09">9</option>
-									<option value="10">10</option>
-									<option value="11">11</option>
-									<option value="12">12</option>
-								</select>
-								<button onClick="chart();" class="btn btn-default m-l-10 m-b-5 width-60" id="btn_today" th:text="#{common.search}">Search</button>
+								<div class="col-xs-push-0">
+									<input type="text" class="form-control width-80" data-parsley-required="true" id="endDate" placeholder="" autocomplete="off" />
+								</div>
+								<button onClick="chart();" class="btn btn-default m-l-10 m-b-5 width-60" id="btn_today">조회</button>
+								
+								
+								
 							</div>
 	                    </div>
 	                </div>
@@ -181,28 +141,44 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	//  시작
 	$(document).ready(function() {
 			
-			
 		App.init();
 		
 		var today = moment();
 		var fdate = moment().subtract(2, 'month');
+
+		$('#startDate').datepicker({
+			autoclose : true,
+			format: "yyyy-mm",
+			language : "ko",
+			viewMode: "months", 
+			minViewMode: "months"
+		});
+		// $('#startDate').val(fdate);
+		$('#startDate').datepicker('setDate', fdate.format("YYYY-MM"));
 		
-		$('#startYear').val(fdate.format('YYYY'));
-		$('#startMonth').val(fdate.format('MM'));
-		$('#endYear').val(today.format('YYYY'));
-		$('#endMonth').val(today.format('MM'));
+		$('#endDate').datepicker({
+			autoclose : true,
+			format: "yyyy-mm",
+			language : "ko",
+			viewMode: "months", 
+			minViewMode: "months"
+		});
+		// $('#endDate').val(today);
+		$('#endDate').datepicker('setDate', today.format("YYYY-MM"));
 		
 		chart();
 	});
 	
 	function chart() {
+		if ($("#startDate").parsley().validate() != true) return;
+		if ($("#endDate").parsley().validate() != true) return;
 		
 	    $.ajax({
 			url : "/chart/get/statistics",
 			type : "GET",
 			data : {
-				start : $("#startYear").val() + "-" + $("#startMonth").val(),
-				end : $("#endYear").val() + "-" + $("#endMonth").val()
+				start : $("#startDate").val(),
+				end : $("#endDate").val()
 			},
 			dataType : "json",
 			contentType : "application/json; charset=utf-8",
@@ -276,9 +252,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 		/* ]]> */
 	</script>
-	<form name="searchForm" id="searchForm" method="post">
-		<input type="hidden" name="startDate" id="startDate" value="" />
-		<input type="hidden" name="finishDate" id="finishDate" value="" />
-	</form>
+	
 </body>
 </html>

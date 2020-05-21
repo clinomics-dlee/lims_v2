@@ -160,6 +160,7 @@ public class InputService {
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());
+		rtn.put("message", ResultCode.SUCCESS.getMsg());
 		return rtn;
 	}
 	
@@ -192,6 +193,7 @@ public class InputService {
 		roles = roles.substring(1);
 
 		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
 
 		if (roles.contains(RoleCode.ROLE_EXP_80.toString())) {
 			
@@ -222,6 +224,7 @@ public class InputService {
 			});
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
 		}
 		sampleRepository.saveAll(samples);
 		

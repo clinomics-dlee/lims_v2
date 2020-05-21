@@ -195,7 +195,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			},
 			{
-				title : '실험실', 
+				title : '검사실ID', 
 				data : 'laboratoryId'
 			},
 			{
@@ -266,7 +266,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				if (data.result.startsWith("0")) {
 					CommonMsg.save(function() {
 						UserTable.reload('_collect_grid');
-					});
+					}, data.message);
 				} else {
 					CommonMsg.error(function() { });
 				}
