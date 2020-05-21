@@ -132,26 +132,22 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		
 		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
 		
+		var startDate = moment().subtract(7, 'days');
+		var endDate = moment();
+
 		$('#default-daterange').daterangepicker({
 			opens: 'right',
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
-			startDate: moment().subtract(1, 'months'),
-			endDate: moment(),
+			startDate: startDate,
+			endDate: endDate,
 			minDate: '2018/01/01',
 			maxDate: moment(),
 		}, function (start, end) {
 			
-			$('#startDate').val(start.format('YYYY-MM-DD'));
-			$('#finishDate').val(end.format('YYYY-MM-DD'));
-			$('#default-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
-			
+			setDaterangepicker(start, end);
 		});
-		startDate = moment().subtract(1, 'months');
-		endDate = moment();
-		$('#default-daterange input').val(startDate.format('YYYY-MM-DD') + ' ~ ' + endDate.format('YYYY-MM-DD'));
-		$('#startDate').val(startDate.format('YYYY-MM-DD'));
-		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
+		setDaterangepicker(startDate, endDate);
 		
 		UserTable.draw('_collect_grid', {
 			url : "/input/rvc",
@@ -252,6 +248,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			});
 		});
+	}
+	
+	function setDaterangepicker(start, end) {
+		
+		$('#default-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+		$('#startDate').val(start.format('YYYY-MM-DD'));
+		$('#finishDate').val(end.format('YYYY-MM-DD'));
 	}
 	
 	function search() {

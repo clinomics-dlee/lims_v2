@@ -62,7 +62,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			</ol> -->
 			<!-- end breadcrumb -->
 			<!-- begin page-header -->
-			<h1 class="page-header" th:text="#{title.sampleStatus}">Sample status</h1>
+			<h1 class="page-header">검체 현황</h1>
 			<!-- end page-header -->
 			
 			<!-- begin fullcalendar-container -->
@@ -270,7 +270,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	
 	<script th:inline="javascript">
-	/* <![CDATA[ */       
+	/* <![CDATA[ */
+	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
 	var rdate = moment();
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
@@ -346,7 +347,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						html += '<div>';
 						if (val1) {
 							w1 += val1; t1 += val1;
-							html += ' <a href="#" onClick="calPopupOnload(\''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
 								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + val1 + '</a>';
 						}
 						if (val2) {
@@ -370,7 +371,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					} else if (loop % 8 == 0 && loop != 0) {
 						html = '&nbsp;<div>';
 						if (w1 > 0) {
-							html += ' <a href="#" onClick="calPopupOnload(\''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
 								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + w1 + '</a>';
 						}
 						if (w2 > 0) {

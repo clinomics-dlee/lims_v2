@@ -27,6 +27,11 @@ public class PageController {
 	
 	@GetMapping()
 	public String calendar(Model model) {
+		Map<String, String> statusCodeMap = Maps.newHashMap();
+		for (StatusCode statusCode : StatusCode.values()) {
+			statusCodeMap.put(statusCode.getKey(), statusCode.getValue());
+		}
+		model.addAttribute("statusCodes", statusCodeMap);
 		model.addAttribute("bundles", bundleService.selectAll());
 		return "calendar";
 	}

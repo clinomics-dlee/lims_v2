@@ -20,7 +20,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">List</h4>
+				<h4 class="modal-title">검체 현황</h4>
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 			</div>
 			<div class="modal-body">
@@ -48,11 +48,13 @@ function afterPopupOnload(type, bundleId, startDate, endDate) {
 }
 
 function afterAfterGetItem(type, bundleId, startDate, endDate) {
-	var url = "/popup/reported";
+	var url = "/popup/registered";
 	if (type == 1) {
 		url = "/popup/analysis";
 	} else if (type == 2) {
 		url = "/popup/completed";
+	} else if (type == 3) {
+		url = "/popup/reported";
 	}
 	UserTable.draw('_com_after_popup', {
 		url : url,
@@ -79,27 +81,28 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 			return '<string>' + (index + 1) + '</string>';
 		}
 	}, {
-		title : "Laboratory",
-		data : "sample.id"
+		title : "서비스",
+		data : "bundle.name",
 	}, {
-		title : "Barcode",
-		data : "sample.barcode"
+		title : "검사실ID",
+		data : "laboratoryId"
 	}, {
-		title : "Product",
-		data : "sample.bundle.name",
+		title : "바코드",
+		data : "items.barcode"
 	}, {
-		title : "Chip Number",
-		data : "chipNumber",
-	}, {
-		title : "Status",
+		title : '상태', 
 		data : "statusCode",
+		render : function(row, data, index) {
+			var value = g_statusCodeInfo[data];
+			return value;
+		}
 	}, {
-		title : "Experiment Date",
+		title : "생성일자",
 		data : "createdDate",
 		type : "date"
 	}, {
-		title : "Experiment user",
-		data : "member.name",
+		title : "생성자",
+		data : "createdMember.name",
 	}]);
 	
 }	

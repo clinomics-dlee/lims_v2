@@ -113,6 +113,12 @@
                     <span>판정</span>
                 </a>
 			</li>
+			<li th:classappend="${#strings.startsWith(path,'/p/pdf')} ? active : ''">
+				<a href="/p/pdf/out">
+                    <i class="fa fa-print"></i>
+                    <span>출고</span>
+                </a>
+			</li>
 			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/set')} ? active : ''">
 				<a href="javascript:;">
                     <b class="caret"></b>

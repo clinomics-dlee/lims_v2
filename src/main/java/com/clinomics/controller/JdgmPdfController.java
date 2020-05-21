@@ -16,18 +16,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinomics.service.setting.BundleService;
-import com.clinomics.service.JdgmService;
+import com.clinomics.service.JdgmPdfService;
 import com.clinomics.service.SampleDbService;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
 
-@RequestMapping("/jdgm")
 @Controller
-public class JdgmController {
+public class JdgmPdfController {
 
 	@Autowired
-	JdgmService jdgmService;
+	JdgmPdfService jdgmPdfService;
 	
 	@Autowired
 	SampleItemService sampleItemService;
@@ -41,17 +40,31 @@ public class JdgmController {
 	@Autowired
 	BundleService bundleService;
 	
-	@GetMapping("/aprv")
+	@GetMapping("/jdgm/list")
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
-		return jdgmService.find(params, Arrays.asList(new StatusCode[] { StatusCode.S460_ANLS_CMPL }));
+		return sampleDbService.find(params, 460);
 	}
 	
-	@PostMapping("/approve")
+	@PostMapping("/jdgm/approve")
 	@ResponseBody
 	public Map<String, String> approve(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return jdgmService.approve(ids, userDetails.getUsername());
+		return jdgmPdfService.jdgmApprove(ids, userDetails.getUsername());
+	}
+	
+	@GetMapping("/output/list")
+	@ResponseBody
+	public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
+		return sampleDbService.find(params, 700);
+	}
+	
+	@PostMapping("/output/approve")
+	@ResponseBody
+	public Map<String, String> outputApprove(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return jdgmPdfService.outputApprove(ids, userDetails.getUsername());
 	}
 }

@@ -26,12 +26,6 @@ public class DashboardController {
 
 	@Autowired
 	BundleService bundleService;
-	
-	@GetMapping()
-	public String calendar(Model model) {
-		model.addAttribute("bundles", bundleService.selectAll());
-		return "calendar";
-	}
 
 	@GetMapping("/calendar/get/statistics")
 	@ResponseBody

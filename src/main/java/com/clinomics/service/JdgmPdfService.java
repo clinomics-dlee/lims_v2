@@ -8,7 +8,9 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ResultCode;
@@ -32,7 +34,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JdgmService {
+public class JdgmPdfService {
 
 	@Autowired
     SampleRepository sampleRepository;
@@ -82,7 +84,7 @@ public class JdgmService {
 	}
     
     @Transactional
-	public Map<String, String> approve(List<Integer> ids, String memberId) {
+	public Map<String, String> jdgmApprove(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		List<Sample> samples = sampleRepository.findByIdIn(ids);
 		
@@ -127,6 +129,45 @@ public class JdgmService {
 					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
 				}
 			});
+		} else {
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+		}
+		sampleRepository.saveAll(samples);
+		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> outputApprove(List<Integer> ids, String memberId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		List<Sample> samples = sampleRepository.findByIdIn(ids);
+		
+		// sample.set
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.get();
+		LocalDateTime now = LocalDateTime.now();
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+
+		if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
+			
+			samples.stream().forEach(s -> {
+				s.setOutputWaitDate(now);
+				s.setOutputWaitMember(member);
+				String products = "";
+				for (Product p : s.getBundle().getProduct()) {
+					products += "_" + p.getName();
+				}
+				products = products + "_";
+				s.setOutputProductTypes(products);
+				s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+			});
+
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
 		}
