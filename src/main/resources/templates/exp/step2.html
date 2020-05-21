@@ -81,7 +81,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<hr/>
 							<div class="row">
 								<button onClick="updateQrtPcr();" class="btn btn-success m-l-20">qRT-PCR</button>
-								<button onClick="excelForm();" class="btn btn-warning m-l-20">Mapping Excel Download</button>
 								<button onClick="mappingUploadPopupOnload();" class="btn btn-warning m-l-20">Mapping</button>
 								<button onClick="completeStep2();" class="btn btn-yellow m-l-20">Step2 완료</button>
 							</div>
@@ -260,7 +259,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    success: function(data, xhr) {
 				    	if (data.result == "00") {
 				    		CommonMsg.save(function() {
-				    			$("#modal-sample-detail").modal('hide');
 				    			UserTable.reload('_step2_grid');
 							});
 						} else if (!data.result.startsWith("0")) {
@@ -278,14 +276,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}
 	}
 
-	function excelForm() {
-		location.href = '/exp/step2/excel/form';
-	}
-	
-	function excelUpload() {
-		$('#file').trigger('click'); 
-	}
-	
 	function completeStep2() {
 		var checkedRows = UserTable.getCheckedRows("_step2_grid");
 		if (checkedRows.length > 0) {

@@ -93,18 +93,11 @@ public class ExpController {
 		requestExcel(xlsx, "Mapping_Template", response);
 	}
 
-	@PostMapping("/step2/mapping/upload")
-	public Map<String, Object> uploadMapping(@RequestParam("file") MultipartFile multipartFile, MultipartHttpServletRequest request)
+	@PostMapping("/step2/mapping/saveall")
+	public Map<String, Object> saveAllMapping(@RequestBody List<Map<String, String>> params)
 			throws InvalidFormatException, IOException {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String memberId = userDetails.getUsername();
-		String mappingNo = request.getParameter("mappingNo");
-
-		Map<String, String> datas = Maps.newHashMap();
-		datas.put("memberId", memberId);
-		datas.put("mappingNo", mappingNo);
-		
-		return expService.uploadMapping(multipartFile, datas);
+		return expService.saveAllMapping(params, userDetails.getUsername());
 	}
 
 	@PostMapping("/step2/complete")

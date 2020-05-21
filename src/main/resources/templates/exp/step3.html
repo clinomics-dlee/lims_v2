@@ -25,7 +25,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/mapping_upload"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -240,7 +239,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 	function updateChipInfo() {
 		var checkedRows = UserTable.getCheckedRows("_step3_grid");
-		console.log(checkedRows);
 		if (checkedRows.length > 0) {
 			CommonMsg.okCancel(function() {
 				var mappingInfos = [];

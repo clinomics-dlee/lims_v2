@@ -1,5 +1,5 @@
 <div class="modal fade" id="modal-mapping-upload">
-	<div class="modal-dialog">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h4 class="modal-title">Mapping File Upload</h4>
@@ -16,14 +16,24 @@
 					<div class="form-group row m-b-12">
 						<label class="col-form-label col-md-4">Mapping File *</label>
 						<div class="col-xs-push-0">
-							<input type="file" id="file" name="file">
+							<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="excelForm();">엑셀 양식 다운로드</button>
+						</div>
+						<div class="col-xs-push-0">
+							<input type="file" id="file" name="file" class="d-none">
+							<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="excelUpload();">엑셀 불러오기</button>
+						</div>
+					</div>
+					<div class="form-group row m-b-12">
+						<label class="col-form-label col-md-4"></label>
+						<div class="col-xs-push-0 col-md-8">
+							<div id="_mapping_grid" style="overflow: auto; max-height: 500px;"></div>
 						</div>
 					</div>
 				</form>
 			</div>
 			<div class="modal-footer">
-				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
-				<a href="javascript:popupUpload();" class="btn btn-success">Upload</a>
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
+				<a href="javascript:saveMapping();" class="btn btn-success">저장</a>
 			</div>
 		</div>
 	</div>
@@ -33,45 +43,152 @@
 /* <![CDATA[ */       
 function mappingUploadPopupOnload(index) {
 	$("#modal-mapping-upload").modal();
+
+	$('#file').on('change', function (event) {
+		if ($("#file").val() == '') return;
+		
+		var input = event.target;
+		var reader = new FileReader();
+		reader.onload = function(){
+			var fileData = reader.result;
+			var wb = XLSX.read(fileData, {type : 'binary'});
+			wb.SheetNames.forEach(function(sheetName){
+				var rowObj = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+				
+				createRow(rowObj);
+			})
+		};
+		reader.readAsBinaryString(input.files[0]);
+	});
+
+	UserTable.init('_mapping_grid', false);
 }
 
-function popupUpload() {
+function createRow(excelData) {
+	UserTable.clear('_mapping_grid');
+
+	var heads = [{name : "Well Position", value : "wellPosition"}, {name : "Genotyping ID", value : "genotypingId"}];
+
+	if (excelData) {
+		var headHtml = "", bodyHtml = "";
+		var html = "";
+
+		for (var i = 0; i < heads.length; i++) {
+			headHtml += '<th>';
+			headHtml += heads[i].name;
+			headHtml += '</th>';
+		}
+
+		for (var i = 0; i < excelData.length; i++) {
+			var data = excelData[i];
+			bodyHtml += "<tr>";
+			for (var j = 0; j < heads.length; j++) {
+				var val = data[heads[j].name];
+				if (val == null || val.trim().length < 1) {
+					val = "";
+				}
+				bodyHtml += "<td>";
+				bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm" '
+						+ 'name="' + heads[j].value + '"'
+						+ 'style="width:200px;" ';
+				bodyHtml += '/>';
+				bodyHtml += "</td>";
+			}
+			bodyHtml += "</tr>";
+		}
+
+		html += '<thead><tr>' + headHtml;
+		html += '</tr></thead>';
+		html += '<tbody>' + bodyHtml;
+		html += '</tbody>';
+		
+		$("#_mapping_grid table").html(html);
+	}
+}
+
+function saveMapping() {
 	if (!$('#frm_popup_mapping_upload').parsley().validate()) {
 		return;	
 	}
 
 	var form = $('#frm_popup_mapping_upload')[0];
-	console.log(form);
 	var data = new FormData(form);
-	console.log(data);
-	
-	$.ajax({
-		enctype: 'multipart/form-data',
-		url: '/exp/step2/mapping/upload',
-		type: 'post',
-		data : data,
-		processData: false,
-		contentType: false,
-		beforeSend: function(xhr) {
-			xhr.setRequestHeader(header, token);
-		},
-		success: function(data, xhr) {
-			if (data.result == "00") {
-				CommonMsg.save(function() {
-					$("#modal-mapping-upload").modal('hide');
-					UserTable.reload('_step2_grid');
-				});
-			} else if (!data.result.startsWith("0")) {
-				CommonMsg.error(function() { });
+
+	var frmData = $('#frm_popup_mapping_upload').serializeObject();
+	var data = [];
+	var rows = $("#_mapping_grid table tbody tr").length;
+	for (var r = 0; r < rows; r++) {
+		var map = {};
+		for (const [key, value] of Object.entries(frmData)) {
+			if (rows > 1) {
+				map[key] = value[r];
+			} else {
+				map[key] = value;
 			}
-		},
-		error : function(data) {
-			CommonMsg.error(function() { });
-		},
-		complete : function() {
-			
 		}
+		map.mappingNo = $("#mappingNo").val();
+		data.push(map);
+	}
+
+	CommonMsg.okCancel(function() {
+		$.ajax({
+			url: '/exp/step2/mapping/saveall',
+			type: 'post',
+			data : JSON.stringify(data),
+			dataType : 'json',
+			contentType : "application/json;charset=utf-8",
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function(data, xhr) {
+				if (data.result == "00") {
+					CommonMsg.save(function() {
+						$("#modal-mapping-upload").modal('hide');
+						UserTable.reload('_step2_grid');
+					});
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
 	});
+}
+
+function excelForm() {
+	location.href = '/exp/step2/excel/form';
+	// var excelDatas = [];
+	// // #. 기본 데이터
+	// var wellPositionPrefixs = ["A", "C", "E", "G", "I", "K", "M", "O"];
+	// for (var i = 1; i < 24; i += 2) {
+	// 	for (var j = 0; j < wellPositionPrefixs.length; j++) {
+	// 		var prefix = wellPositionPrefixs[j];
+	// 		var suffix = (i < 10 ? "0" + i : i);
+	// 		var data = { "Well Position" : prefix + suffix, "Genotyping ID" : "" };
+	// 		excelDatas.push(data);
+	// 	}
+	// }
+	
+	// // step 1. workbook 생성
+	// var wb = XLSX.utils.book_new();
+	// // step 2. 시트 만들기 
+	// var newWorksheet = XLSX.utils.json_to_sheet(excelDatas);
+	// // var newWorksheet = XLSX.utils.table_to_sheet(html);
+	// // step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
+	// XLSX.utils.book_append_sheet(wb, newWorksheet, "sheet1");
+	// // step 4. 엑셀 파일 만들기 
+	// var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+	// // step 5. 엑셀 파일 내보내기 
+	// saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Sample.xlsx");
+}
+
+function excelUpload() {
+	$('#file').trigger('click'); 
 }
 /* ]]> */
 </script>

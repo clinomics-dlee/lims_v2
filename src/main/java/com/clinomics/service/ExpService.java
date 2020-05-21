@@ -375,62 +375,26 @@ public class ExpService {
 	}
 
 	@Transactional
-	public Map<String, Object> uploadMapping(MultipartFile multipartFile, Map<String, String> datas) {
+	public Map<String, Object> saveAllMapping(List<Map<String, String>> datas, String userId) {
 		Map<String, Object> rtn = Maps.newHashMap();
 		
-		XSSFWorkbook workbook = null;
-		try {
-			workbook = excelReadComponent.readWorkbook(multipartFile);
-		} catch (InvalidFormatException e) {
-			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
-		} catch (IOException e) {
-			rtn.put("result", ResultCode.FAIL_FILE_READ.get());
-		}
-		
-		if (workbook == null) {
-			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
-			return rtn;
-		}
-		
-		XSSFSheet sheet = workbook.getSheetAt(0);
-		List<Map<String, Object>> sheetList = excelReadComponent.readMapFromSheet(sheet);
-		
-		if (sheetList.size() < 1) {
-			rtn.put("result", ResultCode.EXCEL_EMPTY.get());
-			return rtn;
-		}
-
-		int sheetNum = workbook.getNumberOfSheets();
-		if (sheetNum < 1) {
-			return rtn;
-		}
-		
-		String mappingNo = datas.get("mappingNo");
-
-		// #. TODO Mapping No 중복 체크
-
-		List<Sample> items = new ArrayList<Sample>();
-		for (Map<String, Object> sht : sheetList) {
-			// #. Genotyping ID를 가지고 조회
-			String genotypingId = (String)sht.get("Genotyping ID");
-			String wellPosition = (String)sht.get("Well Position");
-
-			// #. TODO 중복된 Genotyping ID값 확인 필요
+		for (Map<String, String> data : datas) {
+			String mappingNo = data.get("mappingNo");
+			String genotypingId = data.get("genotypingId");
+			String wellPosition = data.get("wellPosition");
 
 			if (genotypingId.length() > 0 && wellPosition.length() > 0) {
-				// #. 둘다 값이 있는 경우 
 				String[] genotypingInfo = genotypingId.split("-V");
-
 				// #. genotypingId양식이 틀린경우
 				if (genotypingInfo.length != 2) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
 					return rtn;
 				}
-
+	
 				String laboratoryId = genotypingInfo[0];
 				// #. version값이 숫자가아닌경우
 				if (!NumberUtils.isCreatable(genotypingInfo[1])) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
 					return rtn;
 				}
 				int version = NumberUtils.toInt(genotypingInfo[1]);
@@ -442,24 +406,22 @@ public class ExpService {
 				Sample s = samples.get(0);
 				// #. 검사실ID 또는 version이 잘못 입력된 경우
 				if (s == null) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
 					return rtn;
 				}
 				// #. 조회된 검체의 상태가 STEP2가 아닌경우
 				if (!s.getStatusCode().equals(StatusCode.S220_EXP_STEP2)) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
 					return rtn;
 				}
-
+	
 				s.setGenotypingMethodCode(GenotypingMethodCode.CHIP);
 				s.setWellPosition(wellPosition);
 				s.setMappingNo(mappingNo);
-
-				items.add(s);
+	
+				sampleRepository.save(s);
 			}
 		}
-		
-		sampleRepository.saveAll(items);
 		
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
