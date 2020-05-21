@@ -25,58 +25,44 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_history"></th:block>
-		<th:block th:replace="popup/result"></th:block>
-		<th:block th:replace="popup/sample_detail"></th:block>
-		<th:block th:replace="popup/sample_detail_readonly"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">Home</li>
 				<li class="breadcrumb-item">실험</li>
 				<li class="breadcrumb-item active">실험대기</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">실험 - 실험대기</h1>
+			<h1 id="page-header" class="page-header">실험대기</h1>
 			<!-- end page-header -->
 			
 			<!-- begin content panel -->
 			<div class="row">
 				<div class="col-xl-12">
-					<ul class="nav nav-tabs">
-						<li class="nav-item">
-							<a href="#rdy-tab-1" data-toggle="tab" class="nav-link active">
-								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none">목록</span>
-							</a>
-						</li>
-					</ul>
-					
-					<!-- begin tab content -->
-					<div class="tab-content">
-						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="rdy-tab-1">
+					<div class="panel panel-inverse">
+						<div id="panel-body" class="panel-body">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1">서비스</label>
-								<div>
+								<label class="col-form-label m-l-2">서비스</label>
+								<div class="col-xs-push-0">
 									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
-										<option value="">All</option>
+										<option value="">전체</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
-								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
+								
+								<label class="col-form-label m-l-5">조회일자</label>
+								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
 								    <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span>
 								</div>
-								<label class="col-form-label col-md-1">검색어</label>
+								<label class="col-form-label m-l-10">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
 								</div>
 							</div>
 							<hr/>
@@ -86,9 +72,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<button onClick="startExp();" class="btn btn-success m-l-20">실험시작</button>
 							</div>
 						</div>
-						<!-- end tab-1 -->
 					</div>
-					<!-- end tab content -->
 				</div>
 			</div>
 			<!-- end content panel -->

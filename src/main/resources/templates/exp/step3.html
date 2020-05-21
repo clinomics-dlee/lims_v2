@@ -29,37 +29,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">Home</li>
 				<li class="breadcrumb-item">실험</li>
 				<li class="breadcrumb-item active">STEP3</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">실험 - STEP3</h1>
+			<h1 id="page-header" class="page-header">STEP3</h1>
 			<!-- end page-header -->
 			
 			<!-- begin content panel -->
 			<div class="row">
 				<div class="col-xl-12">
-					<ul class="nav nav-tabs">
-						<li class="nav-item">
-							<a href="#step1-tab-1" data-toggle="tab" class="nav-link active">
-								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none">목록</span>
-							</a>
-						</li>
-					</ul>
-					
-					<!-- begin tab content -->
-					<div class="tab-content">
-						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="step1-tab-1">
+					<div class="panel panel-inverse">
+						<div id="panel-body" class="panel-body">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1">검색어</label>
+								<label class="col-form-label m-l-2">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
 								</div>
 							</div>
 							<hr/>
@@ -183,7 +171,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			headClassName : 'width-300',
 			type : {
 				name : "combo",
-				items : g_chipTypeCodeInfo
+				items : g_chipTypeCodeInfo,
+				isBlank : true
 			}
 		}, {
 			title : " ",
@@ -252,7 +241,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 					mappingInfos.push(mappingInfo);
 				}
-				console.log(mappingInfos);
 				$.ajax({
 		            url: '/exp/step3/chipInfos/update',
 			        type : "post",

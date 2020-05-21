@@ -30,12 +30,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">Home</li>
 				<li class="breadcrumb-item">실험</li>
 				<li class="breadcrumb-item active">실험DB</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">실험 - 실험DB</h1>
+			<h1 id="page-header" class="page-header">실험DB</h1>
 			<!-- end page-header -->
 			
 			<!-- begin content panel -->
@@ -61,25 +60,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<!-- begin tab-1 -->
 						<div class="tab-pane fade active show" id="db-tab-1">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1">서비스</label>
+								<label class="col-form-label m-l-2">서비스</label>
 								<div>
 									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
-										<option value="">All</option>
+										<option value="">전체</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
-								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
+								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
 								    <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span>
 								</div>
-								<label class="col-form-label col-md-1">검색어</label>
+								<label class="col-form-label m-l-2">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10">검색</button>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
 								</div>
 							</div>
 							<hr/>
@@ -94,12 +93,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<!-- begin tab-2 -->
 						<div class="tab-pane fade" id="db-tab-2">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1">검색어</label>
+								<label class="col-form-label m-l-2">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keywordMapping" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="searchMapping();" class="btn btn-default m-l-10">검색</button>
+									<button onClick="searchMapping();" class="btn btn-default m-l-10">조회</button>
 								</div>
 							</div>
 							<hr/>

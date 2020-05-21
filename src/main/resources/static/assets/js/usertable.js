@@ -202,6 +202,9 @@ var UserTable = function() {
 										} else if (columns[r].type.name == "combo") {
 											var selectValue = val;
 											val = '<select class="form-control" style="width:100%;" id="' + uid + '_combo_'+ rowIndex +'" name="' + uid + '_combo">';
+											if (columns[r].type.isBlank) {
+												val += '<option value="">선택</option>';
+											}
 											for (var key in columns[r].type.items) {
 												var selected = "";
 												if (selectValue == key) {

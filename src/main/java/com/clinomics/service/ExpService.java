@@ -471,7 +471,8 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusEqual(StatusCode.S230_EXP_STEP3));
+					.and(SampleSpecification.statusEqual(StatusCode.S230_EXP_STEP3))
+					.and(SampleSpecification.mappingInfoLike(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
