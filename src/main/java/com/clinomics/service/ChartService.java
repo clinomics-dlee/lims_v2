@@ -158,25 +158,40 @@ public class ChartService {
 	
 	private Specification<Sample> getSampleWhere(Map<String, String> params) {
 		return Specification
-				.where(SampleSpecification.createdDateOneMonth(params));
+			.where(SampleSpecification.createdDateOneMonth(params))
+			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
-		// return Specification
-		// 		.where(ResultSpecification.modifiedDateOneMonth(params))
-		// 		.and(ResultSpecification.statusCodeIn(Arrays.asList(
-		// 					StatusCode.ANLS_CMPL
-		// 		)));
-		return null;
+		return Specification
+			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.statusIn(
+				Arrays.asList(new StatusCode[] {
+					StatusCode.S200_EXP_READY
+					, StatusCode.S210_EXP_STEP1
+					, StatusCode.S220_EXP_STEP2
+					, StatusCode.S230_EXP_STEP3
+					, StatusCode.S400_ANLS_READY
+					, StatusCode.S410_ANLS_RUNNING
+					, StatusCode.S420_ANLS_SUCC
+					, StatusCode.S430_ANLS_SUCC_CMPL
+					, StatusCode.S440_ANLS_FAIL
+					, StatusCode.S450_ANLS_FAIL_CMPL
+				})
+			));
 	}
 	
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
-		// return Specification
-		// 		.where(ResultSpecification.modifiedDateOneMonth(params))
-		// 		.and(ResultSpecification.statusCodeIn(Arrays.asList(
-		// 					StatusCode.ANLS_CMPL
-		// 		)));
-		return null;
+		return Specification
+			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.statusIn(Arrays.asList(
+				StatusCode.S460_ANLS_CMPL
+				, StatusCode.S600_JDGM_APPROVE
+				, StatusCode.S700_OUTPUT_WAIT
+			)));
 	}
 
 	private List<String> getChartLabels(LocalDateTime end, LocalDateTime loop) {

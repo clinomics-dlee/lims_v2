@@ -71,7 +71,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                     <div class="panel p-20">
                     
     					<div class="row m-b-5">
-							<label class="col-form-label" th:text="#{common.product}">Product</label>
+							<label class="col-form-label">서비스</label>
 							<select class="form-control width-150 m-r-5 m-b-5" data-parsley-required="true" id="sel_bundle" name="bundleId">
 								<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 							</select>

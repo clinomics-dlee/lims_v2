@@ -4,7 +4,7 @@
 		<!-- begin sidebar user -->
 		<ul class="nav">
 			<li class="nav-profile">
-			<div class="cover with-shadow" style="background: url('/assets/img/login-bg/login-bg-bbc2.jpg');"></div>
+			<div class="cover with-shadow" style="background: url('/assets/img/login-bg/laboratory.jpg');"></div>
 			<div class="image">
 				<!-- <img src="/assets/img/logo/logo.png" alt="" /> -->
 			</div>
@@ -107,12 +107,11 @@
 					</li>
                 </ul>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/judgment')} ? active : ''">
-				<a href="javascript:;">
+			<li th:classappend="${#strings.startsWith(path,'/p/jdgm')} ? active : ''">
+				<a href="/p/jdgm/jdgm">
                     <i class="fa fa-balance-scale"></i>
                     <span>판정</span>
                 </a>
-				
 			</li>
 			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/set')} ? active : ''">
 				<a href="javascript:;">

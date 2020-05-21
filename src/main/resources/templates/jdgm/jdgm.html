@@ -38,11 +38,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">입고</li>
-				<li class="breadcrumb-item active">입고DB</li>
+				<li class="breadcrumb-item active">판정</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">입고DB</h1>
+			<h1 id="page-header" class="page-header">판정</h1>
 			
 			<div class="row">
 				<div class="col-xl-12">
@@ -79,11 +78,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10 ">조회</button>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
 								</div>
 							</div>
 							<hr/>
 							<div id="_collect_grid">
+							</div>
+							<hr/>
+							<div class="form-group row m-b-12">
+								
+								<div>
+									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">승인</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -112,7 +118,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	<script th:inline="javascript">
 	/* <![CDATA[ */       
-	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
 
 	var tables = [];
 	var count;
@@ -124,7 +129,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	$(document).ready(function() {
 		App.init();
 		
-		UserTable.init('_collect_grid', true, [10, 50] , [10, 50], true);
+		TableManageDefault.init();
+		
+		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
 		
 		$('#default-daterange').daterangepicker({
 			opens: 'right',
@@ -148,14 +155,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
 		UserTable.draw('_collect_grid', {
-			url : "/input/db",
+			url : "/jdgm/aprv",
 			type : "GET",
 			data : function() {
 				var param = {
 					bundleId : $("#sel_bundle").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
-					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val(),
-					keyword : $("#keyword").val()
+					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
 				};
 				return param;
 			},
@@ -164,7 +170,29 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			beforeSend : function(xhr) {
 				xhr.setRequestHeader(header, token);
 			}
-		}, [
+		}, [ 
+			{
+				title : ' ', 
+				data : 'id',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				type : {
+					name : "checkbox"
+				}
+			},
+			{
+				title : 'No',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					return '<strong>' + (index + 1) + '</strong>';
+				}
+			},
+			{
+				title : '등록일자', 
+				data : 'createdDate',
+				type : 'date'
+			},
 			{
 				title : '실험실', 
 				data : 'laboratoryId'
@@ -174,24 +202,34 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'bundle.name'
 			},
 			{
-				title : '상태', 
-				data : "statusCode",
+				title : '입고담당자', 
+				data : 'inputApproveDate',
+				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var value = g_statusCodeInfo[data];
-					return value;
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
 				}
 			},
 			{
-				serverHeader : true
+				title : '중간관리자', 
+				data : 'inputMngApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
+				}
 			},
 			{
-				title : '검체 등록일자', 
-				data : 'createdDate',
-				type : 'date'
-			},
-			{
-				title : '등록자', 
-				data : 'createdMember.name'
+				title : '검사실책임자', 
+				data : 'inputDrctApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
+				}
 			}
 		], null);
 			
@@ -205,6 +243,38 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				dateFormat : 'yy-mm-dd'
 			});
 		}
+	}
+	
+	function approve() {
+		var checkedRows = UserTable.getCheckedRows('_collect_grid');
+		var data = [];
+		for (var cr in checkedRows) {
+			data.push(checkedRows[cr].id);
+		}
+		$.ajax({
+            url: '/jdgm/approve',
+			type: 'post',
+	        data : JSON.stringify(data),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+					
+				if (data.result.startsWith("0")) {
+					CommonMsg.save(function() { });
+				} else {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
 	}
 	
 	function search() {

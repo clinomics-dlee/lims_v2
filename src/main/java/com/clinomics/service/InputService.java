@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.checkerframework.checker.units.qual.s;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -194,27 +193,27 @@ public class InputService {
 
 		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
 
-		if (roles.contains(RoleCode.ROLE_EXP_80.getValue())) {
+		if (roles.contains(RoleCode.ROLE_EXP_80.toString())) {
 			
 			samples.stream().forEach(s -> {
 				s.setInputDrctApproveDate(now);
 				s.setInputDrctMember(member);
 				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
-					s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
+					s.setStatusCode(StatusCode.S200_EXP_READY);
 				}
 			});
 
-		} else if (roles.contains(RoleCode.ROLE_INPUT_40.getValue())) {
+		} else if (roles.contains(RoleCode.ROLE_INPUT_40.toString())) {
 			
 			samples.stream().forEach(s -> {
 				s.setInputMngApproveDate(now);
 				s.setInputMngApproveMember(member);
 				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
-					s.setStatusCode(StatusCode.S040_INPUT_APPROVE);
+					s.setStatusCode(StatusCode.S200_EXP_READY);
 				}
 			});
 
-		} else if (roles.contains(RoleCode.ROLE_INPUT_20.getValue())) {
+		} else if (roles.contains(RoleCode.ROLE_INPUT_20.toString())) {
 			
 			samples.stream().forEach(s -> {
 				s.setInputApproveDate(now);

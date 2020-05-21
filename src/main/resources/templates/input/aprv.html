@@ -58,7 +58,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<div id="panel-body" class="panel-body">
 					
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1">서비스</label>
+								<label class="col-form-label m-l-2">서비스</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200" id="sel_bundle">
 										<option value>전체</option>
@@ -66,14 +66,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 									</select>
 								</div>
 								
-								<label class="col-form-label">조회일자</label>
+								<label class="col-form-label m-l-5">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
 								    <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span>
 								</div>
-								<label class="col-form-label col-md-1">검색어</label>
+								<label class="col-form-label m-l-10">검색어</label>
 								<div class="col-xs-push-0">
 									
 								    <input type="text" id="keyword" class="form-control"/>
@@ -264,7 +264,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		    success: function(data, xhr) {
 					
 				if (data.result.startsWith("0")) {
-					CommonMsg.save(function() { });
+					CommonMsg.save(function() {
+						UserTable.reload('_collect_grid');
+					});
 				} else {
 					CommonMsg.error(function() { });
 				}
