@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinomics.service.setting.BundleService;
-import com.clinomics.service.AfterService;
+import com.clinomics.service.OutputService;
 import com.clinomics.service.SampleDbService;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
@@ -24,7 +24,7 @@ import com.clinomics.service.SampleItemService;
 public class OutputController {
 
 	@Autowired
-	AfterService AfterService;
+	OutputService outputService;
 	
 	@Autowired
 	SampleItemService sampleItemService;
@@ -55,7 +55,7 @@ public class OutputController {
 	public Map<String, String> approve(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return AfterService.jdgmApprove(ids, userDetails.getUsername());
+		return outputService.jdgmApprove(ids, userDetails.getUsername());
 	}
 	
 	@GetMapping("/output/list")
@@ -69,6 +69,6 @@ public class OutputController {
 	public Map<String, String> outputApprove(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return AfterService.outputApprove(ids, userDetails.getUsername());
+		return outputService.outputApprove(ids, userDetails.getUsername());
 	}
 }
