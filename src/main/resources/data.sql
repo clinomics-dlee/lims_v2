@@ -1,7 +1,7 @@
 INSERT INTO role (code, name) SELECT 'ROLE_GUEST_00' AS code, '방문자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_GUEST_00');
 INSERT INTO role (code, name) SELECT 'ROLE_INPUT_20' AS code, '입고담당자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_INPUT_20');
 INSERT INTO role (code, name) SELECT 'ROLE_INPUT_40' AS code, '입고관리자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_INPUT_40');
-INSERT INTO role (code, name) SELECT 'ROLE_INPUT_20' AS code, '출고담당자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_OUTPUT_20');
+INSERT INTO role (code, name) SELECT 'ROLE_OUTPUT_20' AS code, '출고담당자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_OUTPUT_20');
 INSERT INTO role (code, name) SELECT 'ROLE_EXP_20' AS code, '검사담당자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_EXP_20');
 INSERT INTO role (code, name) SELECT 'ROLE_EXP_40' AS code, '검사실관리자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_EXP_40');
 INSERT INTO role (code, name) SELECT 'ROLE_EXP_80' AS code, '검사실책임자' AS name FROM DUAL WHERE NOT EXISTS (SELECT * FROM role WHERE code = 'ROLE_EXP_80');
