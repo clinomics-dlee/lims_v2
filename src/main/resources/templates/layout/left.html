@@ -107,16 +107,22 @@
 					</li>
                 </ul>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/jdgm')} ? active : ''">
-				<a href="/p/jdgm/jdgm">
+			<li th:classappend="${#strings.startsWith(path,'/p/after/jdgm')} ? active : ''">
+				<a href="/p/output/jdgm">
                     <i class="fa fa-balance-scale"></i>
                     <span>판정</span>
                 </a>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/pdf')} ? active : ''">
-				<a href="/p/pdf/out">
+			<li th:classappend="${#strings.startsWith(path,'/p/after/output')} ? active : ''">
+				<a href="/p/output/output">
                     <i class="fa fa-print"></i>
                     <span>출고</span>
+                </a>
+			</li>
+			<li th:classappend="${#strings.startsWith(path,'/p/after/all')} ? active : ''">
+				<a href="/p/output/all">
+                    <i class="fa fa-print"></i>
+                    <span>검체 목록</span>
                 </a>
 			</li>
 			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/set')} ? active : ''">

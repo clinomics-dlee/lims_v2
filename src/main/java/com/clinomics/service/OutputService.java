@@ -34,7 +34,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JdgmPdfService {
+public class OutputService {
 
 	@Autowired
     SampleRepository sampleRepository;

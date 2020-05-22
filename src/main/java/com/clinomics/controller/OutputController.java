@@ -11,22 +11,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clinomics.service.setting.BundleService;
-import com.clinomics.service.JdgmPdfService;
+import com.clinomics.service.AfterService;
 import com.clinomics.service.SampleDbService;
-import com.clinomics.enums.StatusCode;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
 
 @Controller
-public class JdgmPdfController {
+public class OutputController {
 
 	@Autowired
-	JdgmPdfService jdgmPdfService;
+	AfterService AfterService;
 	
 	@Autowired
 	SampleItemService sampleItemService;
@@ -40,6 +38,12 @@ public class JdgmPdfController {
 	@Autowired
 	BundleService bundleService;
 	
+	@GetMapping("/all/list")
+	@ResponseBody
+	public Map<String, Object> all(@RequestParam Map<String, String> params) {
+		return sampleDbService.find(params, 0);
+	}
+	
 	@GetMapping("/jdgm/list")
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
@@ -51,7 +55,7 @@ public class JdgmPdfController {
 	public Map<String, String> approve(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return jdgmPdfService.jdgmApprove(ids, userDetails.getUsername());
+		return AfterService.jdgmApprove(ids, userDetails.getUsername());
 	}
 	
 	@GetMapping("/output/list")
@@ -65,6 +69,6 @@ public class JdgmPdfController {
 	public Map<String, String> outputApprove(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return jdgmPdfService.outputApprove(ids, userDetails.getUsername());
+		return AfterService.outputApprove(ids, userDetails.getUsername());
 	}
 }

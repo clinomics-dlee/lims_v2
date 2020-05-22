@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="layout/head"></th:block>
+    <style>
+	
+	#table_form td, #table_form th {
+		padding: 2px 10px;
+		border: 0;
+	}
+	
+	</style>
+</head>
+<body class="pace-done">
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">Loading</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<!-- end #sidebar -->
+		<th:block th:replace="popup/sample_detail"></th:block>
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin page header -->
+			<ol class="breadcrumb float-xl-right">
+				<li class="breadcrumb-item active">판정</li>
+			</ol>
+			
+			<h1 id="page-header" class="page-header">판정</h1>
+			
+			<div class="row">
+				<div class="col-xl-12">
+					
+					
+					<div class="panel panel-inverse">
+
+						<!-- begin panel-heading -->
+						
+						<!-- end panel-heading -->
+
+						<!-- begin panel-body -->
+						<div id="panel-body" class="panel-body">
+					
+							<div class="form-group row m-b-12">
+								<label class="col-form-label m-l-2">서비스</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_bundle">
+										<option value>전체</option>
+										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+									</select>
+								</div>
+								
+								<label class="col-form-label m-l-5">조회일자</label>
+								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
+								    <span class="input-group-append">
+								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+									</span>
+								</div>
+								<label class="col-form-label m-l-10">검색어</label>
+								<div class="col-xs-push-0">
+									
+								    <input type="text" id="keyword" class="form-control"/>
+								</div>
+								<div>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
+								</div>
+							</div>
+							<hr/>
+							<div id="_collect_grid">
+							</div>
+							<hr/>
+							<div class="form-group row m-b-12">
+								
+								<div>
+									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">승인</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			
+			
+			<div class="panel panel-inverse">
+				<!-- begin panel-heading -->
+				
+				<!-- end panel-body -->
+			</div>
+			<!-- end panel -->
+		</div>
+		
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	
+	<input type="hidden" name="startDate" id="startDate" value="" />
+	<input type="hidden" name="finishDate" id="finishDate" value="" />
+	<!-- end page container -->
+	
+	
+	<script th:inline="javascript">
+	/* <![CDATA[ */       
+
+	var tables = [];
+	var count;
+	
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	
+	//  시작
+	$(document).ready(function() {
+		App.init();
+		
+		TableManageDefault.init();
+		
+		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
+		
+		var startDate = moment().subtract(3, 'days');
+		var endDate = moment();
+
+		$('#default-daterange').daterangepicker({
+			opens: 'right',
+			format : 'YYYY/MM/DD',
+			separator: ' to ',
+			startDate: startDate,
+			endDate: endDate,
+			minDate: '2018/01/01',
+			maxDate: moment(),
+		}, function (start, end) {
+			
+			setDaterangepicker(start, end);
+		});
+		setDaterangepicker(startDate, endDate);
+		
+		UserTable.draw('_collect_grid', {
+			url : "/all/list",
+			type : "GET",
+			data : function() {
+				var param = {
+					bundleId : $("#sel_bundle").val(),
+					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
+					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
+				};
+				return param;
+			},
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			}
+		}, [
+			{
+				title : 'No',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					return '<strong>' + (index + 1) + '</strong>';
+				}
+			},
+			{
+				title : '등록일자', 
+				data : 'createdDate',
+				type : 'date'
+			},
+			{
+				title : '실험실', 
+				data : 'laboratoryId'
+			},
+			{
+				title : '서비스', 
+				data : 'bundle.name'
+			},
+			{
+				title : '입고담당자', 
+				data : 'inputApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
+				}
+			},
+			{
+				title : '중간관리자', 
+				data : 'inputMngApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
+				}
+			},
+			{
+				title : '검사실책임자', 
+				data : 'inputDrctApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
+									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					return html;
+				}
+			}
+		], null);
+			
+	});
+	
+	function setDaterangepicker(start, end) {
+		
+		$('#default-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+		$('#startDate').val(start.format('YYYY-MM-DD'));
+		$('#finishDate').val(end.format('YYYY-MM-DD'));
+	}
+	
+	function search() {
+		UserTable.reload('_collect_grid');
+	}
+	
+	
+	
+	/* ]]> */
+	</script>
+	
+</body>
+</html>
