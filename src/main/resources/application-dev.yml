@@ -58,6 +58,11 @@ externalApi:
   token: $2y$10$8FzBfexBXEJa7PYaERjLvOk3zGgCSiAyTWiNqsjWktfcvuoAH/fKq
 titan:
   filePath: D:/BiO/Serve/lims_v2/titan
+  ftp:
+    address: 192.168.0.238
+    port: 21
+    username: AFFXUSER
+    password: affxpd
 rest:
   http:
     auth-token-header-name: limsApiKey
