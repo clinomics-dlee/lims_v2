@@ -1,5 +1,6 @@
 package com.clinomics.service;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.Optional;
 
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Sample;
-import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
@@ -87,7 +87,6 @@ public class AnlsService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	@Async
 	public Map<String, String> startAnls(List<String> mappingNos, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
@@ -99,15 +98,19 @@ public class AnlsService {
 			List<Sample> samples = sampleRepository.findAll(where);
 			String chipBarcode = samples.get(0).getChipBarcode();
 			String filePath = workspacePath + "/" + chipBarcode;
+			String chipDesc = samples.get(0).getChipTypeCode().getDesc();
+			File path = new File(filePath);
+			if (!path.exists()) path.mkdir();
+
 			for (Sample sample : samples) {
 				// #. sample 분석관련값 셋팅
 				sample.setFilePath(filePath);
-				sample.setFileName(chipBarcode + "_(Axiom_GSChip-1)_" + sample.getWellPosition() + ".CEL");
+				sample.setFileName(chipBarcode + "_" + chipDesc + "_" + sample.getWellPosition() + ".CEL");
 				sample.setAnlsStartDate(now);
 				sample.setAnlsStartMember(member);
 				sample.setStatusCode(StatusCode.S410_ANLS_RUNNING);
 			}
-			// sampleRepository.saveAll(samples);
+			sampleRepository.saveAll(samples);
 
 			// #. 가져와서 분석 실행하기
 			analysisService.doPythonAnalysis(samples);

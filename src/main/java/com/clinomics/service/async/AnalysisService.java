@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.clinomics.entity.lims.Sample;
@@ -39,17 +38,11 @@ public class AnalysisService {
 	@Value("${lims.celFilePath}")
 	private String celFilePath;
 	
-	@Value("${lims.apmraChipPath}")
-	private String apmraChipPath;
-	
-	@Value("${lims.customChipPath}")
-	private String customChipPath;
-
 	@Value("${titan.ftp.address}")
 	private String ftpAddress;
 	
 	@Value("${titan.ftp.port}")
-	private String ftpPort;
+	private int ftpPort;
 
 	@Value("${titan.ftp.username}")
 	private String ftpUsername;
@@ -66,7 +59,7 @@ public class AnalysisService {
 		String analysisPath = samples.get(0).getFilePath();
 
 		// #. Cell File 서버로 가져오기
-		this.downloadCelFiles(chipTypeCode, chipBarcode, analysisPath);
+		this.downloadCelFiles(samples, analysisPath);
 
 		// #. 명령어 실행
 		FileOutputStream textFileOs = null;
@@ -96,7 +89,7 @@ public class AnalysisService {
 			
 			StringBuilder commandsSb = new StringBuilder();
 			commandsSb.append("python ");
-			commandsSb.append((ChipTypeCode.CUSTOM_CHIP.equals(chipTypeCode) ? customChipPath : apmraChipPath) + " ");
+			commandsSb.append(chipTypeCode.getCmd() + " ");
 			commandsSb.append(textFilePath + " "); // text 파일 경로 지정
 			commandsSb.append(analysisPath + " "); // 작업공간 경로 지정
 			commandsSb.append(excelFilePath); // mappingFile 경로 지정
@@ -178,44 +171,46 @@ public class AnalysisService {
 
 	/**
 	 * ftp(진타이탄장비)에서 cel file 목록을 다운로드 하기
-	 * @param chipTypeCode
-	 * @param chipBarcode
+	 * @param samples
 	 * @param analysisPath
 	 */
-	private void downloadCelFiles(ChipTypeCode chipTypeCode, String chipBarcode, String analysisPath) {
+	private void downloadCelFiles(List<Sample> samples, String analysisPath) {
 		FTPClient ftp = null;
 		try {
 			ftp = new FTPClient();
 			ftp.setControlEncoding("UTF-8");
 
-			ftp.connect(ftpAddress);
+			ftp.connect(ftpAddress, ftpPort);
 			ftp.login(ftpUsername, ftpPassword);
 
-			for (String fileName : ftp.listNames()) {
-				if (fileName.indexOf(chipBarcode + "_") > -1) {
-					File f = new File(analysisPath, fileName);
-
-					FileOutputStream fos = null;
-					try {
-						fos = new FileOutputStream(f);
-						boolean isSuccess = ftp.retrieveFile(fileName, fos);
-						if (isSuccess) {
-							// 다운로드 성공
-							logger.info("★★★★★★★ successed file=" + fileName);
-						} else {
-							// 다운로드 실패
-							logger.info("★★★★★★★ failed file=" + fileName);
-						}
-					} catch (IOException ex) {
-						ex.printStackTrace();
-					} finally {
-						if (fos != null) {
-							try {
-								fos.close();
-							} catch (IOException ex) {
-								ex.printStackTrace();
+			for (Sample sample : samples) {
+				for (String fileName : ftp.listNames()) {
+					if (sample.getFileName().toUpperCase().equals(fileName.toUpperCase())) {
+						File f = new File(analysisPath, fileName);
+	
+						FileOutputStream fos = null;
+						try {
+							fos = new FileOutputStream(f);
+							boolean isSuccess = ftp.retrieveFile(fileName, fos);
+							if (isSuccess) {
+								// 다운로드 성공
+								logger.info("★★★★★★★ successed file=" + fileName);
+							} else {
+								// 다운로드 실패
+								logger.info("★★★★★★★ failed file=" + fileName);
+							}
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						} finally {
+							if (fos != null) {
+								try {
+									fos.close();
+								} catch (IOException ex) {
+									ex.printStackTrace();
+								}
 							}
 						}
+						break;
 					}
 				}
 			}

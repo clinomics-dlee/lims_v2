@@ -93,16 +93,16 @@
                     <span>분석</span>
                 </a>
 				<ul class="sub-menu">
-                    <li th:class="${#strings.contains(path,'/work/register')} ? active : ''">
+                    <li th:class="${#strings.contains(path,'/p/anls/rdy')} ? active : ''">
                     	<a href="/p/anls/rdy">분석대기</a>
                     </li>
-                    <li th:class="${#strings.contains(path,'/work/expr')} ? active : ''">
+                    <li th:class="${#strings.contains(path,'/p/anls/stts')} ? active : ''">
                     	<a href="/p/anls/stts">분석상황</a>
                     </li>
-                    <li th:class="${#strings.contains(path,'/work/report')} ? active : ''">
+                    <li th:class="${#strings.contains(path,'/p/anls/rslt')} ? active : ''">
                     	<a href="/p/anls/rslt">분석결과</a>
                     </li>
-                    <li th:class="${#strings.contains(path,'/work/complete')} ? active : ''">
+                    <li th:class="${#strings.contains(path,'/p/anls/db')} ? active : ''">
                     	<a href="/p/anls/db">분석DB</a>
 					</li>
                 </ul>
