@@ -71,4 +71,12 @@ public class OutputController {
 		
 		return outputService.outputApprove(ids, userDetails.getUsername());
 	}
+	
+	@PostMapping("/output/reissue")
+	@ResponseBody
+	public Map<String, String> outputReIssue(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return outputService.outputApprove(ids, userDetails.getUsername());
+	}
 }

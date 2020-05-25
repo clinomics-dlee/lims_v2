@@ -163,12 +163,40 @@ public class OutputService {
 			samples.stream().forEach(s -> {
 				s.setOutputWaitDate(now);
 				s.setOutputWaitMember(member);
-				String products = "";
-				for (Product p : s.getBundle().getProduct()) {
-					products += "_" + p.getName();
-				}
-				products = products + "_";
-				s.setOutputProductTypes(products);
+				s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+			});
+
+		} else {
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+		}
+		sampleRepository.saveAll(samples);
+		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> outputReIssue(List<Integer> ids, String memberId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		List<Sample> samples = sampleRepository.findByIdIn(ids);
+		
+		// sample.set
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.get();
+		LocalDateTime now = LocalDateTime.now();
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+
+		if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
+			
+			samples.stream().forEach(s -> {
+				s.setOutputWaitDate(now);
+				s.setOutputWaitMember(member);
+				
 				s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
 			});
 
@@ -211,20 +239,34 @@ public class OutputService {
 				if (!isTest) {
 					
 					String outputProductTypes = sample.getOutputProductTypes();
+					if (outputProductTypes == null) outputProductTypes = "";
 					if (!outputProductTypes.contains(productTypeData)) {
 						outputProductTypes += outputProductTypes.substring(1);
 						sample.setOutputProductTypes(outputProductTypes);
 					} else {
 						continue;
 					}
+
+					boolean outputAllProduct = true;
+					for (Product p : sample.getBundle().getProduct()) {
+						if (!outputProductTypes.contains(p.getType())) {
+							outputAllProduct = false;
+							break;
+						}
+					}
 					// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
 
-					if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
-						sample.setOutputCmplDate(now);
-						sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
-					} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
-						sample.setReOutputCmplDate(now);
-						sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
+					if (outputAllProduct) {
+
+						if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+							sample.setOutputCmplDate(now);
+							sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
+							sample.setOutputProductTypes("");
+						} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+							sample.setReOutputCmplDate(now);
+							sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
+							sample.setOutputProductTypes("");
+						}
 					}
 					sampleRepository.save(sample);
 				}
