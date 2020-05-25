@@ -185,20 +185,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : '등록일자', 
-				data : 'createdDate',
-				type : 'date'
-			},
-			{
-				title : '실험실', 
-				data : 'laboratoryId'
-			},
-			{
 				title : '서비스', 
 				data : 'bundle.name'
 			},
 			{
-				title : '입고담당자', 
+				title : '검사실ID', 
+				data : 'laboratoryId'
+			},
+			{
+				title : 'Genotyping Method', 
+				data : 'genotypingMethodCode'
+			},
+			{
+				title : '검사담당자', 
 				data : 'inputApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -226,6 +225,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
 					return html;
 				}
+			},
+			{
+				title : '등록일자', 
+				data : 'createdDate',
+				type : 'date'
 			}
 		], null);
 			

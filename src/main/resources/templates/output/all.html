@@ -176,12 +176,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : '등록일자', 
-				data : 'createdDate',
-				type : 'date'
-			},
-			{
-				title : '실험실', 
+				title : '검사실ID', 
 				data : 'laboratoryId'
 			},
 			{
@@ -189,34 +184,24 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'bundle.name'
 			},
 			{
-				title : '입고담당자', 
-				data : 'inputApproveDate',
-				bodyClassName : 'text-center',
+				title : '상태', 
+				data : "statusCode",
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
-					return html;
+					var value = g_statusCodeInfo[data];
+					return value;
 				}
 			},
 			{
-				title : '중간관리자', 
-				data : 'inputMngApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
-					return html;
-				}
+				serverHeader : true
 			},
 			{
-				title : '검사실책임자', 
-				data : 'inputDrctApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
-					return html;
-				}
+				title : '검체 등록일자', 
+				data : 'createdDate',
+				type : 'date'
+			},
+			{
+				title : '등록자', 
+				data : 'createdMember.name'
 			}
 		], null);
 			
