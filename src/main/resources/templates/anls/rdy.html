@@ -25,63 +25,37 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_history"></th:block>
-		<th:block th:replace="popup/result"></th:block>
-		<th:block th:replace="popup/sample_detail"></th:block>
-		<th:block th:replace="popup/sample_detail_readonly"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">Home</li>
-				<li class="breadcrumb-item">Work</li>
-				<li class="breadcrumb-item active">Complete</li>
+				<li class="breadcrumb-item">분석</li>
+				<li class="breadcrumb-item active">분석대기</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header" th:text="#{menu.complete}">Complete</h1>
+			<h1 id="page-header" class="page-header">분석대기</h1>
 			<!-- end page-header -->
 			
 			<!-- begin content panel -->
 			<div class="row">
 				<div class="col-xl-12">
-					<ul class="nav nav-tabs">
-						<li class="nav-item">
-							<a href="#complete-tab-1" data-toggle="tab" class="nav-link active">
-								<span class="d-sm-none">Tab 1</span>
-								<span class="d-sm-block d-none" th:text="#{common.list}">List</span>
-							</a>
-						</li>
-					</ul>
-					
-					<!-- begin tab content -->
-					<div class="tab-content">
-						<!-- begin tab-1 -->
-						<div class="tab-pane fade active show" id="complete-tab-1">
+					<div class="panel panel-inverse">
+						<div id="panel-body" class="panel-body">
 							<div class="form-group row m-b-12">
-								<label class="col-form-label col-md-1" th:text="#{common.product}">Product</label>
-								<div>
-									<select class="form-control width-200" data-parsley-required="true" id="sel_bundle" name="bundleId">
-										<option value="">All</option>
-										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
-									</select>
-								</div>
-								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 250px" >
-								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
-								    <span class="input-group-append">
-								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
-									</span>
-								</div>
-								<label class="col-form-label col-md-1" th:text="#{common.keyword}">Key word</label>
+								<label class="col-form-label m-l-2">검색어</label>
 								<div class="col-xs-push-0">
 								    <input type="text" id="keyword" class="form-control"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10" th:text="#{common.search}">Search</button>
-									<button onClick="createPdf();" class="btn btn-success m-l-20" th:text="#{page.complete.recreate}">Recreate Report PDF</button>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
 								</div>
 							</div>
 							<hr/>
-							<div id="_complete_sample_grid"></div>
+							<div id="_anls_rdy_grid"></div>
+							<hr/>
+							<div class="row">
+								<button onClick="startAnls();" class="btn btn-success m-l-20">분석시작</button>
+							</div>
 						</div>
 						<!-- end tab-1 -->
 					</div>
@@ -102,6 +76,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	/* <![CDATA[ */
 
 	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	var g_genotypingMethodCodeInfo = /*[[${genotypingMethodCodes}]]*/ {};
+	var g_chipTypeCodeInfo = /*[[${chipTypeCodes}]]*/ {};
 	
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
@@ -142,13 +118,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_complete_sample_grid', true, [10, 50] , [10, 50]);
-		drawCompleteSampleGrid();
+		UserTable.init('_anls_rdy_grid', true, [10, 50] , [10, 50]);
+		drawRdyGrid();
 	});
 	
-	function drawCompleteSampleGrid() {
-		UserTable.draw('_complete_sample_grid', {
-			url : "/work/complete/get",
+	function drawRdyGrid() {
+		UserTable.draw('_anls_rdy_grid', {
+			url : "/anls/rdy/get",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -171,14 +147,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				name : "checkbox"
 			}
 		}, {
-			title : 'History',
-			data : "sample.id",
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<button onclick="historyPopupOnload(\'' + data + '\')" class="btn btn-primary btn-sm m-l-5">View</button>';
-			}
-		}, {
 			title : 'No', 
 			data : 'id',
 			headClassName : 'width-50',
@@ -187,66 +155,51 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				return '<string>' + (index + 1) + '</string>';
 			}
 		}, {
-			title : "Laboratory",
-			data : "sample.id",
+			title : "Mapping No",
+			data : "mappingNo"
+		}, {
+			title : "Chip Barcode",
+			data : "chipBarcode"
+		}, {
+			title : "Chip Type",
+			data : "chipTypeCode",
+			headClassName : 'width-300',
 			render : function(row, data, index) {
-				return '<a href="javascript:samplePopupOnload(\'' + data + '\', true)">' + data + '</string>';
-			}
-		}, {
-			title : "Barcode",
-			data : "sample.barcode"
-		}, {
-			title : "Product",
-			data : "sample.bundle.name",
-		}, {
-			title : "Chip Number",
-			data : "chipNumber",
-		}, {
-			title : "Status",
-			data : "statusCode",
-			render : function(row, data, index) {
-				var value = g_statusCodeInfo[data];
+				var value = '';
+				if (data != null && data.length > 0) {
+					value = g_chipTypeCodeInfo[data];
+				}
 				return value;
 			}
-		}, {
-			serverHeader : true
-		}, {
-			title : "Experiment Date",
-			data : "createdDate",
-			type : "date"
-		}, {
-			title : "Experiment user",
-			data : "member.name",
 		}]);
 	}
 	
 	function search() {
-		UserTable.reload('_complete_sample_grid');
+		UserTable.reload('_anls_rdy_grid');
 	}
-	
-	function createPdf() {
-		var checkedRows = UserTable.getCheckedRows("_complete_sample_grid");
+
+	function startAnls() {
+		var checkedRows = UserTable.getCheckedRows("_anls_rdy_grid");
 		if (checkedRows.length > 0) {
 			CommonMsg.okCancel(function() {
-				var resultIds = [];
+				var mappingNos = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
-					resultIds.push(row.id);
+					mappingNos.push(row.mappingNo);
 				}
 				
 				$.ajax({
-		            url: '/work/complete/recreate/pdf/multi',
+		            url: '/anls/rdy/start',
 			        type : "post",
 			        dataType : 'json',
-			        data : {resultIds : resultIds},
+			        data : {mappingNos : mappingNos},
 			        beforeSend: function(xhr) {
 						xhr.setRequestHeader(header, token);
 					},
 				    success: function(data, xhr) {
 				    	if (data.result == "00") {
 				    		CommonMsg.save(function() {
-				    			$("#modal-sample-detail").modal('hide');
-				    			UserTable.reload('_complete_sample_grid');
+				    			UserTable.reload('_anls_rdy_grid');
 							});
 						} else if (!data.result.startsWith("0")) {
 							CommonMsg.error(function() { });

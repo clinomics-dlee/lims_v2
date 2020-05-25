@@ -60,6 +60,9 @@ public class Sample implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private GenotypingMethodCode genotypingMethodCode;
 
+	@Transient
+	private String genotypingId;
+
 	@Column(length = 100)
 	private String mappingNo;
 
@@ -245,6 +248,10 @@ public class Sample implements Serializable {
 
 	public void setGenotypingMethodCode(GenotypingMethodCode genotypingMethodCode) {
 		this.genotypingMethodCode = genotypingMethodCode;
+	}
+
+	public String getGenotypingId() {
+		return this.laboratoryId + "-V" + this.version;
 	}
 
 	public String getMappingNo() {

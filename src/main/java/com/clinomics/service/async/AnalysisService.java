@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.clinomics.entity.lims.Sample;
+import com.clinomics.enums.ChipTypeCode;
+import com.clinomics.util.FileUtil;
+
+import org.apache.commons.net.ftp.FTPClient;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -26,18 +31,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.clinomics.util.FileUtil;
-
 @Service
 public class AnalysisService {
 	
 	private static String OS = System.getProperty("os.name").toLowerCase();
-	
-	@Value("${lims.filePath}")
-	private String bioFilePath;
-	
-	@Value("${lims.workspacePath}")
-	private String workspacePath;
 	
 	@Value("${lims.celFilePath}")
 	private String celFilePath;
@@ -47,17 +44,35 @@ public class AnalysisService {
 	
 	@Value("${lims.customChipPath}")
 	private String customChipPath;
+
+	@Value("${titan.ftp.address}")
+	private String ftpAddress;
 	
+	@Value("${titan.ftp.port}")
+	private String ftpPort;
+
+	@Value("${titan.ftp.username}")
+	private String ftpUsername;
+
+	@Value("${titan.ftp.password}")
+	private String ftpPassword;
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Async
-	public void doPythonAnalysis(String chipType, String chipNumber, String analysisPath, List<Map<String, String>> infos) {
+	public void doPythonAnalysis(List<Sample> samples) {
+		ChipTypeCode chipTypeCode = samples.get(0).getChipTypeCode();
+		String chipBarcode = samples.get(0).getChipBarcode();
+		String analysisPath = samples.get(0).getFilePath();
+
+		// #. Cell File 서버로 가져오기
+		this.downloadCelFiles(chipTypeCode, chipBarcode, analysisPath);
+
 		// #. 명령어 실행
 		FileOutputStream textFileOs = null;
 		FileOutputStream excelFile = null;
-//		String analysisPath = workspacePath + "/" + chipNumber;
-		String textFilePath = analysisPath + "/" + chipNumber + ".txt";
-		String excelFilePath = analysisPath + "/" + chipNumber + ".xlsx";
+		String textFilePath = analysisPath + "/" + chipBarcode + ".txt";
+		String excelFilePath = analysisPath + "/" + chipBarcode + ".xlsx";
 		try {
 			
 			textFileOs = new FileOutputStream(textFilePath);
@@ -72,7 +87,7 @@ public class AnalysisService {
 				textFileSb.append("\r\n" + analysisPath + "/" + c);
 			});
 			
-			XSSFWorkbook wb = getAnalysisExcel(infos);
+			XSSFWorkbook wb = getAnalysisExcel(samples);
 			excelFile = new FileOutputStream(excelFilePath);
 			wb.write(excelFile);
 			
@@ -81,7 +96,7 @@ public class AnalysisService {
 			
 			StringBuilder commandsSb = new StringBuilder();
 			commandsSb.append("python ");
-			commandsSb.append(("customChip".equals(chipType) ? customChipPath : apmraChipPath) + " ");
+			commandsSb.append((ChipTypeCode.CUSTOM_CHIP.equals(chipTypeCode) ? customChipPath : apmraChipPath) + " ");
 			commandsSb.append(textFilePath + " "); // text 파일 경로 지정
 			commandsSb.append(analysisPath + " "); // 작업공간 경로 지정
 			commandsSb.append(excelFilePath); // mappingFile 경로 지정
@@ -94,7 +109,7 @@ public class AnalysisService {
 				shellExt = ".bat";
 	        }
 			
-			String commandFilePath = analysisPath + "/" + chipNumber + shellExt;
+			String commandFilePath = analysisPath + "/" + chipBarcode + shellExt;
 			BufferedWriter fw = new BufferedWriter(new FileWriter(commandFilePath));
 			fw.write(commandsSb.toString());
 			fw.close();
@@ -124,14 +139,13 @@ public class AnalysisService {
 			
 			process.destroy();
 		} catch (FileNotFoundException e) {
-			
+			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
     }
 	
-	private XSSFWorkbook getAnalysisExcel(List<Map<String, String>> infos) {
-		
+	private XSSFWorkbook getAnalysisExcel(List<Sample> samples) {
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		CellStyle pink = workbook.createCellStyle();
 		pink.setFillForegroundColor(HSSFColorPredefined.ROSE.getIndex());
@@ -146,19 +160,77 @@ public class AnalysisService {
 		cell1.setCellStyle(pink);
 		cell2.setCellStyle(pink);
 		cell1.setCellValue("Cel File Name");
-		cell2.setCellValue("Sample Id");
+		cell2.setCellValue("Genotyping Id");
 		
 		int index = 1;
-		for (Map<String, String> info : infos) {
+		for (Sample sample : samples) {
 			XSSFRow rr = sheet.createRow(index++);
 			XSSFCell c1 = rr.createCell(0);
 			XSSFCell c2 = rr.createCell(1);
-			c1.setCellValue(info.get("fileName"));
-			c2.setCellValue(info.get("id"));
+			c1.setCellValue(sample.getFileName());
+			c2.setCellValue(sample.getGenotypingId());
 		}
 		
 		sheet.setColumnWidth(0, 3000);
 		
 		return workbook;
+	}
+
+	/**
+	 * ftp(진타이탄장비)에서 cel file 목록을 다운로드 하기
+	 * @param chipTypeCode
+	 * @param chipBarcode
+	 * @param analysisPath
+	 */
+	private void downloadCelFiles(ChipTypeCode chipTypeCode, String chipBarcode, String analysisPath) {
+		FTPClient ftp = null;
+		try {
+			ftp = new FTPClient();
+			ftp.setControlEncoding("UTF-8");
+
+			ftp.connect(ftpAddress);
+			ftp.login(ftpUsername, ftpPassword);
+
+			for (String fileName : ftp.listNames()) {
+				if (fileName.indexOf(chipBarcode + "_") > -1) {
+					File f = new File(analysisPath, fileName);
+
+					FileOutputStream fos = null;
+					try {
+						fos = new FileOutputStream(f);
+						boolean isSuccess = ftp.retrieveFile(fileName, fos);
+						if (isSuccess) {
+							// 다운로드 성공
+							logger.info("★★★★★★★ successed file=" + fileName);
+						} else {
+							// 다운로드 실패
+							logger.info("★★★★★★★ failed file=" + fileName);
+						}
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					} finally {
+						if (fos != null) {
+							try {
+								fos.close();
+							} catch (IOException ex) {
+								ex.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+			ftp.logout();
+		} catch (IOException e) {
+			logger.info("IO:" + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (ftp != null && ftp.isConnected()) {
+				try {
+					ftp.disconnect();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }
