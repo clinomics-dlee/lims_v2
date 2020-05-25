@@ -107,21 +107,21 @@
 					</li>
                 </ul>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/after/jdgm')} ? active : ''">
+			<li th:classappend="${#strings.startsWith(path,'/p/output/jdgm')} ? active : ''">
 				<a href="/p/output/jdgm">
                     <i class="fa fa-balance-scale"></i>
                     <span>판정</span>
                 </a>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/after/output')} ? active : ''">
+			<li th:classappend="${#strings.startsWith(path,'/p/output/output')} ? active : ''">
 				<a href="/p/output/output">
                     <i class="fa fa-print"></i>
                     <span>출고</span>
                 </a>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/after/all')} ? active : ''">
+			<li th:classappend="${#strings.startsWith(path,'/p/output/all')} ? active : ''">
 				<a href="/p/output/all">
-                    <i class="fa fa-print"></i>
+                    <i class="fa fa-list-alt"></i>
                     <span>검체 목록</span>
                 </a>
 			</li>

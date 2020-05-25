@@ -1,6 +1,7 @@
 package com.clinomics.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,6 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Role;
@@ -24,6 +24,8 @@ import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,7 +51,9 @@ public class OutputService {
 	SampleItemService sampleItemService;
 
 	@Autowired
-    CustomIndexPublisher customIndexPublisher;
+	CustomIndexPublisher customIndexPublisher;
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
     
     public Map<String, Object> find(Map<String, String> params, List<StatusCode> statusCodes) {
 		int draw = 1;
@@ -172,6 +176,63 @@ public class OutputService {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
 		}
 		sampleRepository.saveAll(samples);
+		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, Object> getResultsForRest(Map<String, String> params) {
+		Map<String, Object> rtn = Maps.newHashMap();
+		// #. productType 추가
+		String productType = params.get("productType");
+		String productTypeData = "_" + productType + "_";
+		boolean isTest = BooleanUtils.toBoolean(params.get("isTest"));
+		
+		Specification<Sample> where = Specification
+				.where(SampleSpecification.productNotLike(params))
+				.and(SampleSpecification.statusIn(Arrays.asList(StatusCode.S700_OUTPUT_WAIT, StatusCode.S800_RE_OUTPUT_WAIT)));
+
+		List<Sample> samples = sampleRepository.findAll(where);
+
+		List<Map<String, Object>> datas = new ArrayList<Map<String, Object>>();
+		LocalDateTime now = LocalDateTime.now();
+
+		if (samples.size() > 0) {
+			for (Sample sample : samples) {
+				
+				Map<String, Object> data = Maps.newHashMap();
+				
+				data.putAll(sample.getItems());
+				data.put("genedata", sample.getData());
+				
+				datas.add(data);
+				
+				// #. result status update
+				if (!isTest) {
+					
+					String outputProductTypes = sample.getOutputProductTypes();
+					if (!outputProductTypes.contains(productTypeData)) {
+						outputProductTypes += outputProductTypes.substring(1);
+						sample.setOutputProductTypes(outputProductTypes);
+					} else {
+						continue;
+					}
+					// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
+
+					if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+						sample.setOutputCmplDate(now);
+						sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
+					} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+						sample.setReOutputCmplDate(now);
+						sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
+					}
+					sampleRepository.save(sample);
+				}
+			}
+		}
+		
+		rtn.put("result", "success");
+		rtn.put("datas", datas);
 		
 		return rtn;
 	}

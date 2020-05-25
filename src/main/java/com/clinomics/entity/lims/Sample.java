@@ -90,9 +90,6 @@ public class Sample implements Serializable {
 
 	// #. interface api 요청된 product에 type값 목록에 "_"를 붙임 ex> _GS_GSX_
 	private String outputProductTypes;
-
-	// #. interface api 요청된 product에 type값 목록에 "_"를 붙임 ex> _GS_GSX_
-	private String reOutputProductTypes;
 	
 	@CreatedDate
 	private LocalDateTime createdDate;
@@ -325,14 +322,6 @@ public class Sample implements Serializable {
 
 	public void setOutputProductTypes(String outputProductTypes) {
 		this.outputProductTypes = outputProductTypes;
-	}
-
-	public String getReOutputProductTypes() {
-		return reOutputProductTypes;
-	}
-
-	public void setReOutputProductTypes(String reOutputProductTypes) {
-		this.reOutputProductTypes = reOutputProductTypes;
 	}
 
 	public LocalDateTime getCreatedDate() {

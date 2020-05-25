@@ -38,10 +38,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item active">판정</li>
+				<li class="breadcrumb-item active">출고</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">판정</h1>
+			<h1 id="page-header" class="page-header">출고</h1>
 			
 			<div class="row">
 				<div class="col-xl-12">
@@ -151,7 +151,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		setDaterangepicker(startDate, endDate);
 		
 		UserTable.draw('_collect_grid', {
-			url : "/jdgm/aprv",
+			url : "/output/list",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -185,12 +185,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : '등록일자', 
-				data : 'createdDate',
-				type : 'date'
-			},
-			{
-				title : '실험실', 
+				title : '검사실ID', 
 				data : 'laboratoryId'
 			},
 			{
@@ -198,34 +193,24 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'bundle.name'
 			},
 			{
-				title : '입고담당자', 
-				data : 'inputApproveDate',
-				bodyClassName : 'text-center',
+				title : '상태', 
+				data : "statusCode",
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
-					return html;
+					var value = g_statusCodeInfo[data];
+					return value;
 				}
 			},
 			{
-				title : '중간관리자', 
-				data : 'inputMngApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
-					return html;
-				}
+				serverHeader : true
 			},
 			{
-				title : '검사실책임자', 
-				data : 'inputDrctApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
-					return html;
-				}
+				title : '검체 등록일자', 
+				data : 'createdDate',
+				type : 'date'
+			},
+			{
+				title : '등록자', 
+				data : 'createdMember.name'
 			}
 		], null);
 			
@@ -245,7 +230,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data.push(checkedRows[cr].id);
 		}
 		$.ajax({
-            url: '/jdgm/approve',
+            url: '/output/approve',
 			type: 'post',
 	        data : JSON.stringify(data),
 	        dataType : 'json',

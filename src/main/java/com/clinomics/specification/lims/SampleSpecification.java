@@ -240,4 +240,24 @@ public class SampleSpecification {
 			
 		};
 	}
+
+	public static Specification<Sample> productNotLike(Map<String, String> params) {
+		
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicateLikes = new ArrayList<>();
+			
+			if (params.containsKey("productType") && !params.get("productType").isEmpty()) {
+				String text = "%_" + params.get("productType") + "_%";
+				
+				predicateLikes.add(criteriaBuilder.notLike(root.get("outputProductTypes"), text));
+				
+				
+				rtn = criteriaBuilder.or(predicateLikes.toArray(new Predicate[predicateLikes.size()]));
+			}
+			
+			return rtn;
+			
+		};
+	}
 }
