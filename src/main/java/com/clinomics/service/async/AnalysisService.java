@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ChipTypeCode;
+import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.util.FileUtil;
 
@@ -204,6 +205,7 @@ public class AnalysisService {
 							boolean isSuccess = ftp.retrieveFile(fileName, fos);
 							if (isSuccess) {
 								sample.setCheckCelFile("PASS");
+								sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
 								sampleRepository.save(sample);
 								existFile = true;
 								// 다운로드 성공
@@ -230,6 +232,7 @@ public class AnalysisService {
 				if (!existFile) {
 					logger.info("★★★★★★★ Not exist File=" + sample.getLaboratoryId());
 					sample.setCheckCelFile("FAIL");
+					sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
 					sampleRepository.save(sample);
 				}
 			}

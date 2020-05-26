@@ -187,28 +187,39 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			title : "Cell File",
 			data : "checkCelFile",
 			render : function(row, data, index) {
-				console.log(row);
-				console.log(data);
-				var value = '<div class="progress rounded-corner progress-striped" style="height:20px;">';
+				var value = '<div class="progress rounded-corner" style="height:20px;">';
 				if (data == "PASS") {
-					value += '<div class="progress-bar bg-success progress-bar-striped progress-bar-animated" style="width: 100%">PASS</div>';
+					value += '<div class="progress-bar bg-success " style="width: 100%">PASS</div>';
 				} else if (data == "FAIL") {
-					value += '<div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" style="width: 100%">FAIL</div>';
+					value += '<div class="progress-bar bg-danger " style="width: 100%">FAIL</div>';
 				} else {
-					value += '<div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" style="width: 100%">분석중</div>';
+					value += '<div class="progress-bar bg-warning " style="width: 100%">분석중</div>';
 				}
 				value += '</div>';
 				return value;
 			}
 		}, {
 			title : "Result",
-			data : "result",
+			data : "statusCode",
 			render : function(row, data, index) {
-				var value = '<div class="progress rounded-corner progress-striped" style="height:20px;">'
-				value += '<div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" style="width: 100%">분석중</div>';
+				var value = '<div class="progress rounded-corner " style="height:20px;">'
+				if ("S440_ANLS_FAIL" == data) {
+					value += '<div class="progress-bar bg-danger" style="width: 100%;cursor: pointer;" onclick="resultPopup()">';
+					value += 'FAIL';
+					value += '</div>';
+				} else {
+					value += '<div class="progress-bar bg-warning" style="width: 100%">분석중</div>';
+				}
 				value += '</div>';
 				return value;
 			}
+		}, {
+			title : "분석 담당자",
+			data : "anlsStartMember.name"
+		}, {
+			title : "분석 시작일",
+			data : "anlsStartDate",
+			type : "date"
 		}]);
 	}
 	

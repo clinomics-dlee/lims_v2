@@ -260,4 +260,11 @@ public class SampleSpecification {
 			
 		};
 	}
+
+	public static Specification<Sample> checkCelFileEqual(String checkCelFile) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.equal(root.get("checkCelFile"), checkCelFile);
+			return rtn;
+		};
+	}
 }

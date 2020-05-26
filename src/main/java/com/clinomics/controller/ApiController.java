@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clinomics.entity.lims.Sample;
 import com.clinomics.service.OutputService;
 import com.clinomics.util.EmailSender;
 import com.google.common.collect.Maps;
@@ -33,13 +34,14 @@ public class ApiController {
 	
 	@RequestMapping(value = "/mail/test")
 	public String sendMailTest() {
-		List<Map<String, String>> test = new ArrayList<>();
-		Map<String, String> map = Maps.newHashMap();
-		map.put("chipNumber", "534252345234523452");
-		map.put("sampleId", "TEST-001-001,TEST-001-002");
-		map.put("message", "TEST MAIL");
-		test.add(map);
-		emailSender.sendMailToFail(test);
+		Sample sample = new Sample();
+		sample.setChipBarcode("test1");
+		sample.setLaboratoryId("TEST-0000-0001");
+		sample.setStatusMessage("Test is good.");
+		sample.setVersion(1);
+		List<Sample> samples = new ArrayList<Sample>();
+		samples.add(sample);
+		emailSender.sendMailToFail(samples);
 		return "asdf";
 	}
 }

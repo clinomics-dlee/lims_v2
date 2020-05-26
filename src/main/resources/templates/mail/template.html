@@ -48,21 +48,21 @@
 		</colgroup>
 		<thead>
 			<tr>
-				<th scope="cols">Chip 번호</th>
-				<th scope="cols">실험실 번호</th>
+				<th scope="cols">Chip Barcode</th>
+				<th scope="cols">Genotyping ID</th>
 				<th scope="cols">메세지</th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="map : ${info}">
-				<th scope="row" th:text="${map.chipNumber}"> </th>
+			<tr th:each="sample : ${samples}">
+				<th scope="row" th:text="${sample.chipBarcode}"> </th>
 				<td>
-					<ul style="list-style: none; padding: 0; margin: 0;" th:each="smpl : ${#strings.arraySplit(map.sampleId, ',')}">
+					<ul style="list-style: none; padding: 0; margin: 0;" th:each="smpl : ${#strings.arraySplit(sample.genotypingId, ',')}">
 						<li style="padding: 0;" th:text="${smpl}">
 						</li>
 					</ul>
 				</td>
-				<td th:text="${map.message}"> </td>
+				<td th:text="${sample.statusMessage}"> </td>
 			</tr>
 		</tbody>
     </table>

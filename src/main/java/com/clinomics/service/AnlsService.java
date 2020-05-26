@@ -138,8 +138,7 @@ public class AnlsService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusEqual(StatusCode.S410_ANLS_RUNNING));
-					
+					.and(SampleSpecification.statusEqual(StatusCode.S410_ANLS_RUNNING).or(SampleSpecification.statusEqual(StatusCode.S440_ANLS_FAIL)));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
