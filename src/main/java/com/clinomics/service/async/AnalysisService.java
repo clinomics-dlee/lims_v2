@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ChipTypeCode;
+import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.util.FileUtil;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -26,13 +27,14 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AnalysisService {
-	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private static String OS = System.getProperty("os.name").toLowerCase();
 	
 	@Value("${lims.celFilePath}")
@@ -50,7 +52,8 @@ public class AnalysisService {
 	@Value("${titan.ftp.password}")
 	private String ftpPassword;
 
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	SampleRepository sampleRepository;
 	
 	@Async
 	public void doPythonAnalysis(List<Sample> samples) {
@@ -59,11 +62,11 @@ public class AnalysisService {
 		String analysisPath = samples.get(0).getFilePath();
 
 		// #. Cell File 서버로 가져오기
-		this.downloadCelFiles(samples, analysisPath);
+		this.downloadCelFiles(samples);
 
 		// #. 명령어 실행
 		FileOutputStream textFileOs = null;
-		FileOutputStream excelFile = null;
+		FileOutputStream excelFileOs = null;
 		String textFilePath = analysisPath + "/" + chipBarcode + ".txt";
 		String excelFilePath = analysisPath + "/" + chipBarcode + ".xlsx";
 		try {
@@ -81,8 +84,8 @@ public class AnalysisService {
 			});
 			
 			XSSFWorkbook wb = getAnalysisExcel(samples);
-			excelFile = new FileOutputStream(excelFilePath);
-			wb.write(excelFile);
+			excelFileOs = new FileOutputStream(excelFilePath);
+			wb.write(excelFileOs);
 			
 			// #. text 파일에 내용 추가
 			textFileOs.write(textFileSb.toString().getBytes());
@@ -135,6 +138,13 @@ public class AnalysisService {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (textFileOs != null) textFileOs.close();
+				if (excelFileOs != null) excelFileOs.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
     }
 	
@@ -172,9 +182,8 @@ public class AnalysisService {
 	/**
 	 * ftp(진타이탄장비)에서 cel file 목록을 다운로드 하기
 	 * @param samples
-	 * @param analysisPath
 	 */
-	private void downloadCelFiles(List<Sample> samples, String analysisPath) {
+	private void downloadCelFiles(List<Sample> samples) {
 		FTPClient ftp = null;
 		try {
 			ftp = new FTPClient();
@@ -184,15 +193,19 @@ public class AnalysisService {
 			ftp.login(ftpUsername, ftpPassword);
 
 			for (Sample sample : samples) {
+				boolean existFile = false;
 				for (String fileName : ftp.listNames()) {
-					if (sample.getFileName().toUpperCase().equals(fileName.toUpperCase())) {
-						File f = new File(analysisPath, fileName);
+					if (sample.getFileName().equals(fileName)) {
+						File f = new File(sample.getFilePath(), fileName);
 	
 						FileOutputStream fos = null;
 						try {
 							fos = new FileOutputStream(f);
 							boolean isSuccess = ftp.retrieveFile(fileName, fos);
 							if (isSuccess) {
+								sample.setCheckCelFile("PASS");
+								sampleRepository.save(sample);
+								existFile = true;
 								// 다운로드 성공
 								logger.info("★★★★★★★ successed file=" + fileName);
 							} else {
@@ -212,6 +225,12 @@ public class AnalysisService {
 						}
 						break;
 					}
+				}
+
+				if (!existFile) {
+					logger.info("★★★★★★★ Not exist File=" + sample.getLaboratoryId());
+					sample.setCheckCelFile("FAIL");
+					sampleRepository.save(sample);
 				}
 			}
 			ftp.logout();

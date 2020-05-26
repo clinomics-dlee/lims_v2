@@ -30,7 +30,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -118,5 +117,36 @@ public class AnlsService {
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
+	}
+
+	public Map<String, Object> findSampleByAnlsSttsStatus(Map<String, String> params) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+		long total;
+		
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.statusEqual(StatusCode.S410_ANLS_RUNNING));
+					
+		
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
+		List<Sample> list = page.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 }

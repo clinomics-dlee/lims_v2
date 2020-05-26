@@ -38,4 +38,9 @@ public class AnlsController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return anlsService.startAnls(mappingNos, userDetails.getUsername());
 	}
+
+	@GetMapping("/stts/get")
+	public Map<String, Object> getStts(@RequestParam Map<String, String> params) {
+		return anlsService.findSampleByAnlsSttsStatus(params);
+	}
 }

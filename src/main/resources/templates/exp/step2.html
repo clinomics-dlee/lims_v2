@@ -179,10 +179,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "laboratoryId"
 		}, {
 			title : "Genotyping ID",
-			data : "laboratoryId",
-			render : function(row, data, index) {
-				return data + '-V' + row.version;
-			}
+			data : "genotypingId"
 		}, {
 			title : "Genotyping Method",
 			data : "genotypingMethodCode",

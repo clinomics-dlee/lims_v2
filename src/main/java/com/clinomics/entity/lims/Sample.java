@@ -91,6 +91,10 @@ public class Sample implements Serializable {
 	@Column(length = 100)
 	private String fileName;
 
+	// #. cel 파일 존재여부 판단 컬럼( NULL : celFile 확인중, PASS : CelFile 존재, FAIL : CelFile이 없음)
+	@Column(length = 100)
+	private String checkCelFile;
+
 	// #. interface api 요청된 product에 type값 목록에 "_"를 붙임 ex> _GS_GSX_
 	private String outputProductTypes;
 	
@@ -633,6 +637,14 @@ public class Sample implements Serializable {
 
 	public void setDnaQc(String dnaQc) {
 		this.dnaQc = dnaQc;
+	}
+
+	public String getCheckCelFile() {
+		return checkCelFile;
+	}
+
+	public void setCheckCelFile(String checkCelFile) {
+		this.checkCelFile = checkCelFile;
 	}
 
 }
