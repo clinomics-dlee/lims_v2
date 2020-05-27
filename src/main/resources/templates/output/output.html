@@ -118,6 +118,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	<script th:inline="javascript">
 	/* <![CDATA[ */       
+	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
 
 	var tables = [];
 	var count;
@@ -185,8 +186,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : '검사실ID', 
-				data : 'laboratoryId'
+				title : "검사실ID",
+				data : "laboratoryId",
+				render : function(row, data, index) {
+					return '<a href="javascript:samplePopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
+				}
 			},
 			{
 				title : '서비스', 

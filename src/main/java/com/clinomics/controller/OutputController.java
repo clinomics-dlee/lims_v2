@@ -61,7 +61,7 @@ public class OutputController {
 	@GetMapping("/output/list")
 	@ResponseBody
 	public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
-		return sampleDbService.find(params, 700);
+		return sampleDbService.find(params, 600);
 	}
 	
 	@PostMapping("/output/approve")

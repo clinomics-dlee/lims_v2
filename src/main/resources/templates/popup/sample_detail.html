@@ -16,7 +16,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Modify Sample</h4>
+				<h4 class="modal-title">검체 정보 수정</h4>
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 			</div>
 			<div class="modal-body">
@@ -24,9 +24,9 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
-				<a href="javascript:samplePopupSave(false);" class="btn btn-success">Save</a>
-				<a id="popup_btn_reissue" href="javascript:samplePopupSave(true);" class="btn btn-success hide">Recreate and Save</a>
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
+				<a href="javascript:samplePopupSave(false);" class="btn btn-success">저장</a>
+				<a id="popup_btn_reissue" href="javascript:samplePopupSave(true);" class="btn btn-success hide">저장하고 재발행</a>
 			</div>
 		</div>
 	</div>
@@ -40,7 +40,7 @@
 			$('#popup_btn_reissue').removeClass('hide');
 		}
 		$.ajax({
-			url : "/work/register/itemby/sample/" + sampleId,
+			url : "/input/itemby/sample/" + sampleId,
 			type : "GET",
 			dataType : "json",
 			contentType : "application/json; charset=utf-8",
@@ -65,16 +65,9 @@
 						
 						readonly = '';
 						notnull = sitm[r].notNull;
-						if ((data.sample.bundle.autoSequence && sitm[r].nameCode == "laboratory")
-							|| (data.sample.bundle.autoBarcode && sitm[r].nameCode == "barcode")) {
-							
-							readonly = ' readonly';
-							notnull = false;
-						}
 						
-						if (code == 'laboratory') value = data.sample.id;
-						else if (code == 'barcode') value = data.sample.barcode;
-						else value = data.sample.items[code];
+						
+						value = data.sample.items[code];
 						//if (!value) data.sample.items
 						if (!value) value = ""; 
 						
@@ -94,7 +87,7 @@
 							}
 							html += '</select>';
 						} else if (sitm[r].type == "date") {
-							aDateInputs.push("date_" + code);
+							aDateInputs.push(code);
 							html += '<div class="input-group" id="date_' + code + '" >';
 							html += '<input type="text" class="form-control form-control-sm"'
 								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + code + '"' : '')
@@ -127,6 +120,8 @@
 					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
 					
 					$("#div_popup_sample_detail").html(html);
+					
+					popupDatepicker(aDateInputs);
 				}
 				
 				
@@ -138,6 +133,19 @@
 		});
 		
 	}
+
+	function popupDatepicker(aDateInputs) {
+		
+		for (var e in aDateInputs) {
+			
+			$('input[name="' + aDateInputs[e] + '"]').datepicker({
+				autoclose : true,
+				format: "yyyy-mm-dd",
+				changeMonth : true,
+            	changeYear : true
+			});
+		}
+	}
 	
 	function samplePopupSave(reissue) {
 		if (!$('#frm_popup_sample_detail').parsley().validate()) {
@@ -145,7 +153,7 @@
 		}
 		
 		$.ajax({
-            url: '/work/register/save',
+            url: '/input/save',
 			type: 'post',
 	        data : JSON.stringify($('#frm_popup_sample_detail').serializeObject()),
 	        dataType : 'json',
@@ -160,10 +168,7 @@
 					} else {
 			    		CommonMsg.save(function() {
 			    			$("#modal-sample-detail").modal('hide');
-			    			if (collect_table) {
-			    				collect_table.ajax.reload();	
-			    			}
-			    			
+			    			search();
 						});
 					}
 				} else if (!data.result.startsWith("0")) {
@@ -182,7 +187,7 @@
 	function samplePopupRecreate() {
 		CommonMsg.okCancel(function() {
 			$.ajax({
-	            url: '/work/complete/recreate/pdf/' + $('input[name=laboratory]').val(),
+	            url: '/output/reissue/' + $('input[name=id]').val(),
 		        dataType : 'json',
 		        contentType : "application/json;charset=utf-8",
 		        beforeSend: function(xhr) {
@@ -192,7 +197,7 @@
 			    	if (data.result == "00") {
 			    		CommonMsg.save(function() {
 			    			$("#modal-sample-detail").modal('hide');
-			    			UserTable.reload('_complete_sample_grid');
+			    			search();
 						});
 					} else if (!data.result.startsWith("0")) {
 						CommonMsg.error(function() { });

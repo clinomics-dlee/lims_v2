@@ -178,6 +178,20 @@ public class InputService {
 	}
 
 	@Transactional
+	public Map<String, String> delete(List<Integer> ids) {
+		Map<String, String> rtn = Maps.newHashMap();
+		List<Sample> samples = sampleRepository.findByIdIn(ids);
+		
+		rtn.put("result", ResultCode.SUCCESS_DELETE.get());
+		rtn.put("message", ResultCode.SUCCESS_DELETE.getMsg());
+
+		
+		sampleRepository.deleteAll(samples);
+		
+		return rtn;
+	}
+
+	@Transactional
 	public Map<String, String> approve(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		List<Sample> samples = sampleRepository.findByIdIn(ids);

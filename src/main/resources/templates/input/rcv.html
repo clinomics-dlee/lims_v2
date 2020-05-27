@@ -88,6 +88,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<div class="form-group row m-b-12">
 								<div>
 									<button onClick="receive();" class="btn btn-primary m-l-10 ">승인</button>
+									<button onClick="deleteChecked();" class="btn btn-warning m-l-10 ">삭제</button>
 								</div>
 							</div>
 						</div>
@@ -178,8 +179,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : '검사실ID', 
-				data : 'laboratoryId'
+				title : "검사실ID",
+				data : "laboratoryId",
+				render : function(row, data, index) {
+					return '<a href="javascript:samplePopupOnload(\'' + row.id + '\', false)">' + data + '</string>';
+				}
 			},
 			{
 				title : '서비스', 
@@ -209,6 +213,45 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				dateFormat : 'yy-mm-dd'
 			});
 		}
+	}
+
+	function deleteChecked() {
+
+		CommonMsg.okCancel(function() {
+
+			var checkedRows = UserTable.getCheckedRows('_collect_grid');
+			var data = [];
+			for (var cr in checkedRows) {
+				data.push(checkedRows[cr].id);
+			}
+			$.ajax({
+				url: '/input/delete',
+				type: 'post',
+				data : JSON.stringify(data),
+				dataType : 'json',
+				contentType : "application/json;charset=utf-8",
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function(data, xhr) {
+					if (data.result.startsWith("0")) {
+						CommonMsg.save(function() {
+							UserTable.reload('_collect_grid');
+						}, data.message);
+					} else if (data.result == "61") {
+						CommonMsg.info(function() { }, data.message);
+					} else {
+						CommonMsg.error(function() { });
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() { });
+				},
+				complete : function() {
+					
+				}
+			});
+		});
 	}
 	
 	function receive() {

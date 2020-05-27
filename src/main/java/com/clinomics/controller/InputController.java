@@ -104,6 +104,13 @@ public class InputController {
 		return inputService.approve(ids, userDetails.getUsername());
 	}
 	
+	@PostMapping("/delete")
+	@ResponseBody
+	public Map<String, String> delete(@RequestBody List<Integer> ids) {
+		
+		return inputService.delete(ids);
+	}
+	
 	@GetMapping("/itemby/sample/{id}")
 	@ResponseBody
 	public Map<String, Object> getItemBySample(@PathVariable String id) {

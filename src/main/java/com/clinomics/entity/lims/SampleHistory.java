@@ -49,7 +49,7 @@ public class SampleHistory implements Serializable {
 	@Convert(converter = StringMapConverter.class)
 	private Map<String, Object> items = new HashMap<>();
 	
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "createdMemberId")
 	private Member member;
 	

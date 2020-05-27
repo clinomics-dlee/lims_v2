@@ -43,7 +43,7 @@ public class Sample implements Serializable {
 
 	private int version;
 
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name="bundleId")
 	private Bundle bundle = new Bundle();
 	
@@ -103,63 +103,63 @@ public class Sample implements Serializable {
 
 	private LocalDateTime modifiedDate;
 
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "createdMemberId")
 	private Member createdMember;
 	
 	// #. 입고 승인일
 	private LocalDateTime inputApproveDate;
 	// #. 입고 승인자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "inputApproveMemberId")
 	private Member inputApproveMember;
 
 	// #. 입고 중간관리자 승인일
 	private LocalDateTime inputMngApproveDate;
 	// #. 입고 중간관리자 승인자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "inputMngApproveMemberId")
 	private Member inputMngApproveMember;
 
 	// #. 입고 검사실책임자 승인일
 	private LocalDateTime inputDrctApproveDate;
 	// #. 입고 검사실책임자 승인자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "inputDrctMemberId")
 	private Member inputDrctMember;
 
 	// #. 실험 시작일
 	private LocalDateTime expStartDate;
 	// #. 실험 시작 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "expStartMemberId")
 	private Member expStartMember;
 
 	// #. STEP1 완료일
 	private LocalDateTime expStep1Date;
 	// #. STEP1 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "expStep1MemberId")
 	private Member expStep1Member;
 
 	// #. STEP2 완료일
 	private LocalDateTime expStep2Date;
 	// #. STEP2 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "expStep2MemberId")
 	private Member expStep2Member;
 
 	// #. STEP3 완료일
 	private LocalDateTime expStep3Date;
 	// #. STEP3 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "expStep3MemberId")
 	private Member expStep3Member;
 
 	// #. 분석 시작일
 	private LocalDateTime anlsStartDate;
 	// #. 분석 시작 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "anlsStartMemberId")
 	private Member anlsStartMember;
 	// #. 분석 종료일
@@ -168,35 +168,35 @@ public class Sample implements Serializable {
 	// #. 분석 완료일
 	private LocalDateTime anlsCmplDate;
 	// #. 분석 완료 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "anlsCmplMemberId")
 	private Member anlsCmplMember;
 
 	// #. 판정 검사 담당자 승인일
 	private LocalDateTime jdgmApproveDate;
 	// #. 판정 검사 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "jdgmApproveMemberId")
 	private Member jdgmApproveMember;
 
 	// #. 판정 중간관리자 승인일
 	private LocalDateTime jdgmMngApproveDate;
 	// #. 판정 중간관리자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "jdgmMngApproveMemberId")
 	private Member jdgmMngApproveMember;
 
 	// #. 판정 검사실책임자 승인일
 	private LocalDateTime jdgmDrctApproveDate;
 	// #. 판정 검사실책임자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "jdgmDrctApproveMemberId")
 	private Member jdgmDrctApproveMember;
 
 	// #. 출고 대기일
 	private LocalDateTime outputWaitDate;
 	// #. 출고 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "outputWaitMemberId")
 	private Member outputWaitMember;
 	// #. 출고 완료일
@@ -205,7 +205,7 @@ public class Sample implements Serializable {
 	// #. 재발행 대기일
 	private LocalDateTime reOutputWaitDate;
 	// #. 재발행 담당자
-	@ManyToOne(cascade =  CascadeType.ALL)
+	@ManyToOne()
 	@JoinColumn(name = "reOutputWaitMemberId")
 	private Member reOutputWaitMember;
 	// #. 재발행 완료일

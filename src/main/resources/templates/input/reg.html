@@ -109,6 +109,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								
 								<div>
 									<button type="button" class="btn btn-success m-l-10" onclick="save();">저장</button>
+									<button type="button" class="btn btn-warning m-l-10" onclick="deleteRow();">삭제</button>
 								</div>
 							</div>
 
@@ -266,6 +267,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}
 	}
 	
+	function deleteRow() {
+		var rows = $('#_input_grid').find('tbody tr');
+		for (var i = 0; i < rows.length; i++) {
+			if ($(rows[i]).find("input[name=checkbox]").is(":checked")) {
+				rows[i].remove();
+			}
+		}
+		
+	}
+	
 	function save() {
 		if (!$('#frm_new').parsley().validate()) {
 			return;	
@@ -381,8 +392,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					if (excelData) {
 						max = excelData.length;
 					}
+					headHtml += '<th>'
+						+ '<div class="checkbox checkbox-css text-center">'
+						+ '<input type="checkbox" value="" id="checkbox_all" name="checkbox_all" data="">'
+						+ '<label for="checkbox_all"></label>'
+						+ '</div>'
+						+ '</th>';
 					for (var ii = 0; ii < max; ii++) {
 						bodyHtml += "<tr>";
+						bodyHtml += '<td><div class="checkbox checkbox-css text-center">'
+							+ '<input type="checkbox" value="" id="checkbox_' + ii + '" name="checkbox" data="' + ii + '">'
+							+ '<label for="checkbox_' + ii + '"></label>'
+							+ '</div></td>';
+						
 						for (var r in data) {
 							readonly = '';
 							notnull = data[r].notNull;
@@ -403,6 +425,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								headHtml += '<th>';
 								headHtml += data[r].name;
 								headHtml += '</th>';
+
 							}
 
 							bodyHtml += '<td>';
@@ -453,6 +476,34 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 				
 				setDatepicker(aDateInputs);
+
+				$("#checkbox_all").change(function() {
+					var rowCount = max;
+					if (rowCount > 0) {
+						var checkedValue = false;
+						if ($(this).is(":checked")) {
+							checkedValue = true;
+						}
+						
+						for (var i = 0; i < rowCount; i++) {
+							$("#checkbox_" + i).prop("checked", checkedValue);
+						}
+					}
+				});
+
+				$("input[name=checkbox]").change(function(e) {
+					var rowCount = max;
+					if (rowCount > 0) {
+						var allCheckedValue = true;
+						for (var i = 0; i < rowCount; i++) {
+							if (!$("#checkbox_" + i).is(":checked")) {
+								allCheckedValue = false;
+								break;
+							}
+						}
+						$("#checkbox_all").prop("checked", allCheckedValue);
+					}
+				});
 				
 			},
 			error : function(data) {
