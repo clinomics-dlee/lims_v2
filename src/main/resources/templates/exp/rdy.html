@@ -211,7 +211,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		            url: '/exp/rdy/start',
 			        type : "post",
 			        dataType : 'json',
-			        data : {sampleIds : sampleIds},
+			        data : JSON.stringify(sampleIds),
+					contentType : "application/json;charset=utf-8",
 			        beforeSend: function(xhr) {
 						xhr.setRequestHeader(header, token);
 					},

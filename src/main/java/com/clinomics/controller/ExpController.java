@@ -45,7 +45,7 @@ public class ExpController {
 	}
 
 	@PostMapping("/rdy/start")
-	public Map<String, String> startExp(@RequestParam("sampleIds[]") List<String> sampleIds) {
+	public Map<String, String> startExp(@RequestBody List<Integer> sampleIds) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return expService.startExp(sampleIds, userDetails.getUsername());
 	}
@@ -71,7 +71,7 @@ public class ExpController {
 	}
 
 	@PostMapping("/step1/complete")
-	public Map<String, String> completeStep1(@RequestParam("sampleIds[]") List<String> sampleIds) {
+	public Map<String, String> completeStep1(@RequestBody List<Integer> sampleIds) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return expService.completeStep1(sampleIds, userDetails.getUsername());
 	}
@@ -82,7 +82,7 @@ public class ExpController {
 	}
 
 	@PostMapping("/step2/qrtPcr/update")
-	public Map<String, String> updateQrtPcr(@RequestParam("sampleIds[]") List<String> sampleIds) {
+	public Map<String, String> updateQrtPcr(@RequestBody List<Integer> sampleIds) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return expService.updateQrtPcr(sampleIds, userDetails.getUsername());
 	}
@@ -101,7 +101,7 @@ public class ExpController {
 	}
 
 	@PostMapping("/step2/complete")
-	public Map<String, String> completeStep2(@RequestParam("sampleIds[]") List<String> sampleIds) {
+	public Map<String, String> completeStep2(@RequestBody List<Integer> sampleIds) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return expService.completeStep2(sampleIds, userDetails.getUsername());
 	}
@@ -124,7 +124,7 @@ public class ExpController {
 	}
 
 	@PostMapping("/step3/complete")
-	public Map<String, String> completeStep3(@RequestParam("mappingNos[]") List<String> mappingNos) {
+	public Map<String, String> completeStep3(@RequestBody List<String> mappingNos) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return expService.completeStep3(mappingNos, userDetails.getUsername());
 	}

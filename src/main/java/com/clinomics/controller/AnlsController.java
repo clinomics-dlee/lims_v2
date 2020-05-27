@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +35,7 @@ public class AnlsController {
 	}
 
 	@PostMapping("/rdy/start")
-	public Map<String, String> startAnls(@RequestParam("mappingNos[]") List<String> mappingNos) {
+	public Map<String, String> startAnls(@RequestBody List<String> mappingNos) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return anlsService.startAnls(mappingNos, userDetails.getUsername());
 	}
@@ -42,5 +43,11 @@ public class AnlsController {
 	@GetMapping("/stts/get")
 	public Map<String, Object> getStts(@RequestParam Map<String, String> params) {
 		return anlsService.findSampleByAnlsSttsStatus(params);
+	}
+
+	@PostMapping("/stts/reexpreg")
+	public Map<String, String> completeStep2(@RequestBody List<Integer> sampleIds) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return anlsService.reExpReg(sampleIds, userDetails.getUsername());
 	}
 }

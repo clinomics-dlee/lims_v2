@@ -202,9 +202,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			title : "Result",
 			data : "statusCode",
 			render : function(row, data, index) {
-				var value = '<div class="progress rounded-corner " style="height:20px;">'
+				var value = '<div class="progress rounded-corner " style="height:20px;">';
+				console.log(row);
 				if ("S440_ANLS_FAIL" == data) {
-					value += '<div class="progress-bar bg-danger" style="width: 100%;cursor: pointer;" onclick="resultPopup()">';
+					value += '<div class="progress-bar bg-danger" style="width: 100%;cursor: pointer;" onclick="viewErrorMsg(\'' + row.statusMessage + '\')">';
 					value += 'FAIL';
 					value += '</div>';
 				} else {
@@ -225,6 +226,49 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	function search() {
 		UserTable.reload('_anls_stts_grid');
+	}
+
+	function viewErrorMsg(msg) {
+		CommonMsg.error(function() { }, msg);
+	}
+
+	function reExpReg() {
+		var checkedRows = UserTable.getCheckedRows("_anls_stts_grid");
+		if (checkedRows.length > 0) {
+			CommonMsg.okCancel(function() {
+				var sampleIds = [];
+				for (var i = 0; i < checkedRows.length; i++) {
+					var row = checkedRows[i];
+					sampleIds.push(row.id);
+				}
+
+				$.ajax({
+		            url: '/anls/stts/reexpreg',
+			        type : "post",
+			        dataType : 'json',
+			        data : JSON.stringify(sampleIds),
+					contentType : "application/json;charset=utf-8",
+			        beforeSend: function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+				    success: function(data, xhr) {
+				    	if (data.result == "00") {
+				    		CommonMsg.save(function() {
+				    			UserTable.reload('_anls_stts_grid');
+							});
+						} else if (!data.result.startsWith("0")) {
+							CommonMsg.error(function() { });
+						}
+					},
+					error : function(data) {
+						CommonMsg.error(function() { });
+					},
+					complete : function() {
+						
+					}
+				});
+			});
+		}
 	}
 
 	/* ]]> */

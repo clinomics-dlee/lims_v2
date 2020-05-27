@@ -101,14 +101,14 @@ public class ExpService {
 	}
 
 	@Transactional
-	public Map<String, String> startExp(List<String> sampleIds, String userId) {
+	public Map<String, String> startExp(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
-		for (String id : sampleIds) {
-			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		for (int id : sampleIds) {
+			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			sample.setStatusCode(StatusCode.S210_EXP_STEP1);
@@ -251,14 +251,14 @@ public class ExpService {
 	}
 
 	@Transactional
-	public Map<String, String> completeStep1(List<String> sampleIds, String userId) {
+	public Map<String, String> completeStep1(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
-		for (String id : sampleIds) {
-			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		for (int id : sampleIds) {
+			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			sample.setStatusCode(StatusCode.S220_EXP_STEP2);
@@ -303,11 +303,11 @@ public class ExpService {
 	}
 
 	@Transactional
-	public Map<String, String> updateQrtPcr(List<String> sampleIds, String userId) {
+	public Map<String, String> updateQrtPcr(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
-		for (String id : sampleIds) {
-			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		for (int id : sampleIds) {
+			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			sample.setGenotypingMethodCode(GenotypingMethodCode.QRT_PCR);
@@ -428,14 +428,14 @@ public class ExpService {
 	}
 
 	@Transactional
-	public Map<String, String> completeStep2(List<String> sampleIds, String userId) {
+	public Map<String, String> completeStep2(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
 
-		for (String id : sampleIds) {
-			Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		for (int id : sampleIds) {
+			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
 			// #. GenotypingMethodCode 가 chip인 경우 step3으로, QRT_PCR인 경우 분석 성공으로 처리

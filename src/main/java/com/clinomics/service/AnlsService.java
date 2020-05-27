@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ResultCode;
@@ -138,7 +140,7 @@ public class AnlsService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusEqual(StatusCode.S410_ANLS_RUNNING).or(SampleSpecification.statusEqual(StatusCode.S440_ANLS_FAIL)));
+					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S410_ANLS_RUNNING, StatusCode.S440_ANLS_FAIL})));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -147,5 +149,50 @@ public class AnlsService {
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
+	@Transactional
+	public Map<String, String> reExpReg(List<Integer> sampleIds, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		LocalDateTime now = LocalDateTime.now();
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+
+		for (int id : sampleIds) {
+			Optional<Sample> oSample = sampleRepository.findById(id);
+			Sample sample = oSample.orElseThrow(NullPointerException::new);
+			// #. 분석 실패인 검체 상태 변경
+			sample.setStatusCode(StatusCode.S450_ANLS_FAIL_CMPL);
+			sample.setAnlsCmplDate(now);
+			sample.setAnlsCmplMember(member);
+
+			sampleRepository.save(sample);
+
+			// #. 해당 검체 복사 step2전까지만 사용한 데이터 복사
+			Sample nSample = new Sample();
+			nSample.setLaboratoryId(sample.getLaboratoryId());
+			nSample.setVersion(sample.getVersion() + 1);
+			nSample.setBundle(sample.getBundle());
+			nSample.setItems(sample.getItems());
+			nSample.setA260280(sample.getA260280());
+			nSample.setCncnt(sample.getCncnt());
+			nSample.setDnaQc(sample.getDnaQc());
+			nSample.setStatusCode(StatusCode.S220_EXP_STEP2);
+			nSample.setInputApproveDate(sample.getInputApproveDate());
+			nSample.setInputApproveMember(sample.getInputApproveMember());
+			nSample.setInputMngApproveDate(sample.getInputMngApproveDate());
+			nSample.setInputMngApproveMember(sample.getInputMngApproveMember());
+			nSample.setInputDrctApproveDate(sample.getInputDrctApproveDate());
+			nSample.setInputDrctMember(sample.getInputDrctMember());
+			nSample.setExpStartDate(sample.getExpStartDate());
+			nSample.setExpStartMember(sample.getExpStartMember());
+			nSample.setExpStep1Date(sample.getExpStep1Date());
+			nSample.setExpStep1Member(sample.getExpStep1Member());
+
+			sampleRepository.save(nSample);
+		}
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
 	}
 }
