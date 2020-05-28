@@ -205,7 +205,7 @@ public class AnalysisService {
 							boolean isSuccess = ftp.retrieveFile(fileName, fos);
 							if (isSuccess) {
 								sample.setCheckCelFile("PASS");
-								sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+								sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
 								sampleRepository.save(sample);
 								existFile = true;
 								// 다운로드 성공
@@ -232,7 +232,7 @@ public class AnalysisService {
 				if (!existFile) {
 					logger.info("★★★★★★★ Not exist File=" + sample.getLaboratoryId());
 					sample.setCheckCelFile("FAIL");
-					sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+					sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
 					sampleRepository.save(sample);
 				}
 			}

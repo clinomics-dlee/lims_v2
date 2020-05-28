@@ -176,8 +176,8 @@ public class ChartService {
 					, StatusCode.S400_ANLS_READY
 					, StatusCode.S410_ANLS_RUNNING
 					, StatusCode.S420_ANLS_SUCC
-					, StatusCode.S430_ANLS_SUCC_CMPL
-					, StatusCode.S440_ANLS_FAIL
+					, StatusCode.S440_ANLS_SUCC_CMPL
+					, StatusCode.S430_ANLS_FAIL
 					, StatusCode.S450_ANLS_FAIL_CMPL
 				})
 			));

@@ -143,7 +143,7 @@ public class AnlsService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S410_ANLS_RUNNING, StatusCode.S440_ANLS_FAIL})));
+					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S410_ANLS_RUNNING, StatusCode.S430_ANLS_FAIL})));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -164,8 +164,12 @@ public class AnlsService {
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
-			// #. 분석 실패인 검체 상태 변경
-			sample.setStatusCode(StatusCode.S450_ANLS_FAIL_CMPL);
+			// #. 검체 상태 변경
+			if (sample.getStatusCode().equals(StatusCode.S430_ANLS_FAIL)) {
+				sample.setStatusCode(StatusCode.S450_ANLS_FAIL_CMPL);
+			} else if (sample.getStatusCode().equals(StatusCode.S420_ANLS_SUCC)) {
+				sample.setStatusCode(StatusCode.S440_ANLS_SUCC_CMPL);
+			}
 			sample.setAnlsCmplDate(now);
 			sample.setAnlsCmplMember(member);
 
@@ -181,6 +185,8 @@ public class AnlsService {
 			nSample.setCncnt(sample.getCncnt());
 			nSample.setDnaQc(sample.getDnaQc());
 			nSample.setStatusCode(StatusCode.S220_EXP_STEP2);
+			nSample.setCreatedDate(sample.getCreatedDate());
+			nSample.setCreatedMember(sample.getCreatedMember());
 			nSample.setInputApproveDate(sample.getInputApproveDate());
 			nSample.setInputApproveMember(sample.getInputApproveMember());
 			nSample.setInputMngApproveDate(sample.getInputMngApproveDate());
@@ -250,6 +256,28 @@ public class AnlsService {
 		rtn.put("sample", sample);
 		rtn.put("datas", datas);
 		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> completeAnls(List<Integer> sampleIds, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		LocalDateTime now = LocalDateTime.now();
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+
+		for (int id : sampleIds) {
+			Optional<Sample> oSample = sampleRepository.findById(id);
+			Sample sample = oSample.orElseThrow(NullPointerException::new);
+
+			sample.setStatusCode(StatusCode.S460_ANLS_CMPL);
+			sample.setAnlsCmplDate(now);
+			sample.setAnlsCmplMember(member);
+
+			sampleRepository.save(sample);
+		}
+
+		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
 }

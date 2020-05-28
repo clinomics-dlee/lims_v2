@@ -157,7 +157,7 @@ public class Scheduler {
                         if (productTypeMarkerInfos.isEmpty()) {
                             // #. 조회한 마커 목록이 비어있는경우
                             logger.info(">> not found marker infomation error sample id=[" + genotypingId + "]");
-                            sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+                            sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
                             sample.setStatusMessage("not found marker infomation");
                             sample.setAnlsEndDate(LocalDateTime.now());
                             sampleRepository.save(sample);
@@ -195,7 +195,7 @@ public class Scheduler {
                             // #. 마커가 존재하지 않는것이 있는 경우
                             logger.info(">> Not Exist Markers error sample id=[" + genotypingId + "]");
                             // #. resultUpload 상태 업데이트
-                            sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+                            sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
                             sample.setStatusMessage("Not Exist Markers[" + genotypingId + "]=" + notExistMarkers.toString());
                             sample.setAnlsEndDate(LocalDateTime.now());
                             sampleRepository.save(sample);
@@ -223,7 +223,7 @@ public class Scheduler {
                             // #. marker 값 유효하지 않은 경우
                             logger.info(">> Invalid Markers error sample id=[" + genotypingId + "]");
                             // #. resultUpload 상태 업데이트
-                            sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+                            sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
                             sample.setStatusMessage("Invalid Markers Result[" + genotypingId + "]=" + invalidMarkers.toString());
                             sample.setAnlsEndDate(LocalDateTime.now());
                             sampleRepository.save(sample);
@@ -250,7 +250,7 @@ public class Scheduler {
                         
                     } else if (!failRowData.isEmpty()) {
                         // #. 분석 실패 파일에 존재하는 경우
-                        sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+                        sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
                         sample.setStatusMessage((String)failRowData.get(failHeaderDatas.get(1)));
                         sample.setAnlsEndDate(LocalDateTime.now());
                         sampleRepository.save(sample);
@@ -259,7 +259,7 @@ public class Scheduler {
                         // #. 둘다 존재하지 않는 경우
                         logger.info(">> Missing sample ID in file.=[" + genotypingId + "]");
                         // #. 상태 업데이트
-                        sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+                        sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
                         sample.setStatusMessage("Missing sample ID in file[" + genotypingId + "]");
                         sample.setAnlsEndDate(LocalDateTime.now());
                         sampleRepository.save(sample);
@@ -267,7 +267,7 @@ public class Scheduler {
                     }
 				} else if (errorFile.exists()) {
 					// #. 분석 실패인 경우
-                    sample.setStatusCode(StatusCode.S440_ANLS_FAIL);
+                    sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
                     sample.setStatusMessage("Error occurred during analysis[" + genotypingId + "]");
                     sample.setAnlsEndDate(LocalDateTime.now());
                     sampleRepository.save(sample);

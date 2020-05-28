@@ -54,8 +54,8 @@ public class AnlsController {
 		return anlsService.findSampleByAnlsSttsStatus(params);
 	}
 
-	@PostMapping("/stts/reexpreg")
-	public Map<String, String> completeStep2(@RequestBody List<Integer> sampleIds) {
+	@PostMapping("/reexpreg")
+	public Map<String, String> reExpReg(@RequestBody List<Integer> sampleIds) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return anlsService.reExpReg(sampleIds, userDetails.getUsername());
 	}
@@ -77,5 +77,16 @@ public class AnlsController {
 		String memberId = userDetails.getUsername();
 		
 		return anlsExcelService.importRsltExcel(multipartFile, memberId);
+	}
+
+	@PostMapping("/rslt/complete")
+	public Map<String, String> completeAnls(@RequestBody List<Integer> sampleIds) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return anlsService.completeAnls(sampleIds, userDetails.getUsername());
+	}
+
+	@GetMapping("/db/get")
+	public Map<String, Object> getSampleDb(@RequestParam Map<String, String> params) {
+		return sampleDbService.find(params, 440);
 	}
 }
