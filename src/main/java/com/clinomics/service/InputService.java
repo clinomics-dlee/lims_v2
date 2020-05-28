@@ -113,6 +113,7 @@ public class InputService {
 		
 		boolean existsSample = sample.getId() > 0;
 		
+		LocalDateTime now = LocalDateTime.now();
 		Bundle bundle;
 		if (existsSample) {
 			if (!sampleRepository.existsById(NumberUtils.toInt(id))) {
@@ -131,6 +132,7 @@ public class InputService {
 			
 			Optional<Member> oMember = memberRepository.findById(datas.getOrDefault("memberId", ""));
 			Member member = oMember.orElseThrow(NullPointerException::new);
+			sample.setCreatedDate(now);
 			sample.setCreatedMember(member);
 			sample.setStatusCode(StatusCode.S000_INPUT_REG);
 		}

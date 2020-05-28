@@ -98,7 +98,6 @@ public class Sample implements Serializable {
 	// #. interface api 요청된 product에 type값 목록에 "_"를 붙임 ex> _GS_GSX_
 	private String outputProductTypes;
 	
-	@CreatedDate
 	private LocalDateTime createdDate;
 
 	private LocalDateTime modifiedDate;
