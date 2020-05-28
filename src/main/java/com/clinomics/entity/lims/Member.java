@@ -16,13 +16,12 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
 /**
  * The persistent class for the admin_user database table.
  * 
  */
 @Entity
-@Table(name="member")
+@Table(name = "member")
 public class Member implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -42,16 +41,15 @@ public class Member implements Serializable {
 
 	@Column(length = 80)
 	private String dept;
-	
-	@JsonIgnore
+
+	private boolean isFailedMailSent;
+
 	@Column(columnDefinition = "boolean default true")
 	private boolean inUse;
 
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.EAGER, cascade =  CascadeType.ALL)
-	@JoinTable(name="member_role",
-				joinColumns = @JoinColumn(name = "memberId", referencedColumnName = "id"),
-				inverseJoinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id"))
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "member_role", joinColumns = @JoinColumn(name = "memberId", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id"))
 	private Set<Role> role = new HashSet<Role>();
 
 	public String getId() {
@@ -92,6 +90,14 @@ public class Member implements Serializable {
 
 	public void setDept(String dept) {
 		this.dept = dept;
+	}
+
+	public boolean isFailedMailSent() {
+		return isFailedMailSent;
+	}
+
+	public void setFailedMailSent(boolean isFailedMailSent) {
+		this.isFailedMailSent = isFailedMailSent;
 	}
 
 	public boolean isInUse() {

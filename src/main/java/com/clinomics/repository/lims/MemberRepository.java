@@ -15,4 +15,6 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	
 	@Query(value = "SELECT COUNT(*) FROM member WHERE id LIKE %?1% OR name LIKE %?1%", nativeQuery = true)
 	int countBySearchValue(String searchValue);
+
+	List<Member> findByInUseTrueAndIsFailedMailSentTrue();
 }

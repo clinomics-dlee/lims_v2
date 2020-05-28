@@ -145,6 +145,7 @@
 										<th class="text-nowrap" data-orderable="true" th:text="#{page.member.email}">Email</th>
 										<th class="text-nowrap" data-orderable="true" th:text="#{page.member.department}">Department</th>
 										<th class="text-nowrap"></th>
+										<th class="text-nowrap">실패메일</th>
 										<th class="text-nowrap" data-orderable="true" th:text="#{common.active}">in use</th>
 									</tr>
 								</thead>
@@ -287,6 +288,18 @@ function doList() {
 			className : "with-btn text-center align-middle",
 			render : function(data, type, row) {
 				return '<a href="javascript:edit(\'' + row.id + '\')" class="btn btn-sm btn-primary width-60 m-r-2">Edit</a>';
+			}
+		}, {
+			data : "isFailedMailSent",
+			className : "with-btn text-center align-middle",
+			render : function(data, type, row) {
+				var checked = "";
+				if (data) checked = "checked";
+				
+				return '<div class="custom-control custom-switch">'
+					+ '<input type="checkbox" class="custom-control-input" onclick="sendMailSave(\'' + row.id + '\')" id="chk_member_' + row.id + '" ' + checked + '>'
+					+ '<label class="custom-control-label" for="chk_member_' + row.id + '"></label>'
+					+ '</div>';
 			}
 		}, {
 			data : "inUse",
@@ -486,6 +499,32 @@ $("#initBtn").on("click", function(event) {
 	// #. event 중단
 	event.preventDefault();
 });
+
+function sendMailSave(id) {
+	$.ajax({
+		url : "/set/mbr/save",
+		type : 'post',
+		dataType : 'json',
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+		data : JSON.stringify({
+			id : id,
+			isFailedMailSent : $("#chk_member_" + id).prop('checked')
+		}),
+		contentType : "application/json;charset=utf-8",
+		success : function(data) {
+			if (data.result == "00") {
+				CommonMsg.save(function() { });
+			} else if (!data.result.startsWith("0")) {
+				CommonMsg.error(function() { });
+			}
+		},
+		error : function(data) {
+			CommonMsg.error(function() { });
+		}
+	});
+}
 
 function inUseSave(id) {
 	$.ajax({

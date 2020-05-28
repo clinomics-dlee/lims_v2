@@ -198,7 +198,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			},
 			{
 				title : '검사담당자', 
-				data : 'inputApproveDate',
+				data : 'jdgmApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
@@ -208,7 +208,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			},
 			{
 				title : '중간관리자', 
-				data : 'inputMngApproveDate',
+				data : 'jdgmMngApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
@@ -218,7 +218,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			},
 			{
 				title : '검사실책임자', 
-				data : 'inputDrctApproveDate',
+				data : 'jdgmDrctApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
@@ -251,29 +251,38 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		for (var cr in checkedRows) {
 			data.push(checkedRows[cr].id);
 		}
-		$.ajax({
-            url: '/jdgm/approve',
-			type: 'post',
-	        data : JSON.stringify(data),
-	        dataType : 'json',
-	        contentType : "application/json;charset=utf-8",
-	        beforeSend: function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-		    success: function(data, xhr) {
-					
-				if (data.result.startsWith("0")) {
-					CommonMsg.save(function() { });
-				} else {
+		if (data.length < 1) {
+			return
+		}
+		CommonMsg.okCancel(function() {
+			
+			$.ajax({
+				url: '/jdgm/approve',
+				type: 'post',
+				data : JSON.stringify(data),
+				dataType : 'json',
+				contentType : "application/json;charset=utf-8",
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function(data, xhr) {
+						
+					if (data.result.startsWith("0")) {
+						CommonMsg.save(function() {
+							UserTable.reload('_collect_grid');
+						}, data.message);
+					} else {
+						CommonMsg.error(function() { });
+					}
+				},
+				error : function(data) {
 					CommonMsg.error(function() { });
+				},
+				complete : function() {
+					
 				}
-			},
-			error : function(data) {
-				CommonMsg.error(function() { });
-			},
-			complete : function() {
-				
-			}
+			});
+			
 		});
 	}
 	

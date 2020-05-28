@@ -1,11 +1,14 @@
 package com.clinomics.util;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Sample;
+import com.clinomics.repository.lims.MemberRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,6 +22,9 @@ public class EmailSender {
 
     @Autowired
     private JavaMailSender javaMailSender;
+	
+	@Autowired
+	MemberRepository memberRepository;
 
     @Autowired
     private SpringTemplateEngine templateEngine;
@@ -27,9 +33,21 @@ public class EmailSender {
         try {
             MimeMessage msg = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
-            helper.setSubject("Chip 분석 실패 메일");
-            helper.setTo(new String[] {"dlee@clinomics.co.kr"});
 
+            List<Member> members = memberRepository.findByInUseTrueAndIsFailedMailSentTrue();
+
+            helper.setSubject("Chip 분석 실패 메일");
+
+            List<String> emails = members.stream()
+                .map(m -> m.getEmail())
+                .collect(Collectors.toList());
+            
+            if (emails.size() < 1) {
+                emails.add("eastpeople@clinomics.co.kr");
+                emails.add("dlee@clinomics.co.kr");
+            }
+
+            helper.setTo(emails.toArray(new String[emails.size()]));
 
             Context context =  new Context();
             context.setVariable("samples", failSamples);

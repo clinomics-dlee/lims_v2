@@ -168,6 +168,13 @@ public class MemberService {
 				// #. 사용여부 저장
 				rtn.put("result", ResultCode.SUCCESS_NOT_USE_ALERT.get());
 			}
+						
+			if (datas.containsKey("isFailedMailSent")) {
+				boolean isFailedMailSent = BooleanUtils.toBooleanObject(datas.get("isFailedMailSent"));
+				member.setFailedMailSent(isFailedMailSent);
+				// #. 사용여부 저장
+				rtn.put("result", ResultCode.SUCCESS_NOT_USE_ALERT.get());
+			}
 			
 			// #. 수정
 			memberRepository.save(member);

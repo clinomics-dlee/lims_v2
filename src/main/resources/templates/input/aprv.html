@@ -240,13 +240,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function approve() {
-		CommonMsg.okCancel(function() {
+		var checkedRows = UserTable.getCheckedRows('_collect_grid');
+		var data = [];
+		for (var cr in checkedRows) {
+			data.push(checkedRows[cr].id);
+		}
+		if (data.length < 1) {
+			return
+		}
 
-			var checkedRows = UserTable.getCheckedRows('_collect_grid');
-			var data = [];
-			for (var cr in checkedRows) {
-				data.push(checkedRows[cr].id);
-			}
+		CommonMsg.okCancel(function() {
+			
 			$.ajax({
 				url: '/input/approve',
 				type: 'post',
