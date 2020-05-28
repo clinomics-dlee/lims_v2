@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,18 +21,16 @@ import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.ProductRepository;
 import com.clinomics.repository.lims.SampleRepository;
+import com.clinomics.service.SampleDbService;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.EmailSender;
 import com.clinomics.util.ExcelReadComponent;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -45,13 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class Scheduler {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	@Value("${externalApi.url}")
-	private String externalApiUrl;
-	@Value("${externalApi.tokenName}")
-	private String externalApiTokenName;
-	@Value("${externalApi.token}")
-	private String externalApiToken;
-	
 	@Autowired
 	SampleRepository sampleRepository;
 	
@@ -59,7 +47,7 @@ public class Scheduler {
 	ProductRepository productRepository;
 	
 	@Autowired
-	ExcelReadComponent excelReadComponent;
+	SampleDbService sampleDbService;
 
 	@Autowired
 	EmailSender emailSender;
@@ -164,7 +152,7 @@ public class Scheduler {
                         });
                         
                         // #. 상품목록이 가지고 있는 모든 마커 정보 조회
-                        Map<String, List<Map<String, String>>> productTypeMarkerInfos = this.getMarkerInfo(new ArrayList<String>(productTypes));
+                        Map<String, List<Map<String, String>>> productTypeMarkerInfos = sampleDbService.getMarkerInfo(new ArrayList<String>(productTypes));
                         // #. marker 정보가 없는 경우
                         if (productTypeMarkerInfos.isEmpty()) {
                             // #. 조회한 마커 목록이 비어있는경우
@@ -375,69 +363,5 @@ public class Scheduler {
 		
 		return datas;
 	}
-
-    private Map<String, List<Map<String, String>>> getMarkerInfo(List<String> reportTypes) throws Exception {
-		Map<String, List<Map<String, String>>> rtn = Maps.newHashMap();
-		BufferedReader br = null;
-		try {
-			String reportTypeString = String.join(",", reportTypes);
-			URL url = new URL(externalApiUrl + "getMarker.php?reporttype=" + reportTypeString);
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setConnectTimeout(5000); // 서버에 연결되는 Timeout 시간 설정
-			con.setReadTimeout(5000); // InputStream 읽어 오는 Timeout 시간 설정
-			con.addRequestProperty(externalApiTokenName, externalApiToken); // key값 설정
-			con.setRequestMethod("GET");
-
-			con.setDoOutput(false);
-
-			if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				ObjectMapper mapper = new ObjectMapper();
-				
-				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-				StringBuilder sb = new StringBuilder();
-				String line;
-				while ((line = br.readLine()) != null) {
-					sb.append(line).append("\n");
-				}
-				
-				Map<Object, Object> jsonMap = mapper.readValue(sb.toString(), new TypeReference<Map<Object, Object>>(){});
-				if (jsonMap != null && !jsonMap.keySet().isEmpty()) {
-					// #. jsonMap이 있는경우 데이터 가공
-					for (String reportType : reportTypes) {
-						List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-						List<Map<String, String>> markerInfos = (List)jsonMap.get(reportType);
-						for (Map<String, String> info : markerInfos) {
-							Map<String, String> ri = Maps.newHashMap();
-							String name = info.get("marker");
-							String refValue = info.get("refer");
-							String altValue = info.get("factor");
-							
-							ri.put("name", name);
-							ri.put("nameCode", name);
-							ri.put("refValue", refValue);
-							ri.put("altValue", altValue);
-							
-							list.add(ri);
-						}
-						rtn.put(reportType, list);
-					}
-				}
-			} else {
-				logger.info(con.getResponseMessage());
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		return rtn;
-	}
+    
 }

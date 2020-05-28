@@ -73,7 +73,7 @@ var _result_popup_table;
 	});
 } */
 
-function resultPopupOnload(sampleId) {
+function resultPopupOnload(sampleId, genotypingId) {
 	$("#modal-result-detail").modal();
 	
 	/* if ($.fn.DataTable.isDataTable("#_result_popup_table")) {
@@ -86,9 +86,9 @@ function resultPopupOnload(sampleId) {
 	
 	resultPopupDynamicTable("#_result_popup_table", sampleId, n_columns); */
 	
-	$('#popup_result_title').text(sampleId);
+	$('#popup_result_title').text(genotypingId);
 	$.ajax({
-		url : "/work/mng/result/" + sampleId,
+		url : "/anls/databy/sample/" + sampleId,
 		type : "GET",
 		dataType : "json",
 		contentType : "application/json; charset=utf-8",
@@ -96,19 +96,14 @@ function resultPopupOnload(sampleId) {
 			xhr.setRequestHeader(header, token);
 		},
 		success: function (data) {
-			
 			var html = "";
-			for (var d in data) {
-				var rd = data[d].data;
-				
-				var c = 0;
-				for (var k in rd) {
-					if (c % 5 == 0) html += "<tr>";
-					html += "<th>" + k + "</th>";
-					html += "<td>" + rd[k] + "</td>";
-					if (c % 5 == 4) html += "</tr>";	
-					c++;
-				}
+			console.log(data.datas);
+			for (var i = 0; i < data.datas.length; i++) {
+				var rd = data.datas[i];
+				if (i % 5 == 0) html += "<tr>";
+				html += "<th>" + rd.marker + "</th>";
+				html += "<td>" + rd.value + "</td>";
+				if (i % 5 == 4) html += "</tr>";
 			}
 			$("#_result_popup_table").html(html);
 			
@@ -117,11 +112,7 @@ function resultPopupOnload(sampleId) {
 			CommonMsg.error(function() { });
 		}
 	});
-	
-	
 }
-		
-
 
 /* ]]> */
 </script>

@@ -2,10 +2,13 @@ package com.clinomics.service;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.transaction.Transactional;
 
@@ -193,6 +196,60 @@ public class AnlsService {
 		}
 
 		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	public Map<String, Object> findSampleByAnlsSuccStatus(Map<String, String> params) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+		long total;
+		
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.statusEqual(StatusCode.S420_ANLS_SUCC));
+		
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
+		List<Sample> list = page.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
+	public Map<String, Object> findSampleDataBySampleId(String id) {
+		Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		Sample sample = oSample.orElse(new Sample());
+		
+		Map<String, Object> resultData = sample.getData();
+
+		TreeMap<String, Object> tm = new TreeMap<String, Object>(resultData);
+		Iterator<String> iteratorKey = tm.keySet().iterator();   //키값 오름차순 정렬(기본)
+		List<Map<String, String>> datas = new ArrayList<Map<String, String>>();
+		while(iteratorKey.hasNext()) {
+			String key = iteratorKey.next();
+			Map<String, String> map = Maps.newHashMap();
+			map.put("marker", key);
+			map.put("value", (String)resultData.get(key));
+			datas.add(map);
+		}
+
+		Map<String, Object> rtn = Maps.newHashMap();
+		rtn.put("sample", sample);
+		rtn.put("datas", datas);
+		
 		return rtn;
 	}
 }

@@ -7,9 +7,9 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import com.clinomics.service.ExpExcelService;
 import com.clinomics.service.ExpService;
 import com.clinomics.service.SampleDbService;
-import com.google.common.collect.Maps;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -37,6 +37,9 @@ public class ExpController {
     ExpService expService;
 
 	@Autowired
+	ExpExcelService expExcelService;
+	
+	@Autowired
     SampleDbService sampleDbService;
 
 	@GetMapping("/rdy/get")
@@ -57,7 +60,7 @@ public class ExpController {
 
 	@GetMapping("/step1/excel/form")
 	public void exportExcelForm(@RequestParam Map<String, String> params, HttpServletResponse response) {
-		XSSFWorkbook xlsx = expService.exportStep1ExcelForm(params);
+		XSSFWorkbook xlsx = expExcelService.exportStep1ExcelForm(params);
 		requestExcel(xlsx, "Dna_Qc_Template", response);
 	}
 
@@ -67,7 +70,7 @@ public class ExpController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String memberId = userDetails.getUsername();
 
-		return expService.importStep1Excel(multipartFile, memberId);
+		return expExcelService.importStep1Excel(multipartFile, memberId);
 	}
 
 	@PostMapping("/step1/complete")
@@ -89,7 +92,7 @@ public class ExpController {
 
 	@GetMapping("/step2/excel/form")
 	public void exportStep2ExcelForm(@RequestParam Map<String, String> params, HttpServletResponse response) {
-		XSSFWorkbook xlsx = expService.exportStep2ExcelForm(params);
+		XSSFWorkbook xlsx = expExcelService.exportStep2ExcelForm(params);
 		requestExcel(xlsx, "Mapping_Template", response);
 	}
 

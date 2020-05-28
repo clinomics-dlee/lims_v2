@@ -187,7 +187,11 @@ var UserTable = function() {
 									}
 								} else {
 									if (columns[r].type == 'date') {
-										val = moment(val).format('YYYY-MM-DD');
+										if (val != null) {
+											val = moment(val).format('YYYY-MM-DD');
+										} else {
+											val = "";
+										}
 									} else if (columns[r].type != null && columns[r].type.constructor == Object) {
 										if (columns[r].type.name == 'checkbox') {
 											val = '<div class="checkbox checkbox-css text-center">'
