@@ -108,6 +108,7 @@ public class OutputService {
 			
 			samples.stream().forEach(s -> {
 				s.setJdgmDrctApproveDate(now);
+				s.setModifiedDate(now);
 				s.setJdgmDrctApproveMember(member);
 				if (s.getJdgmApproveDate() != null && s.getJdgmMngApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
 					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
@@ -118,6 +119,7 @@ public class OutputService {
 			
 			samples.stream().forEach(s -> {
 				s.setJdgmMngApproveDate(now);
+				s.setModifiedDate(now);
 				s.setJdgmMngApproveMember(member);
 				if (s.getJdgmApproveDate() != null && s.getJdgmMngApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
 					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
@@ -128,6 +130,7 @@ public class OutputService {
 			
 			samples.stream().forEach(s -> {
 				s.setJdgmApproveDate(now);
+				s.setModifiedDate(now);
 				s.setJdgmApproveMember(member);
 				if (s.getJdgmApproveDate() != null && s.getJdgmMngApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
 					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
@@ -163,6 +166,7 @@ public class OutputService {
 			samples.stream().forEach(s -> {
 				s.setOutputWaitDate(now);
 				s.setOutputWaitMember(member);
+				s.setModifiedDate(now);
 				s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
 			});
 
@@ -196,6 +200,7 @@ public class OutputService {
 			samples.stream().forEach(s -> {
 				s.setOutputWaitDate(now);
 				s.setOutputWaitMember(member);
+				s.setModifiedDate(now);
 				
 				s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
 			});
@@ -262,10 +267,12 @@ public class OutputService {
 							sample.setOutputCmplDate(now);
 							sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
 							sample.setOutputProductTypes("");
+							sample.setModifiedDate(now);
 						} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
 							sample.setReOutputCmplDate(now);
 							sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
 							sample.setOutputProductTypes("");
+							sample.setModifiedDate(now);
 						}
 					}
 					sampleRepository.save(sample);

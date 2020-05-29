@@ -123,7 +123,7 @@ public class CalendarService {
 			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
 		}
 		
-		Specification<Sample> where = getSampleWhere(params);
+		Specification<Sample> where = getRegisteredWhere(params);
 		Page<Sample> sample = sampleRepository.findAll(where, pageable);
 		long total = sample.getTotalElements();
 		long filtered = total;
@@ -203,6 +203,19 @@ public class CalendarService {
 			.where(SampleSpecification.createdDateOneMonth(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusCodeGt(20));
+	}
+	
+	private Specification<Sample> getRegisteredWhere(Map<String, String> params) {
+		return Specification
+			.where(SampleSpecification.createdDateOneMonth(params))
+			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.statusIn(
+				Arrays.asList(new StatusCode[] {
+					StatusCode.S000_INPUT_REG
+					, StatusCode.S020_INPUT_RCV
+					, StatusCode.S040_INPUT_APPROVE
+				})
+			));
 	}
 	
 	private Specification<Sample> getAnalysisWhere(Map<String, String> params) {

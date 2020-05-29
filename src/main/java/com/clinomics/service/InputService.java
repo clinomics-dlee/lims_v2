@@ -216,6 +216,7 @@ public class InputService {
 			samples.stream().forEach(s -> {
 				s.setInputDrctApproveDate(now);
 				s.setInputDrctMember(member);
+				s.setModifiedDate(now);
 				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
 					s.setStatusCode(StatusCode.S200_EXP_READY);
 				}
@@ -226,6 +227,7 @@ public class InputService {
 			samples.stream().forEach(s -> {
 				s.setInputMngApproveDate(now);
 				s.setInputMngApproveMember(member);
+				s.setModifiedDate(now);
 				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
 					s.setStatusCode(StatusCode.S200_EXP_READY);
 				}
@@ -236,6 +238,7 @@ public class InputService {
 			samples.stream().forEach(s -> {
 				s.setInputApproveDate(now);
 				s.setInputApproveMember(member);
+				s.setModifiedDate(now);
 				s.setStatusCode(StatusCode.S020_INPUT_RCV);
 			});
 		} else {

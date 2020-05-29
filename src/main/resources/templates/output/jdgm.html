@@ -118,6 +118,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	<script th:inline="javascript">
 	/* <![CDATA[ */       
+	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
 
 	var tables = [];
 	var count;
@@ -185,12 +186,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
+				title : '검사실ID', 
+				data : 'laboratoryId'
+			},
+			{
 				title : '서비스', 
 				data : 'bundle.name'
 			},
 			{
-				title : '검사실ID', 
-				data : 'laboratoryId'
+				title : '상태', 
+				data : "statusCode",
+				render : function(row, data, index) {
+					var value = g_statusCodeInfo[data];
+					return value;
+				}
 			},
 			{
 				title : 'Genotyping Method', 

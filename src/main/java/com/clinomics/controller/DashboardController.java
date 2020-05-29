@@ -35,7 +35,7 @@ public class DashboardController {
 
 	@GetMapping("/popup/registered")
 	@ResponseBody
-	public Map<String, Object> complete(@RequestParam Map<String, String> params) {
+	public Map<String, Object> registered(@RequestParam Map<String, String> params) {
 		return calendarService.selectRegistered(params);
 	}
 

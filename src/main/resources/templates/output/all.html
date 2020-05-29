@@ -38,10 +38,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item active">판정</li>
+				<li class="breadcrumb-item active">검체 목록</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">판정</h1>
+			<h1 id="page-header" class="page-header">검체 목록</h1>
 			
 			<div class="row">
 				<div class="col-xl-12">
@@ -118,6 +118,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	<script th:inline="javascript">
 	/* <![CDATA[ */       
+	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
 
 	var tables = [];
 	var count;
