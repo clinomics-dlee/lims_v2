@@ -69,16 +69,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<hr/>
 							<div id="_anls_db_grid"></div>
 							<hr/>
-							<div class="row">
-								<form id="fileupload" method="POST" enctype="multipart/form-data">
-									<div class="hide">
-										<input type="file" id="file" name="file">
-									</div>
-								</form>
-								<button onClick="excelUpload();" class="btn btn-success m-l-20">결과파일 Upload</button>
-								<button onClick="reExpReg();" class="btn btn-warning m-l-20">재실험등록</button>
-								<button onClick="completeAnls();" class="btn btn-yellow m-l-20">분석완료</button>
-							</div>
 						</div>
 						<!-- end tab-1 -->
 					</div>
@@ -140,7 +130,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_anls_db_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_anls_db_grid', true, [10, 50] , [10, 50], true);
 		drawDbGrid();
 	});
 	
@@ -165,6 +155,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "id",
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
+			hideExcel : true,
 			type : {
 				name : "checkbox"
 			}
@@ -173,6 +164,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : 'id',
 			headClassName : 'width-50',
 			bodyClassName : 'text-center',
+			hideExcel : true,
 			render : function(row, data, index) {
 				return '<string>' + (index + 1) + '</string>';
 			}
@@ -212,6 +204,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			title : "결과",
 			data : "id",
+			bodyClassName : 'text-center',
 			render : function(row, data, index) {
 				var value = "";
 				if (!jQuery.isEmptyObject(row.data)) {

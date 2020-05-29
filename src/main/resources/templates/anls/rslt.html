@@ -231,6 +231,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			title : "결과파일",
 			data : "id",
+			bodyClassName : 'text-center',
 			render : function(row, data, index) {
 				var value = "";
 				if (!jQuery.isEmptyObject(row.data)) {
