@@ -181,6 +181,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			title : "Genotyping ID",
 			data : "genotypingId"
 		}, {
+			title : "Mapping No",
+			data : "mappingNo"
+		}, {
 			title : "Genotyping Method",
 			data : "genotypingMethodCode",
 			render : function(row, data, index) {
@@ -271,6 +274,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				var sampleIds = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
+
+					if (row.genotypingMethodCode == null) {
+						CommonMsg.error(function() { }, "Genotyping Method 정보를 입력하세요.[" + row.laboratoryId + "]");
+						return;
+					}
+					
 					sampleIds.push(row.id);
 				}
 				

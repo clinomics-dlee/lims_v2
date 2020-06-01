@@ -1,0 +1,104 @@
+<!-- begin modal-dialog -->
+<div class="modal fade" id="modal-dnaqc-detail">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">DNA QC 정보 수정</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<form id="frm_popup_dnaqc_detail" name="frm_popup_dnaqc_detail" method="POST" enctype="multipart/form-data">
+					<div class="form-group row m-b-12">
+						<input type="hidden" id="sampleId" name="id" value="">
+						<label class="col-form-label col-md-4">A 260/280 *</label>
+						<div class="col-xs-push-0 col-md-8">
+							<input type="text" id="a260280" name="a260280" class="form-control"/>
+						</div>
+					</div>
+					<div class="form-group row m-b-12">
+						<label class="col-form-label col-md-4">농도 (ng/μL)	 *</label>
+						<div class="col-xs-push-0 col-md-8">
+							<input type="text" id="cncnt" name="cncnt" class="form-control"/>
+						</div>
+					</div>
+					<div class="form-group row m-b-12">
+						<label class="col-form-label col-md-4">DNA QC *</label>
+						<div class="col-xs-push-0 col-md-8">
+							<input type="text" id="dnaQc" name="dnaQc" class="form-control"/>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
+				<a href="javascript:dnaqcPopupSave();" class="btn btn-success">저장</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script th:inline="javascript">
+/* <![CDATA[ */    
+	function dnaqcPopupOnload(sampleId) {
+		$("#modal-dnaqc-detail").modal();
+		$.ajax({
+			url : "/exp/databy/sample/" + sampleId,
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (data) {
+				$('#sampleId').val(data.sample.id);
+				$('#a260280').val(data.sample.a260280);
+				$('#cncnt').val(data.sample.cncnt);
+				$('#dnaQc').val(data.sample.dnaQc);
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			}
+		});
+		
+	}
+
+	function dnaqcPopupSave(reissue) {
+		if (!$('#frm_popup_dnaqc_detail').parsley().validate()) {
+			return;	
+		}
+		
+		$.ajax({
+            url: '/exp/step1/dnaqc/update',
+			type: 'post',
+	        data : JSON.stringify($('#frm_popup_dnaqc_detail').serializeObject()),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result == "00") {
+					if (reissue) {
+						dnaqcPopupRecreate();
+					} else {
+			    		CommonMsg.save(function() {
+			    			$("#modal-dnaqc-detail").modal('hide');
+			    			search();
+						});
+					}
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	
+/* ]]> */
+</script>

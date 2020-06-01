@@ -1,6 +1,7 @@
 package com.clinomics.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,17 @@ public class ExpController {
 		return expExcelService.importStep1Excel(multipartFile, memberId);
 	}
 
+	@GetMapping("/databy/sample/{id}")
+	public Map<String, Object> getDataBySample(@PathVariable String id) {
+		return expService.findSampleDataBySampleId(id);
+	}
+
+	@PostMapping("/step1/dnaqc/update")
+	public Map<String, String> updateDnaQcInfo(@RequestBody Map<String, String> params) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return expService.updateDnaQcInfo(params, userDetails.getUsername());
+	}
+
 	@PostMapping("/step1/complete")
 	public Map<String, String> completeStep1(@RequestBody List<Integer> sampleIds) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -112,12 +124,6 @@ public class ExpController {
 	@GetMapping("/step3/get")
 	public Map<String, Object> getStep3(@RequestParam Map<String, String> params) {
 		return expService.findMappingInfosByExpStep3Status(params);
-	}
-
-	@PostMapping("/step3/chipInfo/update")
-	public Map<String, String> updateChipInfo(@RequestParam Map<String, String> params) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return expService.updateChipInfo(params, userDetails.getUsername());
 	}
 
 	@PostMapping("/step3/chipInfos/update")

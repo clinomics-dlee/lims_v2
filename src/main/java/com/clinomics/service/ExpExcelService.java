@@ -15,6 +15,7 @@ import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.ExcelReadComponent;
 import com.google.common.collect.Maps;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -105,25 +106,32 @@ public class ExpExcelService {
 		if (sheetNum < 1) {
 			return rtn;
 		}
+
+		// #. 첫번째 열의 값은 laboratoryId값으로 해당 열은 고정
+		String laboratoryIdCellName = sheet.getRow(0).getCell(0).getStringCellValue();
 		
 		List<Sample> items = new ArrayList<Sample>();
 		for (Map<String, Object> sht : sheetList) {
+			String laboratoryId = (String)sht.get(laboratoryIdCellName);
 			// #. 검사실ID값으로 조회한 모든 검체 업데이트
-			Specification<Sample> where = Specification.where(SampleSpecification.laboratoryIdEqual((String)sht.get("검사실 ID")));
+			Specification<Sample> where = Specification.where(SampleSpecification.laboratoryIdEqual(laboratoryId));
 			List<Sample> samples = sampleRepository.findAll(where);
 
 			if (samples.size() < 1) {
+				logger.info(">> not found laboratory Id=" + laboratoryId);
 				rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
+				rtn.put("message", "검사실 ID를 찾을 수 없습니다.[" + laboratoryId + "]");
 				return rtn;
 			}
 			
 			for (Sample sample : samples) {
 				String a260280 = (String)sht.get("A 260/280");
 				String cncnt = (String)sht.get("농도 (ng/μL)");
-				String dnaQc = (String)sht.get("DNA QC");
-				
-				if (!NumberUtils.isCreatable(a260280) || !NumberUtils.isCreatable(a260280)) {
+				String dnaQc = (StringUtils.isEmpty((String)sht.get("DNA QC")) ? "PASS" : (String)sht.get("DNA QC"));
+				if (!NumberUtils.isCreatable(a260280) || !NumberUtils.isCreatable(cncnt)) {
+					logger.info(">> A 260/280 and concentration can only be entered in numbers=" + laboratoryId);
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					rtn.put("message", "A 260/280, 농도는 숫자만 입력가능합니다.[" + laboratoryId + "]");
 					return rtn;
 				}
 

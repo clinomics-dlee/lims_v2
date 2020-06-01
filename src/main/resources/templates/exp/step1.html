@@ -25,6 +25,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
+		<th:block th:replace="popup/dnaqc_detail"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -145,7 +146,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			if ($("#file").val() == '') return;
 			
 			var form = $('#fileupload')[0];
-			console.log(form);
 			var data = new FormData(form);
 			$.ajax({
 				enctype: 'multipart/form-data',
@@ -160,8 +160,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			    success: function(data,xhr) {
 			        if (data.result == "00") {
 						CommonMsg.save(function() { });
-					} else if (!data.result.startsWith("0")) {
-						CommonMsg.error(function() { });
+					} else {
+						CommonMsg.error(function() { }, data.message);
 					}
 			    },
 			    error : function(xhr, status, error) {
@@ -213,7 +213,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "bundle.name"
 		}, {
 			title : "검사실 ID",
-			data : "laboratoryId"
+			data : "laboratoryId",
+			render : function(row, data, index) {
+				return '<a href="javascript:dnaqcPopupOnload(\'' + row.id + '\')">' + data + '</string>';
+			}
 		}, {
 			title : "검체종류",
 			data : "items.sampleType"
@@ -264,6 +267,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				var sampleIds = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
+
+					if (row.a260280 == null || row.cncnt == null || row.dnaQc == null) {
+						CommonMsg.error(function() { }, "DNA QC 관련 정보를 입력하세요.[" + row.laboratoryId + "]");
+						return;
+					}
+
 					sampleIds.push(row.id);
 				}
 				

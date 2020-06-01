@@ -1,10 +1,13 @@
 package com.clinomics.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.transaction.Transactional;
 
@@ -21,6 +24,7 @@ import com.clinomics.specification.lims.SampleSpecification;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,6 +139,58 @@ public class ExpService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
+	public Map<String, Object> findSampleDataBySampleId(String id) {
+		Optional<Sample> oSample = sampleRepository.findById(NumberUtils.toInt(id));
+		Sample sample = oSample.orElse(new Sample());
+		
+		Map<String, Object> resultData = sample.getData();
+
+		TreeMap<String, Object> tm = new TreeMap<String, Object>(resultData);
+		Iterator<String> iteratorKey = tm.keySet().iterator();   //키값 오름차순 정렬(기본)
+		List<Map<String, String>> datas = new ArrayList<Map<String, String>>();
+		while(iteratorKey.hasNext()) {
+			String key = iteratorKey.next();
+			Map<String, String> map = Maps.newHashMap();
+			map.put("marker", key);
+			map.put("value", (String)resultData.get(key));
+			datas.add(map);
+		}
+
+		Map<String, Object> rtn = Maps.newHashMap();
+		rtn.put("sample", sample);
+		rtn.put("datas", datas);
+		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> updateDnaQcInfo(Map<String, String> datas, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+
+		int id = NumberUtils.toInt(datas.get("id"), 0);
+		String a260280 = datas.get("a260280");
+		String cncnt = datas.get("cncnt");
+		String dnaQc = (StringUtils.isEmpty((String)datas.get("dnaQc")) ? "PASS" : (String)datas.get("dnaQc"));
+
+		Optional<Sample> oSample = sampleRepository.findById(id);
+		Sample sample = oSample.orElseThrow(NullPointerException::new);
+		if (!NumberUtils.isCreatable(a260280) || !NumberUtils.isCreatable(cncnt)) {
+			logger.info(">> A 260/280 and concentration can only be entered in numbers=" + id);
+			rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+			rtn.put("message", "A 260/280, 농도는 숫자만 입력가능합니다.[" + sample.getLaboratoryId() + "]");
+			return rtn;
+		}
+
+		sample.setA260280(a260280);
+		sample.setCncnt(cncnt);
+		sample.setDnaQc(dnaQc);
+
+		sampleRepository.save(sample);
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
 	@Transactional
 	public Map<String, String> completeStep1(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
@@ -195,6 +251,8 @@ public class ExpService {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
+			sample.setMappingNo(null);
+			sample.setWellPosition(null);
 			sample.setGenotypingMethodCode(GenotypingMethodCode.QRT_PCR);
 
 			sampleRepository.save(sample);
@@ -213,11 +271,23 @@ public class ExpService {
 			String genotypingId = data.get("genotypingId");
 			String wellPosition = data.get("wellPosition");
 
+			// #. 입력하려는 MappingNo가 STEP2가 아닌 다른상태의 검체에 동일한 값이 존재하면 리턴
+			Specification<Sample> w = Specification
+						.where(SampleSpecification.mappingNoEqual(mappingNo))
+						.and(SampleSpecification.statusNotEqual(StatusCode.S220_EXP_STEP2));
+			List<Sample> ss = sampleRepository.findAll(w);
+			if (ss.size() > 0) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+				rtn.put("message", "해당 Mapping No는 이미 사용중입니다.[" + mappingNo + "]");
+				return rtn;
+			}
+
 			if (genotypingId.length() > 0 && wellPosition.length() > 0) {
 				String[] genotypingInfo = genotypingId.split("-V");
 				// #. genotypingId양식이 틀린경우
 				if (genotypingInfo.length != 2) {
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "Genotyping ID 값을 확인해주세요.[" + genotypingId + "]");
 					return rtn;
 				}
 	
@@ -225,6 +295,7 @@ public class ExpService {
 				// #. version값이 숫자가아닌경우
 				if (!NumberUtils.isCreatable(genotypingInfo[1])) {
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "Genotyping ID Version 값을 확인해주세요.[" + genotypingId + "]");
 					return rtn;
 				}
 				int version = NumberUtils.toInt(genotypingInfo[1]);
@@ -237,11 +308,13 @@ public class ExpService {
 				// #. 검사실ID 또는 version이 잘못 입력된 경우
 				if (s == null) {
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "조회된 Genotyping ID 값이 없습니다.[" + genotypingId + "]");
 					return rtn;
 				}
 				// #. 조회된 검체의 상태가 STEP2가 아닌경우
 				if (!s.getStatusCode().equals(StatusCode.S220_EXP_STEP2)) {
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "이미 실험이 진행중인 검체입니다.[" + genotypingId + "]");
 					return rtn;
 				}
 	
@@ -314,50 +387,38 @@ public class ExpService {
 	}
 
 	@Transactional
-	public Map<String, String> updateChipInfo(Map<String, String> datas, String userId) {
-		Map<String, String> rtn = Maps.newHashMap();
-
-		String mappingNo = datas.get("mappingNo");
-		String chipBarcode = datas.get("chipBarcode");
-		String chipTypeCodeKey = datas.get("chipTypeCode");
-		ChipTypeCode chipTypeCode = null;
-		for (ChipTypeCode code : ChipTypeCode.values()) {
-			if (chipTypeCodeKey.equals(code.getKey())) {
-				chipTypeCode = code;
-			}
-		}
-
-		Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
-		List<Sample> samples = sampleRepository.findAll(where);
-
-		for (Sample sample : samples) {
-			sample.setChipBarcode(chipBarcode);
-			sample.setChipTypeCode(chipTypeCode);
-		}
-		sampleRepository.saveAll(samples);
-
-		rtn.put("result", ResultCode.SUCCESS.get());
-		return rtn;
-	}
-
-	@Transactional
 	public Map<String, String> updateChipInfos(List<Map<String, String>> datas, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
 		for (Map<String, String> data : datas) {
 			String mappingNo = data.get("mappingNo");
-			String chipBarcode = data.get("chipBarcode");
-			String chipTypeCodeKey = data.get("chipTypeCode");
+			String beforeChipBarcode = StringUtils.stripToEmpty(data.get("beforeChipBarcode"));
+			String chipBarcode = StringUtils.stripToEmpty(data.get("chipBarcode"));
+			String chipTypeCodeKey = StringUtils.stripToEmpty(data.get("chipTypeCode"));
 			ChipTypeCode chipTypeCode = null;
 			for (ChipTypeCode code : ChipTypeCode.values()) {
 				if (chipTypeCodeKey.equals(code.getKey())) {
 					chipTypeCode = code;
 				}
 			}
+
+			Specification<Sample> w = Specification
+					.where(SampleSpecification.mappingInfoGroupBy())
+					.and(SampleSpecification.chipBarcodeEqual(chipBarcode));
+			List<Sample> ss = sampleRepository.findAll(w);
+
+			// #. 수정전 값과 수정후 값이 동일한 경우 해당 카운트 추가
+			int cnt = 0;
+			if (beforeChipBarcode.equals(chipBarcode)) cnt = 1;
+			
+			if (ss.size() > cnt) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+				rtn.put("message", "이미 등록된 Chip Barcode 입니다.[" + chipBarcode + "]");
+				return rtn;
+			}
 	
 			Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 			List<Sample> samples = sampleRepository.findAll(where);
-	
 			for (Sample sample : samples) {
 				sample.setChipBarcode(chipBarcode);
 				sample.setChipTypeCode(chipTypeCode);
@@ -382,6 +443,7 @@ public class ExpService {
 			List<Sample> samples = sampleRepository.findAll(where);
 
 			for (Sample sample : samples) {
+				sample.setModifiedDate(now);
 				sample.setExpStep3Date(now);
 				sample.setExpStep3Member(member);
 				sample.setStatusCode(StatusCode.S400_ANLS_READY);

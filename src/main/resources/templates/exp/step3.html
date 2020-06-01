@@ -192,17 +192,21 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		CommonMsg.okCancel(function() {
 			var editRow = UserTable.getRowAt("_step3_grid", index);
 			var chipBarcode = $('#chipBarcode_' + index).val();
-			var chipTypeCode = $("#_step3_grid_combo_" + index).val();
+			var chipTypeCode = $('#_step3_grid_combo_' + index).val();
+
+			var mappingInfos = [{
+				mappingNo : editRow.mappingNo,
+				beforeChipBarcode : editRow.chipBarcode,
+				chipBarcode : chipBarcode,
+				chipTypeCode : chipTypeCode
+			}];
 			
 			$.ajax({
-				url: '/exp/step3/chipInfo/update',
+				url: '/exp/step3/chipInfos/update',
 				type : "post",
 				dataType : 'json',
-				data : {
-					mappingNo : editRow.mappingNo,
-					chipBarcode : chipBarcode,
-					chipTypeCode : chipTypeCode
-				},
+				data : JSON.stringify(mappingInfos),
+				contentType : "application/json;charset=utf-8",
 				beforeSend: function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
@@ -212,8 +216,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							$("#modal-sample-detail").modal('hide');
 							UserTable.reload('_step3_grid');
 						});
-					} else if (!data.result.startsWith("0")) {
-						CommonMsg.error(function() { });
+					} else {
+						CommonMsg.error(function() { }, data.message);
 					}
 				},
 				error : function(data) {
@@ -233,10 +237,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				var mappingInfos = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
+					var chipBarcode = $('#chipBarcode_' + row.index).val();
+					var chipTypeCode = $('#_step3_grid_combo_' + row.index).val();
+
 					var mappingInfo = {
 						mappingNo : row.mappingNo,
-						chipBarcode :  $('#chipBarcode_' + row.index).val(),
-						chipTypeCode : $('#_step3_grid_combo_' + row.index).val()
+						beforeChipBarcode : row.chipBarcode,
+						chipBarcode : chipBarcode,
+						chipTypeCode : chipTypeCode
 					};
 
 					mappingInfos.push(mappingInfo);
@@ -256,8 +264,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    			$("#modal-sample-detail").modal('hide');
 				    			UserTable.reload('_step3_grid');
 							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
+						} else {
+							CommonMsg.error(function() { }, data.message);
 						}
 					},
 					error : function(data) {
@@ -278,6 +286,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				var mappingNos = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
+
+					if (row.chipBarcode == null || row.chipBarcode.length < 1) {
+						CommonMsg.error(function() { }, "Chip Barcode 정보를 입력하세요.[" + row.mappingNo + "]");
+						return;
+					}
+
+					if (row.chipTypeCode == null || row.chipTypeCode.length < 1) {
+						CommonMsg.error(function() { }, "Chip Type을 선택하세요.[" + row.mappingNo + "]");
+						return;
+					}
+
 					mappingNos.push(row.mappingNo);
 				}
 				

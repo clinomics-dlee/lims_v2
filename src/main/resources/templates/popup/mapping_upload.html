@@ -146,8 +146,8 @@ function saveMapping() {
 						$("#modal-mapping-upload").modal('hide');
 						UserTable.reload('_step2_grid');
 					});
-				} else if (!data.result.startsWith("0")) {
-					CommonMsg.error(function() { });
+				} else {
+					CommonMsg.error(function() { }, data.message);
 				}
 			},
 			error : function(data) {

@@ -267,4 +267,11 @@ public class SampleSpecification {
 			return rtn;
 		};
 	}
+
+	public static Specification<Sample> chipBarcodeEqual(String chipBarcode) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.equal(root.get("chipBarcode"), chipBarcode);
+			return rtn;
+		};
+	}
 }
