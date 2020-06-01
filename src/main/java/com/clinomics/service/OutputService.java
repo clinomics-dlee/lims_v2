@@ -70,7 +70,7 @@ public class OutputService {
 		long total;
 		
 		Specification<Sample> where = Specification
-					.where(SampleSpecification.betweenDate(params))
+					.where(SampleSpecification.betweenModifiedDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
@@ -90,7 +90,7 @@ public class OutputService {
     @Transactional
 	public Map<String, String> jdgmApprove(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdIn(ids);
+		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, Arrays.asList(new StatusCode[] { StatusCode.S460_ANLS_CMPL }));
 		
 		// sample.set
 		Optional<Member> oMember = memberRepository.findById(memberId);
@@ -103,6 +103,7 @@ public class OutputService {
 		roles = roles.substring(1);
 
 		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
 
 		if (roles.contains(RoleCode.ROLE_EXP_80.toString())) {
 			
@@ -138,6 +139,7 @@ public class OutputService {
 			});
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
 		}
 		sampleRepository.saveAll(samples);
 		
@@ -147,7 +149,8 @@ public class OutputService {
 	@Transactional
 	public Map<String, String> outputApprove(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdIn(ids);
+		
+		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, Arrays.asList(new StatusCode[] { StatusCode.S600_JDGM_APPROVE }));
 		
 		// sample.set
 		Optional<Member> oMember = memberRepository.findById(memberId);
@@ -160,18 +163,26 @@ public class OutputService {
 		roles = roles.substring(1);
 
 		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
 
 		if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
 			
 			samples.stream().forEach(s -> {
-				s.setOutputWaitDate(now);
-				s.setOutputWaitMember(member);
-				s.setModifiedDate(now);
-				s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+				
+				StatusCode sc = s.getStatusCode();
+				if (sc.equals(StatusCode.S600_JDGM_APPROVE)) {
+
+					s.setOutputWaitDate(now);
+					s.setOutputWaitMember(member);
+					s.setModifiedDate(now);
+					s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+				}
+
 			});
 
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
 		}
 		sampleRepository.saveAll(samples);
 		
@@ -194,19 +205,25 @@ public class OutputService {
 		roles = roles.substring(1);
 
 		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
 
 		if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
 			
 			samples.stream().forEach(s -> {
-				s.setOutputWaitDate(now);
-				s.setOutputWaitMember(member);
-				s.setModifiedDate(now);
 				
-				s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+				StatusCode sc = s.getStatusCode();
+				if (sc.equals(StatusCode.S710_OUTPUT_CMPL)) {
+					s.setOutputWaitDate(now);
+					s.setOutputWaitMember(member);
+					s.setModifiedDate(now);
+					
+					s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+				}
 			});
 
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
 		}
 		sampleRepository.saveAll(samples);
 		

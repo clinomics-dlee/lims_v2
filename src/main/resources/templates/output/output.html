@@ -174,7 +174,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				headClassName : 'width-50',
 				bodyClassName : 'text-center',
 				type : {
-					name : "checkbox"
+					name : "checkbox",
+					disabled : function(row) {
+						return (row.statusCode != 'S600_JDGM_APPROVE');
+					}
 				}
 			},
 			{
@@ -245,7 +248,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		    success: function(data, xhr) {
 					
 				if (data.result.startsWith("0")) {
-					CommonMsg.save(function() { });
+					CommonMsg.save(function() {
+						search();
+					});
 				} else {
 					CommonMsg.error(function() { });
 				}

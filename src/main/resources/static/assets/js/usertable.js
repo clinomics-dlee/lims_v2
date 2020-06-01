@@ -193,6 +193,9 @@ var UserTable = function() {
 											val = "";
 										}
 									} else if (columns[r].type != null && columns[r].type.constructor == Object) {
+
+										var disabled = columns[r].type.disabled(rows[Number(s)]);
+										
 										if (columns[r].type.name == 'checkbox') {
 											val = '<div class="checkbox checkbox-css text-center">'
 												+ '<input type="checkbox" value="" id="' + uid + '_checkbox_'+ rowIndex +'" name="' + uid + '_checkbox" data="'+ val +'">'
@@ -217,6 +220,9 @@ var UserTable = function() {
 												val += '<option value="' + key + '" ' + selected + '>' + columns[r].type.items[key] + '</option>';
 											}
 											val += '</select>';
+										}
+										if (disabled) {
+											val = "";
 										}
 									}
 									html += '<td' + bodyClassName + '>' + (val ? val : '') + '</td>';

@@ -174,7 +174,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				headClassName : 'width-50',
 				bodyClassName : 'text-center',
 				type : {
-					name : "checkbox"
+					name : "checkbox",
+					disabled : function(row) {
+						return (row.statusCode != 'S460_ANLS_CMPL');
+					}
 				}
 			},
 			{

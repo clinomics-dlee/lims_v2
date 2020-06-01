@@ -47,7 +47,7 @@ public class OutputController {
 	@GetMapping("/jdgm/list")
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
-		return sampleDbService.find(params, 460);
+		return sampleDbService.findByModifiedDate(params, 460);
 	}
 	
 	@PostMapping("/jdgm/approve")
@@ -61,7 +61,7 @@ public class OutputController {
 	@GetMapping("/output/list")
 	@ResponseBody
 	public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
-		return sampleDbService.find(params, 600);
+		return sampleDbService.findByModifiedDate(params, 600);
 	}
 	
 	@PostMapping("/output/approve")
