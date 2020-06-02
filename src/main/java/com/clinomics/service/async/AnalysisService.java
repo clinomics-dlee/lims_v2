@@ -205,7 +205,6 @@ public class AnalysisService {
 							boolean isSuccess = ftp.retrieveFile(fileName, fos);
 							if (isSuccess) {
 								sample.setCheckCelFile("PASS");
-								sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
 								sampleRepository.save(sample);
 								existFile = true;
 								// 다운로드 성공

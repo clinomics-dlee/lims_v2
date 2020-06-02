@@ -75,7 +75,6 @@ public class ExpExcelService {
 		return workbook;
 	}
 
-	@Transactional
 	public Map<String, Object> importStep1Excel(MultipartFile multipartFile, String memberId) {
 		
 		Map<String, Object> rtn = Maps.newHashMap();
@@ -110,7 +109,7 @@ public class ExpExcelService {
 		// #. 첫번째 열의 값은 laboratoryId값으로 해당 열은 고정
 		String laboratoryIdCellName = sheet.getRow(0).getCell(0).getStringCellValue();
 		
-		List<Sample> items = new ArrayList<Sample>();
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, Object> sht : sheetList) {
 			String laboratoryId = (String)sht.get(laboratoryIdCellName);
 			// #. 검사실ID값으로 조회한 모든 검체 업데이트
@@ -139,11 +138,11 @@ public class ExpExcelService {
 				sample.setCncnt(cncnt);
 				sample.setDnaQc(dnaQc);
 				
-				items.add(sample);
+				savedSamples.add(sample);
 			}
 		}
 		
-		sampleRepository.saveAll(items);
+		sampleRepository.saveAll(savedSamples);
 		
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;

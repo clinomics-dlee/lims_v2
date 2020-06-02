@@ -60,7 +60,8 @@ function mappingUploadPopupOnload(index) {
 		};
 		reader.readAsBinaryString(input.files[0]);
 	});
-
+	
+	$('#file').val("");
 	UserTable.init('_mapping_grid', false);
 }
 

@@ -4413,6 +4413,9 @@ legend {
     color: #000;
     font-weight: 600;
     border-bottom: 1px solid #BDBDBD !important;
+    /* begin - added dlee */
+    vertical-align: middle;
+    /* end - added dlee */
 }
 .table > thead > tr > th, 
 .table > tbody > tr > th, 
@@ -4822,8 +4825,8 @@ blockquote-reverse, blockquote.pull-right {
 }
 .checkbox.checkbox-css label:before {
     content: '';
-    /* deleted dlee 
 	position: absolute;
+    /* deleted dlee 
 	left: 0;
     top: 7px;
     */

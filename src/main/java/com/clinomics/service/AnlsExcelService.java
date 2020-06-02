@@ -9,11 +9,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Sample;
-import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
@@ -28,7 +25,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.checkerframework.checker.units.qual.s;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +52,6 @@ public class AnlsExcelService {
 	@Autowired
 	SampleDbService sampleDbService;
 
-	@Transactional
 	public Map<String, Object> importRsltExcel(MultipartFile multipartFile, String memberId) {
 		Map<String, Object> rtn = Maps.newHashMap();
 		XSSFWorkbook workbook = null;
@@ -88,6 +83,7 @@ public class AnlsExcelService {
 			// #. 첫번째 열의 값은 genotypingId값으로 해당 열은 고정
 			String genotypingIdCellName = sheet.getRow(0).getCell(0).getStringCellValue();
 			
+			List<Sample> savedSamples = new ArrayList<Sample>();
 			for (Map<String, Object> sht : sheetList) {
 				String genotypingId = (String)sht.get(genotypingIdCellName);
 				
@@ -215,9 +211,11 @@ public class AnlsExcelService {
 
 				s.setData(data);
 				s.setAnlsEndDate(LocalDateTime.now());
-				sampleRepository.save(s);
+
+				savedSamples.add(s);
 			}
 		
+			sampleRepository.saveAll(savedSamples);
 			rtn.put("result", ResultCode.SUCCESS.get());
 		} catch (InvalidFormatException e) {
 			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
