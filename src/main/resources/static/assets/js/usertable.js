@@ -194,7 +194,7 @@ var UserTable = function() {
 										}
 									} else if (columns[r].type != null && columns[r].type.constructor == Object) {
 
-										var disabled = columns[r].type.disabled(rows[Number(s)]);
+										var disabled = (columns[r].type.disabled ? columns[r].type.disabled(rows[Number(s)]) : null);
 										
 										if (columns[r].type.name == 'checkbox') {
 											val = '<div class="checkbox checkbox-css text-center">'
