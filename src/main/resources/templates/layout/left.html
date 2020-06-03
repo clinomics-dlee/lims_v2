@@ -41,7 +41,8 @@
 					</li>
                 </ul>
             </li>
-			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/input')} ? active : ''">
+			<li sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_INPUT_40', 'ROLE_EXP_80', 'ROLE_IT_99')"
+				class="has-sub" th:classappend="${#strings.startsWith(path,'/p/input')} ? active : ''">
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-truck"></i>
@@ -62,7 +63,8 @@
 					</li>
                 </ul>
 			</li>
-			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/exp')} ? active : ''">
+			<li sec:authorize="hasAnyRole('ROLE_EXP_20', 'ROLE_EXP_40', 'ROLE_EXP_80', 'ROLE_IT_99')"
+				class="has-sub" th:classappend="${#strings.startsWith(path,'/p/exp')} ? active : ''">
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-flask"></i>
@@ -86,7 +88,8 @@
                     </li>
                 </ul>
 			</li>
-			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/anls')} ? active : ''">
+			<li sec:authorize="hasAnyRole('ROLE_EXP_20', 'ROLE_EXP_40', 'ROLE_EXP_80', 'ROLE_IT_99')"
+				class="has-sub" th:classappend="${#strings.startsWith(path,'/p/anls')} ? active : ''">
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-laptop"></i>
@@ -107,25 +110,29 @@
 					</li>
                 </ul>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/output/jdgm')} ? active : ''">
+			<li sec:authorize="hasAnyRole('ROLE_EXP_20', 'ROLE_EXP_40', 'ROLE_EXP_80', 'ROLE_IT_99')"
+				th:classappend="${#strings.startsWith(path,'/p/output/jdgm')} ? active : ''">
 				<a href="/p/output/jdgm">
                     <i class="fa fa-balance-scale"></i>
                     <span>판정</span>
                 </a>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/output/output')} ? active : ''">
+			<li sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_INPUT_40', 'ROLE_OUTPUT_20', 'ROLE_EXP_80', 'ROLE_IT_99')"
+				th:classappend="${#strings.startsWith(path,'/p/output/output')} ? active : ''">
 				<a href="/p/output/output">
                     <i class="fa fa-print"></i>
                     <span>출고</span>
                 </a>
 			</li>
-			<li th:classappend="${#strings.startsWith(path,'/p/output/all')} ? active : ''">
+			<li sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_INPUT_40', 'ROLE_EXP_80', 'ROLE_IT_99')"
+				th:classappend="${#strings.startsWith(path,'/p/output/all')} ? active : ''">
 				<a href="/p/output/all">
                     <i class="fa fa-list-alt"></i>
                     <span>검체 목록</span>
                 </a>
 			</li>
-			<li class="has-sub" th:classappend="${#strings.startsWith(path,'/p/set')} ? active : ''">
+			<li sec:authorize="hasAnyRole('ROLE_EXP_80', 'ROLE_IT_99')"
+				class="has-sub" th:classappend="${#strings.startsWith(path,'/p/set')} ? active : ''">
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-cog fa-fw"></i>

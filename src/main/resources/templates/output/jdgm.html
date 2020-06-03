@@ -86,8 +86,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							</div>
 							<hr/>
 							<div class="form-group row m-b-12">
-								
-								<div>
+								<div sec:authorize="hasAnyRole('ROLE_EXP_20', 'ROLE_EXP_40', 'ROLE_EXP_80')">
 									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">승인</button>
 								</div>
 							</div>
