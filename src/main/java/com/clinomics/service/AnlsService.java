@@ -11,8 +11,10 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
@@ -94,6 +96,20 @@ public class AnlsService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (String mappingNo : mappingNos) {
@@ -160,6 +176,20 @@ public class AnlsService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
@@ -266,6 +296,20 @@ public class AnlsService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {

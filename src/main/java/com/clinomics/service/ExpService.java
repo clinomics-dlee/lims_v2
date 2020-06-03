@@ -12,10 +12,12 @@ import java.util.TreeMap;
 import javax.transaction.Transactional;
 
 import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
@@ -92,6 +94,20 @@ public class ExpService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
@@ -180,6 +196,23 @@ public class ExpService {
 	public Map<String, String> updateDnaQcInfo(Map<String, String> datas, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
 		int id = NumberUtils.toInt(datas.get("id"), 0);
 		String a260280 = datas.get("a260280");
 		String cncnt = datas.get("cncnt");
@@ -209,6 +242,20 @@ public class ExpService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
@@ -271,6 +318,23 @@ public class ExpService {
 	public Map<String, String> updateQrtPcr(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
@@ -291,6 +355,23 @@ public class ExpService {
 
 	public Map<String, Object> saveAllMapping(List<Map<String, String>> datas, String userId) {
 		Map<String, Object> rtn = Maps.newHashMap();
+
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 		
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, String> data : datas) {
@@ -364,6 +445,20 @@ public class ExpService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
@@ -425,6 +520,23 @@ public class ExpService {
 	public Map<String, String> updateChipInfos(List<Map<String, String>> datas, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, String> data : datas) {
 			String mappingNo = data.get("mappingNo");
@@ -473,6 +585,20 @@ public class ExpService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (String mappingNo : mappingNos) {

@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import javax.transaction.Transactional;
-
+import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
+import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.ExcelReadComponent;
@@ -40,6 +43,9 @@ public class ExpExcelService {
 
 	@Autowired
 	SampleRepository sampleRepository;
+
+	@Autowired
+	MemberRepository memberRepository;
 
 	@Autowired
 	ExcelReadComponent excelReadComponent;
@@ -78,18 +84,38 @@ public class ExpExcelService {
 	public Map<String, Object> importStep1Excel(MultipartFile multipartFile, String memberId) {
 		
 		Map<String, Object> rtn = Maps.newHashMap();
+
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 		
 		XSSFWorkbook workbook = null;
 		try {
 			workbook = excelReadComponent.readWorkbook(multipartFile);
 		} catch (InvalidFormatException e) {
 			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+			rtn.put("message", ResultCode.EXCEL_FILE_TYPE.getMsg());
 		} catch (IOException e) {
 			rtn.put("result", ResultCode.FAIL_FILE_READ.get());
+			rtn.put("message", ResultCode.FAIL_FILE_READ.getMsg());
 		}
 		
 		if (workbook == null) {
 			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+			rtn.put("message", ResultCode.EXCEL_FILE_TYPE.getMsg());
 			return rtn;
 		}
 		
@@ -98,6 +124,7 @@ public class ExpExcelService {
 		
 		if (sheetList.size() < 1) {
 			rtn.put("result", ResultCode.EXCEL_EMPTY.get());
+			rtn.put("message", ResultCode.EXCEL_EMPTY.getMsg());
 			return rtn;
 		}
 		

@@ -262,8 +262,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    		CommonMsg.save(function() {
 				    			UserTable.reload('_anls_stts_grid');
 							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
+						} else {
+							CommonMsg.error(function() { }, data.message);
 						}
 					},
 					error : function(data) {
