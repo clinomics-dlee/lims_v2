@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import javax.transaction.Transactional;
-
 import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
@@ -96,7 +96,22 @@ public class AnlsService {
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
 
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (String mappingNo : mappingNos) {
 			Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 			List<Sample> samples = sampleRepository.findAll(where);
@@ -114,11 +129,13 @@ public class AnlsService {
 				sample.setAnlsStartMember(member);
 				sample.setStatusCode(StatusCode.S410_ANLS_RUNNING);
 			}
-			sampleRepository.saveAll(samples);
+			savedSamples.addAll(samples);
 
 			// #. 가져와서 분석 실행하기
 			analysisService.doPythonAnalysis(samples);
 		}
+
+		sampleRepository.saveAll(savedSamples);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
@@ -154,13 +171,27 @@ public class AnlsService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	@Transactional
 	public Map<String, String> reExpReg(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
 
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
@@ -173,7 +204,7 @@ public class AnlsService {
 			sample.setAnlsCmplDate(now);
 			sample.setAnlsCmplMember(member);
 
-			sampleRepository.save(sample);
+			savedSamples.add(sample);
 
 			// #. 해당 검체 복사 step2전까지만 사용한 데이터 복사
 			Sample nSample = new Sample();
@@ -198,9 +229,10 @@ public class AnlsService {
 			nSample.setExpStep1Date(sample.getExpStep1Date());
 			nSample.setExpStep1Member(sample.getExpStep1Member());
 
-			sampleRepository.save(nSample);
+			savedSamples.add(nSample);
 		}
 
+		sampleRepository.saveAll(savedSamples);
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
@@ -259,23 +291,46 @@ public class AnlsService {
 		return rtn;
 	}
 
-	@Transactional
 	public Map<String, String> completeAnls(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
 
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
 
+			if (!sample.getStatusCode().equals(StatusCode.S420_ANLS_SUCC)) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+				rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
+				return rtn;
+			}
+
+			sample.setModifiedDate(now);
 			sample.setStatusCode(StatusCode.S460_ANLS_CMPL);
 			sample.setAnlsCmplDate(now);
 			sample.setAnlsCmplMember(member);
 
-			sampleRepository.save(sample);
+			savedSamples.add(sample);
 		}
+
+		sampleRepository.saveAll(savedSamples);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;

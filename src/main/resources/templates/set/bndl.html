@@ -5,6 +5,18 @@
 <head>
 <!-- #. 화면 기본 head 추가 -->
 <th:block th:replace="layout/head"></th:block>
+
+<style>
+.custom-checkbox-label {
+	padding-left: 24px;
+}
+
+.custom-checkbox-label:before,
+.custom-checkbox-label:after {
+	left: 0;
+}
+</style>
+
 </head>
 
 <body class="pace-done">
@@ -384,7 +396,7 @@
 						+ '<input type="checkbox" name="chk_product[]" data-parsley-multiple="mincheck" class="form-check-input"' + mincheck
 						+ ' data-parsley-errors-container="#error_new_frm"'
 						+ ' id="' + checkboxId + '" value="'  + item.id + '" >'
-						+ '<label class="form-check-label" for="' + checkboxId + '">' + item.name + '</label>'
+						+ '<label class="form-check-label custom-checkbox-label" for="' + checkboxId + '">' + item.name + '</label>'
 						+ '</div>';
 				});
 				html += '<div style="margin-left:15px;" id="error_new_frm"></div>';

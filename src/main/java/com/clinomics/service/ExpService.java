@@ -12,10 +12,12 @@ import java.util.TreeMap;
 import javax.transaction.Transactional;
 
 import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
@@ -87,23 +89,50 @@ public class ExpService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	@Transactional
 	public Map<String, String> startExp(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
 
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
+
+			if (!sample.getStatusCode().equals(StatusCode.S200_EXP_READY)) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+				rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
+				return rtn;
+			}
 
 			sample.setStatusCode(StatusCode.S210_EXP_STEP1);
 			sample.setExpStartDate(now);
 			sample.setExpStartMember(member);
 
-			sampleRepository.save(sample);
+			savedSamples.add(sample);
 		}
+
+		/* 
+		 * #. Transactional 어노테이션 사용시 repository.save 하기 전에 이미 DB를 변경하고 중간에 return을 해도 
+		 * 이미 업데이트된 목록은 저장되어 롤백 되지 않음. 그래서 Transactional 어노테이션 제거하고 목록을 나중에 saveall 하는 방식 사용
+		 */
+
+		sampleRepository.saveAll(savedSamples);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
@@ -167,6 +196,23 @@ public class ExpService {
 	public Map<String, String> updateDnaQcInfo(Map<String, String> datas, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
 		int id = NumberUtils.toInt(datas.get("id"), 0);
 		String a260280 = datas.get("a260280");
 		String cncnt = datas.get("cncnt");
@@ -191,23 +237,49 @@ public class ExpService {
 		return rtn;
 	}
 
-	@Transactional
 	public Map<String, String> completeStep1(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
 
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
+
+			if (!sample.getStatusCode().equals(StatusCode.S210_EXP_STEP1)) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+				rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
+				return rtn;
+			}
 
 			sample.setStatusCode(StatusCode.S220_EXP_STEP2);
 			sample.setExpStep1Date(now);
 			sample.setExpStep1Member(member);
 
-			sampleRepository.save(sample);
+			savedSamples.add(sample);
 		}
+		
+		/* 
+		 * #. Transactional 어노테이션 사용시 repository.save 하기 전에 이미 DB를 변경하고 중간에 return을 해도 
+		 * 이미 업데이트된 목록은 저장되어 롤백 되지 않음. 그래서 Transactional 어노테이션 제거하고 목록을 나중에 saveall 하는 방식 사용
+		 */
+		sampleRepository.saveAll(savedSamples);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
@@ -243,10 +315,27 @@ public class ExpService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	@Transactional
 	public Map<String, String> updateQrtPcr(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
@@ -255,17 +344,36 @@ public class ExpService {
 			sample.setWellPosition(null);
 			sample.setGenotypingMethodCode(GenotypingMethodCode.QRT_PCR);
 
-			sampleRepository.save(sample);
+			savedSamples.add(sample);
 		}
+
+		sampleRepository.saveAll(savedSamples);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
 
-	@Transactional
 	public Map<String, Object> saveAllMapping(List<Map<String, String>> datas, String userId) {
 		Map<String, Object> rtn = Maps.newHashMap();
+
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 		
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, String> data : datas) {
 			String mappingNo = data.get("mappingNo");
 			String genotypingId = data.get("genotypingId");
@@ -322,24 +430,46 @@ public class ExpService {
 				s.setWellPosition(wellPosition);
 				s.setMappingNo(mappingNo);
 	
-				sampleRepository.save(s);
+				savedSamples.add(s);
 			}
 		}
 		
+		sampleRepository.saveAll(savedSamples);
+
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
 
-	@Transactional
 	public Map<String, String> completeStep2(List<Integer> sampleIds, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
 
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
+
+			if (!sample.getStatusCode().equals(StatusCode.S220_EXP_STEP2)) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+				rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
+				return rtn;
+			}
 
 			// #. GenotypingMethodCode 가 chip인 경우 step3으로, QRT_PCR인 경우 분석 성공으로 처리
 			if (GenotypingMethodCode.CHIP.equals(sample.getGenotypingMethodCode())) {
@@ -350,9 +480,10 @@ public class ExpService {
 			sample.setExpStep2Date(now);
 			sample.setExpStep2Member(member);
 
-			sampleRepository.save(sample);
+			savedSamples.add(sample);
 		}
-
+		
+		sampleRepository.saveAll(savedSamples);
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
@@ -386,10 +517,27 @@ public class ExpService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	@Transactional
 	public Map<String, String> updateChipInfos(List<Map<String, String>> datas, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, String> data : datas) {
 			String mappingNo = data.get("mappingNo");
 			String beforeChipBarcode = StringUtils.stripToEmpty(data.get("beforeChipBarcode"));
@@ -424,33 +572,55 @@ public class ExpService {
 				sample.setChipTypeCode(chipTypeCode);
 			}
 
-			sampleRepository.saveAll(samples);
+			savedSamples.addAll(samples);
 		}
-
+		
+		sampleRepository.saveAll(savedSamples);
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
 
-	@Transactional
 	public Map<String, String> completeStep3(List<String> mappingNos, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
 		Optional<Member> oMember = memberRepository.findById(userId);
 		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
 
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (String mappingNo : mappingNos) {
 			Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 			List<Sample> samples = sampleRepository.findAll(where);
 
 			for (Sample sample : samples) {
+				if (!sample.getStatusCode().equals(StatusCode.S230_EXP_STEP3)) {
+					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+					rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
+					return rtn;
+				}
+
 				sample.setModifiedDate(now);
 				sample.setExpStep3Date(now);
 				sample.setExpStep3Member(member);
 				sample.setStatusCode(StatusCode.S400_ANLS_READY);
 			}
-			sampleRepository.saveAll(samples);
+			savedSamples.addAll(samples);
 		}
-
+		
+		sampleRepository.saveAll(savedSamples);
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}

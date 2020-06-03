@@ -203,7 +203,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "statusCode",
 			render : function(row, data, index) {
 				var value = '<div class="progress rounded-corner " style="height:20px;">';
-				console.log(row);
 				if ("S440_ANLS_FAIL" == data) {
 					value += '<div class="progress-bar bg-danger" style="width: 100%;cursor: pointer;" onclick="viewErrorMsg(\'' + row.statusMessage + '\')">';
 					value += 'FAIL';
@@ -234,11 +233,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 	function reExpReg() {
 		var checkedRows = UserTable.getCheckedRows("_anls_stts_grid");
+		console.log(checkedRows);
 		if (checkedRows.length > 0) {
 			CommonMsg.okCancel(function() {
 				var sampleIds = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
+
+					if (row.statusCode != "S430_ANLS_FAIL") {
+						CommonMsg.error(function() { }, "아직 분석중인 목록은 재실험등록 할 수 없습니다.[" + row.laboratoryId + "]");
+						return;
+					}
+
 					sampleIds.push(row.id);
 				}
 
@@ -256,8 +262,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    		CommonMsg.save(function() {
 				    			UserTable.reload('_anls_stts_grid');
 							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
+						} else {
+							CommonMsg.error(function() { }, data.message);
 						}
 					},
 					error : function(data) {

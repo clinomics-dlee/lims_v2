@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import javax.transaction.Transactional;
-
+import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
+import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.ExcelReadComponent;
@@ -40,6 +43,9 @@ public class ExpExcelService {
 
 	@Autowired
 	SampleRepository sampleRepository;
+
+	@Autowired
+	MemberRepository memberRepository;
 
 	@Autowired
 	ExcelReadComponent excelReadComponent;
@@ -75,22 +81,41 @@ public class ExpExcelService {
 		return workbook;
 	}
 
-	@Transactional
 	public Map<String, Object> importStep1Excel(MultipartFile multipartFile, String memberId) {
 		
 		Map<String, Object> rtn = Maps.newHashMap();
+
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 		
 		XSSFWorkbook workbook = null;
 		try {
 			workbook = excelReadComponent.readWorkbook(multipartFile);
 		} catch (InvalidFormatException e) {
 			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+			rtn.put("message", ResultCode.EXCEL_FILE_TYPE.getMsg());
 		} catch (IOException e) {
 			rtn.put("result", ResultCode.FAIL_FILE_READ.get());
+			rtn.put("message", ResultCode.FAIL_FILE_READ.getMsg());
 		}
 		
 		if (workbook == null) {
 			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+			rtn.put("message", ResultCode.EXCEL_FILE_TYPE.getMsg());
 			return rtn;
 		}
 		
@@ -99,6 +124,7 @@ public class ExpExcelService {
 		
 		if (sheetList.size() < 1) {
 			rtn.put("result", ResultCode.EXCEL_EMPTY.get());
+			rtn.put("message", ResultCode.EXCEL_EMPTY.getMsg());
 			return rtn;
 		}
 		
@@ -110,7 +136,7 @@ public class ExpExcelService {
 		// #. 첫번째 열의 값은 laboratoryId값으로 해당 열은 고정
 		String laboratoryIdCellName = sheet.getRow(0).getCell(0).getStringCellValue();
 		
-		List<Sample> items = new ArrayList<Sample>();
+		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, Object> sht : sheetList) {
 			String laboratoryId = (String)sht.get(laboratoryIdCellName);
 			// #. 검사실ID값으로 조회한 모든 검체 업데이트
@@ -139,11 +165,11 @@ public class ExpExcelService {
 				sample.setCncnt(cncnt);
 				sample.setDnaQc(dnaQc);
 				
-				items.add(sample);
+				savedSamples.add(sample);
 			}
 		}
 		
-		sampleRepository.saveAll(items);
+		sampleRepository.saveAll(savedSamples);
 		
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;

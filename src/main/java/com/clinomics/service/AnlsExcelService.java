@@ -9,14 +9,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
+import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Product;
+import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
-import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
+import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.ProductRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
@@ -28,7 +29,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.checkerframework.checker.units.qual.s;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +49,9 @@ public class AnlsExcelService {
 
 	@Autowired
 	ProductRepository productRepository;
+	
+	@Autowired
+	MemberRepository memberRepository;
 
 	@Autowired
 	ExcelReadComponent excelReadComponent;
@@ -56,16 +59,33 @@ public class AnlsExcelService {
 	@Autowired
 	SampleDbService sampleDbService;
 
-	@Transactional
 	public Map<String, Object> importRsltExcel(MultipartFile multipartFile, String memberId) {
 		Map<String, Object> rtn = Maps.newHashMap();
 		XSSFWorkbook workbook = null;
+
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
 		
 		try {
 			workbook = excelReadComponent.readWorkbook(multipartFile);
 			
 			if (workbook == null) {
 				rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+				rtn.put("message", ResultCode.EXCEL_FILE_TYPE.getMsg());
 				return rtn;
 			}
 			
@@ -73,21 +93,22 @@ public class AnlsExcelService {
 			List<Map<String, Object>> sheetList = excelReadComponent.readMapFromSheet(sheet);
 
 			if (sheetList.size() < 1) {
-				logger.info(">> Empty excel");
 				rtn.put("result", ResultCode.EXCEL_EMPTY.get());
+				rtn.put("message", ResultCode.EXCEL_EMPTY.getMsg());
 				return rtn;
 			}
 			
 			int sheetNum = workbook.getNumberOfSheets();
 			if (sheetNum < 1) {
-				logger.info(">> Empty sheet");
 				rtn.put("result", ResultCode.EXCEL_EMPTY.get());
+				rtn.put("message", ResultCode.EXCEL_EMPTY.getMsg());
 				return rtn;
 			}
 
 			// #. 첫번째 열의 값은 genotypingId값으로 해당 열은 고정
 			String genotypingIdCellName = sheet.getRow(0).getCell(0).getStringCellValue();
 			
+			List<Sample> savedSamples = new ArrayList<Sample>();
 			for (Map<String, Object> sht : sheetList) {
 				String genotypingId = (String)sht.get(genotypingIdCellName);
 				
@@ -96,6 +117,7 @@ public class AnlsExcelService {
 				if (genotypingInfo.length != 2) {
 					logger.info(">> Invalid Genotyping Id=[" + genotypingId + "]");
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "Genotyping ID 값을 확인해주세요.[" + genotypingId + "]");
 					return rtn;
 				}
 
@@ -104,6 +126,7 @@ public class AnlsExcelService {
 				if (!NumberUtils.isCreatable(genotypingInfo[1])) {
 					logger.info(">> Invalid Genotyping Version=[" + genotypingId + "]");
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "Genotyping ID Version 값을 확인해주세요.[" + genotypingId + "]");
 					return rtn;
 				}
 				int version = NumberUtils.toInt(genotypingInfo[1]);
@@ -117,6 +140,7 @@ public class AnlsExcelService {
 				if (s == null) {
 					logger.info(">> not found sample id=[" + genotypingId + "]");
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "조회된 Genotyping ID 값이 없습니다.[" + genotypingId + "]");
 					return rtn;
 				}
 
@@ -124,6 +148,7 @@ public class AnlsExcelService {
 				if (!s.getStatusCode().equals(StatusCode.S420_ANLS_SUCC)) {
 					logger.info(">> Invalid status sample id=[" + genotypingId + "]");
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + genotypingId + "]");
 					return rtn;
 				}
 
@@ -131,6 +156,7 @@ public class AnlsExcelService {
 				if (!s.getGenotypingMethodCode().equals(GenotypingMethodCode.QRT_PCR)) {
 					logger.info(">> Invalid Genotyping Method sample id=[" + genotypingId + "]");
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "Genotyping Method 값이 Chip이 아닌 검체가 존재합니다.[" + genotypingId + "]");
 					return rtn;
 				}
 
@@ -148,6 +174,7 @@ public class AnlsExcelService {
 					// #. 조회한 마커 목록이 비어있는경우
 					logger.info(">> not found marker infomation error sample id=[" + genotypingId + "]");
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "마커 정보를 조회할 수 없습니다.[" + genotypingId + "]");
 					return rtn;
 				}
 
@@ -184,6 +211,7 @@ public class AnlsExcelService {
 					// #. 마커가 존재하지 않는것이 있는 경우
 					logger.info(">> Not Exist Markers error sample id=[" + genotypingId + "]" + notExistMarkers.toString());
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "해당 마커 정보가 없습니다.[" + genotypingId + "]" + notExistMarkers.toString());
 					return rtn;
 				}
 
@@ -207,6 +235,7 @@ public class AnlsExcelService {
 					// #. marker 값 유효하지 않은 경우
 					logger.info(">> Invalid Markers error sample id=[" + genotypingId + "]" + invalidMarkers.toString());
 					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+					rtn.put("message", "해당 마커에 값이 유효하지 않습니다.[" + genotypingId + "]" + invalidMarkers.toString());
 					return rtn;
 				}
 				
@@ -215,14 +244,18 @@ public class AnlsExcelService {
 
 				s.setData(data);
 				s.setAnlsEndDate(LocalDateTime.now());
-				sampleRepository.save(s);
+
+				savedSamples.add(s);
 			}
 		
+			sampleRepository.saveAll(savedSamples);
 			rtn.put("result", ResultCode.SUCCESS.get());
 		} catch (InvalidFormatException e) {
 			rtn.put("result", ResultCode.EXCEL_FILE_TYPE.get());
+			rtn.put("message", ResultCode.EXCEL_FILE_TYPE.getMsg());
 		} catch (IOException e) {
 			rtn.put("result", ResultCode.FAIL_FILE_READ.get());
+			rtn.put("message", ResultCode.FAIL_FILE_READ.getMsg());
 		} catch (Exception e) {
 			rtn.put("result", ResultCode.FAIL_UPLOAD);
 		}

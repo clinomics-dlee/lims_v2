@@ -161,8 +161,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			    success: function(data,xhr) {
 			        if (data.result == "00") {
 						CommonMsg.save(function() { });
-					} else if (!data.result.startsWith("0")) {
-						CommonMsg.error(function() { });
+					} else {
+						CommonMsg.error(function() { }, data.message);
 					}
 			    },
 			    error : function(xhr, status, error) {
@@ -285,8 +285,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    		CommonMsg.save(function() {
 				    			UserTable.reload('_anls_rslt_grid');
 							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
+						} else {
+							CommonMsg.error(function() { }, data.message);
 						}
 					},
 					error : function(data) {
@@ -307,6 +307,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				var sampleIds = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
+
+					if (jQuery.isEmptyObject(row.data)) {
+						CommonMsg.error(function() { }, "결과 정보를 입력하세요.[" + row.laboratoryId + "]");
+						return;
+					}
+
 					sampleIds.push(row.id);
 				}
 				
@@ -324,8 +330,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    		CommonMsg.save(function() {
 				    			UserTable.reload('_anls_rslt_grid');
 							});
-						} else if (!data.result.startsWith("0")) {
-							CommonMsg.error(function() { });
+						} else {
+							CommonMsg.error(function() { }, data.message);
 						}
 					},
 					error : function(data) {
