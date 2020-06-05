@@ -263,7 +263,8 @@ public class OutputService {
 					String outputProductTypes = sample.getOutputProductTypes();
 					if (outputProductTypes == null) outputProductTypes = "";
 					if (!outputProductTypes.contains(productTypeData)) {
-						outputProductTypes += outputProductTypes.substring(1);
+						outputProductTypes += productTypeData;
+						outputProductTypes.replace("__", "_");
 						sample.setOutputProductTypes(outputProductTypes);
 					} else {
 						continue;
@@ -277,9 +278,7 @@ public class OutputService {
 						}
 					}
 					// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
-
 					if (outputAllProduct) {
-
 						if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
 							sample.setOutputCmplDate(now);
 							sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
