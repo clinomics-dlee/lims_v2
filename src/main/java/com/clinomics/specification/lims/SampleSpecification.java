@@ -268,6 +268,7 @@ public class SampleSpecification {
 				String text = "%_" + params.get("productType") + "_%";
 				
 				predicateLikes.add(criteriaBuilder.notLike(root.get("outputProductTypes"), text));
+				predicateLikes.add(criteriaBuilder.isNull(root.get("outputProductTypes")));
 				
 				
 				rtn = criteriaBuilder.or(predicateLikes.toArray(new Predicate[predicateLikes.size()]));
