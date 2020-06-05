@@ -291,4 +291,21 @@ public class SampleSpecification {
 			return rtn;
 		};
 	}
+
+	public static Specification<Sample> anlsCmplDatebetween(Map<String, String> params) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			if (params.containsKey("sDate") && params.containsKey("fDate")) {
+				List<Predicate> predicatesAnds = new ArrayList<>();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
+				LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
+				predicatesAnds.add(criteriaBuilder.between(root.get("anlsCmplDate"), start, end));
+				query.orderBy(criteriaBuilder.asc(root.get("anlsCmplDate")));
+				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			}
+			return rtn;
+		
+		};
+	}
 }

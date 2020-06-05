@@ -52,6 +52,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<th:block th:replace="layout/left"></th:block>
 		<th:block th:replace="popup/cal_after"></th:block>
 		<th:block th:replace="popup/cal_registered"></th:block>
+		<th:block th:replace="popup/cal_human"></th:block>
 		<!-- end #sidebar -->
 		<!-- begin #content -->
 		<div id="content" class="content">
@@ -69,21 +70,22 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		    <div class="row">
                 <div class="col-lg-12">
                     <div class="panel p-20">
-                    
     					<div class="row m-b-5">
-							<label class="col-form-label">서비스</label>
-							<select class="form-control width-150 m-r-5 m-b-5" data-parsley-required="true" id="sel_bundle" name="bundleId">
-								<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
-							</select>
-							
-							<div class="width-10"></div>
-							<button class="btn btn-white m-r-5 m-b-5" id="btn_prev" th:text="#{common.prev}">Prev</button>
-							<b id="tit_date" style="display:inline-block; width:150px; text-align: center; font-size: 24px; vertical-align: middle;">
-								2020-01-01
-							</b>
-							<button class="btn btn-white m-r-5 m-b-5" id="btn_next" th:text="#{common.next}">Next</button>
-							<button class="btn btn-default m-r-5 m-b-5 width-60" id="btn_today" th:text="#{common.today}">Today</button>
-							<div class="width-200"></div>
+							<div class="row col-md-8">
+								<label class="col-form-label">서비스</label>
+								<select class="form-control width-150 m-r-5 m-b-5" data-parsley-required="true" id="sel_bundle" name="bundleId">
+									<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+								</select>
+								<button class="btn btn-white m-r-5 m-b-5" id="btn_prev">이전</button>
+								<b id="tit_date" style="display:inline-block; width:150px; text-align: center; font-size: 24px; vertical-align: middle;">
+									2020-01-01
+								</b>
+								<button class="btn btn-white m-r-5 m-b-5" id="btn_next">다음</button>
+								<button class="btn btn-default m-r-5 m-b-5 width-60" id="btn_today">오늘</button>
+							</div>
+							<div class="col-md-4 text-right">
+								<button class="btn btn-success m-r-5 m-b-5" id="btn_human">인체유래물등 다운로드</button>
+							</div>
 						</div>
                     </div>
                 </div>
@@ -301,6 +303,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#sel_bundle').on('change', function () {
 
 			writeTitleDate();
+		});
+
+		$('#btn_human').click(function() {
+			humanPopupOnload();
 		});
 	});
 	

@@ -1,0 +1,85 @@
+<style>
+body .daterangepicker {
+	z-index: 9999 !important;
+}
+
+@media screen and (min-width: 576px) {
+	.modal-sm {
+		max-width: 500px;
+	}
+}
+</style>
+
+<div class="modal fade" id="modal-human">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">인체유래물등(관리대장) 다운로드</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<form id="frm_popup_human" name="frm_popup_human" method="POST">
+					<div class="form-group row m-b-12">
+						<input type="hidden" id="sampleId" name="id" value="">
+						<label class="col-form-label col-md-4">조회기간</label>
+						<div class="col-xs-push-0 row col-md-8">
+							<div class="input-group" id="human-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
+								<input type="text" name="human-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
+								<span class="input-group-append">
+									<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<a href="javascript:popupExcelDownload();" class="btn btn-success">Excel Download</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="humanStartDate" id="humanStartDate" value="" />
+<input type="hidden" name="humanFinishDate" id="humanFinishDate" value="" />
+
+<script th:inline="javascript">
+/* <![CDATA[ */       
+//ajax Data List
+
+$(document).ready(function() {
+	//set search date
+	$('#human-daterange').daterangepicker({
+		opens: 'left',
+		format : 'YYYY/MM/DD',
+		separator: ' to ',
+		startDate: moment().subtract(1, 'months'),
+		endDate: moment(),
+		minDate: '2018/01/01',
+		maxDate: moment(),
+	}, function (start, end) {
+		
+		$('#humanStartDate').val(start.format('YYYY-MM-DD'));
+		$('#humanFinishDate').val(end.format('YYYY-MM-DD'));
+		$('#human-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+		
+	});
+	startDate = moment().subtract(1, 'months');
+	endDate = moment();
+	$('#human-daterange input').val(startDate.format('YYYY-MM-DD') + ' ~ ' + endDate.format('YYYY-MM-DD'));
+	$('#humanStartDate').val(startDate.format('YYYY-MM-DD'));
+	$('#humanFinishDate').val(endDate.format('YYYY-MM-DD'));
+});
+
+function humanPopupOnload() {
+	$("#modal-human").modal();
+}
+
+function popupExcelDownload() {
+	var sDate = $('#humanStartDate').val();
+	var fDate = $('#humanFinishDate').val();
+	location.href = '/human/excel/form?sDate=' + sDate + "&fDate=" + fDate;
+}
+/* ]]> */
+</script>
