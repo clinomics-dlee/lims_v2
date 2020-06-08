@@ -79,7 +79,8 @@ function humanPopupOnload() {
 function popupExcelDownload() {
 	var sDate = $('#humanStartDate').val();
 	var fDate = $('#humanFinishDate').val();
-	location.href = '/human/excel/form?sDate=' + sDate + "&fDate=" + fDate;
+	var bundleId = $("#sel_bundle").val();
+	location.href = '/human/excel/form?sDate=' + sDate + "&fDate=" + fDate + "&bundleId=" + bundleId;
 }
 /* ]]> */
 </script>

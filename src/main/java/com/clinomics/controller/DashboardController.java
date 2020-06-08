@@ -1,9 +1,11 @@
 package com.clinomics.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.clinomics.service.CalendarExcelService;
@@ -72,16 +74,31 @@ public class DashboardController {
 	}
 
 	@GetMapping("/human/excel/form")
-	public void exportExcelForm(@RequestParam Map<String, String> params, HttpServletResponse response) {
+	public void exportExcelForm(@RequestParam Map<String, String> params, HttpServletRequest request, HttpServletResponse response) {
 		XSSFWorkbook xlsx = calendarExcelService.exportHumanExcelForm(params);
-		requestExcel(xlsx, "인체유래물등 관리대장", response);
+		String sDate = params.get("sDate");
+		String fDate = params.get("fDate");
+		requestExcel(xlsx, "인체유래물등 관리대장(" + sDate + " - " + fDate + ")", request, response);
 	}
 
 	// ############################ private
-	private void requestExcel(XSSFWorkbook xlsx, String fileName, HttpServletResponse response) {
+	private void requestExcel(XSSFWorkbook xlsx, String fileName, HttpServletRequest request, HttpServletResponse response) {
 		if (fileName == null || fileName.trim().length() < 1) {
 			fileName = "sample";
 		}
+
+		String userAgent = request.getHeader("User-Agent");
+		boolean ie = userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident") > -1 || userAgent.indexOf("Edge") > -1;
+		try {
+			if (ie) {
+				fileName = URLEncoder.encode(fileName, "utf-8");
+			} else {
+				fileName = new String(fileName.getBytes("utf-8"), "ISO-8859-1");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
 		response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 		// 엑셀파일명 한글깨짐 조치
 		response.setHeader("Content-Transfer-Encoding", "binary;");
