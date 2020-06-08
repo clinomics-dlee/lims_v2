@@ -116,15 +116,17 @@ var UserTable = function() {
 						headHtml = htmls.headHtml;
 					} else {
 						
+						var aColumns = columns.slice();
 						if (rtn.header) {
-							for (var r in columns) {
-								if (columns[r].serverHeader == true) {
-									var serverHeader = rtn.header;
-									serverHeader.reverse();
-									columns.splice(r, 1);
+							for (var r in aColumns) {
+								
+								if (aColumns[r].serverHeader) {
+									var sHeader = rtn.header;
+									sHeader.reverse();
+									aColumns.splice(r, 1);
 									
-									for (var h in serverHeader) {
-										if (serverHeader[h]) columns.splice(r, 0, serverHeader[h]);
+									for (var h in sHeader) {
+										if (sHeader[h]) aColumns.splice(r, 0, sHeader[h]);
 									}
 									break;
 								}
@@ -135,89 +137,89 @@ var UserTable = function() {
 						for (var s in rows) {
 							var excelData = {};
 							html += '<tr>';
-							for (var r in columns) {
+							for (var r in aColumns) {
 								var val = '';
 								try {
-									val = eval('rows[s].' + columns[r].data);
+									val = eval('rows[s].' + aColumns[r].data);
 								} catch(ex) {
 									val = '';
 								}
 								var width = '', headClassName = '', bodyClassName = '';
-								if (columns[r].width) {
-									width = ' style="width:' + columns[r].width + ';"';
+								if (aColumns[r].width) {
+									width = ' style="width:' + aColumns[r].width + ';"';
 								}
-								if (columns[r].headClassName) {
-									headClassName = ' class="' + columns[r].headClassName + '"';
+								if (aColumns[r].headClassName) {
+									headClassName = ' class="' + aColumns[r].headClassName + '"';
 								}
-								if (columns[r].bodyClassName) {
-									bodyClassName = ' class="' + columns[r].bodyClassName + '"';
+								if (aColumns[r].bodyClassName) {
+									bodyClassName = ' class="' + aColumns[r].bodyClassName + '"';
 								}
 
 								// #. header settings
-								if (s == 0 && columns[r].title) {
-									if (columns[r].type != null && columns[r].type.constructor == Object) {
-										if (columns[r].type.name == 'checkbox') {
+								if (s == 0 && aColumns[r].title) {
+									if (aColumns[r].type != null && aColumns[r].type.constructor == Object) {
+										if (aColumns[r].type.name == 'checkbox') {
 											headHtml += '<th' + width + headClassName + '>'
-												+ columns[r].title
-												+ '<div class="checkbox checkbox-css text-center">'
+												+ aColumns[r].title
+												+ '<div class="form-check checkbox checkbox-css p-5">'
 												+ '<input type="checkbox" value="" id="' + uid + '_checkbox_all" name="' + uid + '_checkbox_all" data="">'
 												+ '<label for="' + uid + '_checkbox_all"></label>'
 												+ '</div>'
 												+ '</th>';
 										} else {
 											// #. default header
-											headHtml += '<th' + width + headClassName + '>' + columns[r].title + '</th>';
+											headHtml += '<th' + width + headClassName + '>' + aColumns[r].title + '</th>';
 										}
 									} else {
 										// #. default header
-										headHtml += '<th' + width + headClassName + '>' + columns[r].title + '</th>';
+										headHtml += '<th' + width + headClassName + '>' + aColumns[r].title + '</th>';
 									}
 
-									if (!columns[r].hideExcel) {
-										excelData[columns[r].title] = "";
+									if (!aColumns[r].hideExcel) {
+										excelData[aColumns[r].title] = "";
 									}
 								}
 								
-								if (columns[r].render) {
-									var renderValue = columns[r].render(rows[Number(s)], val, Number(s));
+								if (aColumns[r].render) {
+									var renderValue = aColumns[r].render(rows[Number(s)], val, Number(s));
 									html += '<td' + bodyClassName + '>' + renderValue + '</td>';
-									if (!columns[r].hideExcel) {
+									if (!aColumns[r].hideExcel) {
 										// #. rendering 한 값에 tag 제거
-										excelData[columns[r].title] = renderValue.replace(/(<([^>]+)>)/ig,"");;
+										excelData[aColumns[r].title] = renderValue.replace(/(<([^>]+)>)/ig,"");;
 									}
 								} else {
-									if (columns[r].type == 'date') {
+									if (aColumns[r].type == 'date') {
 										if (val != null) {
 											val = moment(val).format('YYYY-MM-DD');
 										} else {
 											val = "";
 										}
-									} else if (columns[r].type != null && columns[r].type.constructor == Object) {
+									} else if (aColumns[r].type != null && aColumns[r].type.constructor == Object) {
 
-										var disabled = (columns[r].type.disabled ? columns[r].type.disabled(rows[Number(s)]) : null);
+										var disabled = (aColumns[r].type.disabled ? aColumns[r].type.disabled(rows[Number(s)]) : null);
 										
-										if (columns[r].type.name == 'checkbox') {
-											val = '<div class="checkbox checkbox-css text-center">'
+										if (aColumns[r].type.name == 'checkbox') {
+											val = '<div class="form-check checkbox checkbox-css p-5">'
 												+ '<input type="checkbox" value="" id="' + uid + '_checkbox_'+ rowIndex +'" name="' + uid + '_checkbox" data="'+ val +'">'
 												+ '<label for="' + uid + '_checkbox_'+ rowIndex +'"></label>'
 												+ '</div>';
-										} else if (columns[r].type.name == "radio") {
+										} else if (aColumns[r].type.name == "radio") {
 											val = '<div class="radio radio-css">'
 												+ '<input type="radio" value="" id="' + uid + '_radio_'+ rowIndex +'" name="' + uid + '_radio" data="'+ val +'">'
 												+ '<label for="' + uid + '_radio_'+ rowIndex +'"></label>'
 												+ '</div>';
-										} else if (columns[r].type.name == "combo") {
+										} else if (aColumns[r].type.name == "combo") {
 											var selectValue = val;
 											val = '<select class="form-control" style="width:100%;" id="' + uid + '_combo_'+ rowIndex +'" name="' + uid + '_combo">';
-											if (columns[r].type.isBlank) {
+											if (aColumns[r].type.isBlank) {
 												val += '<option value="">선택</option>';
 											}
-											for (var key in columns[r].type.items) {
+											for (var key in aColumns[r].type.items) {
 												var selected = "";
 												if (selectValue == key) {
 													selected = "selected";
 												}
-												val += '<option value="' + key + '" ' + selected + '>' + columns[r].type.items[key] + '</option>';
+												val += '<option value="' + key + '" ' + selected + '>' + aColumns[r].type.items[key] + '</option>';
 											}
 											val += '</select>';
 										}
@@ -226,8 +228,8 @@ var UserTable = function() {
 										}
 									}
 									html += '<td' + bodyClassName + '>' + (val ? val : '') + '</td>';
-									if (!columns[r].hideExcel) {
-										excelData[columns[r].title] = (val ? val : '');
+									if (!aColumns[r].hideExcel) {
+										excelData[aColumns[r].title] = (val ? val : '');
 									}
 								}
 								
