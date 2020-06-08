@@ -74,7 +74,9 @@ public class DashboardController {
 	@GetMapping("/human/excel/form")
 	public void exportExcelForm(@RequestParam Map<String, String> params, HttpServletResponse response) {
 		XSSFWorkbook xlsx = calendarExcelService.exportHumanExcelForm(params);
-		requestExcel(xlsx, "인체유래물등 관리대장", response);
+		String sDate = params.get("sDate");
+		String fDate = params.get("fDate");
+		requestExcel(xlsx, "인체유래물등 관리대장(" + sDate + " ~ " + fDate + ")", response);
 	}
 
 	// ############################ private
@@ -82,6 +84,7 @@ public class DashboardController {
 		if (fileName == null || fileName.trim().length() < 1) {
 			fileName = "sample";
 		}
+
 		response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 		// 엑셀파일명 한글깨짐 조치
 		response.setHeader("Content-Transfer-Encoding", "binary;");

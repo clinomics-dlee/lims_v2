@@ -1,13 +1,10 @@
 package com.clinomics.service;
 
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.SampleRepository;
@@ -56,24 +53,15 @@ public class CalendarExcelService {
 		// #. 분석완료일 기준으로 목록 조회
 		Specification<Sample> where = Specification
 				.where(SampleSpecification.anlsCmplDatebetween(params))
+				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.bundleIsActive())
 				.and(SampleSpecification.statusCodeGt(600));
 		List<Sample> samples = sampleRepository.findAll(where);
 
 
-		// #. deprecated
-		Member m = new Member();
-		m.setName("Tester1");
-		Member m2 = new Member();
-		m.setName("Tester2");
-		for (int i = 0; i < 200; i++) {
-			Sample s = new Sample();
-			s.setLaboratoryId("TEST-2004-" + String.format("%04d", i));
-			s.setAnlsCmplDate(LocalDateTime.of(2020, Month.JANUARY, 1, 0, 0, 0));
-			s.setAnlsCmplMember(m);
-			s.setJdgmDrctApproveMember(m2);
-
-			samples.add(s);
+		if (samples.size() < 1) {
+			wb.createSheet();
+			return wb;
 		}
 
 		List<String> monthlyList = new ArrayList<String>();
@@ -99,43 +87,21 @@ public class CalendarExcelService {
 		int lastPageStartSampleRowIndex = 9;
 		int pageSampleRowCount = 25;
 		int pageTotalRowCount = 33;
-		int lastPageTotalRowCount = 35;
 
 		for (String month : monthlyList) {
 			List<Sample> sList = monthlySamplesMap.get(month);
 			// #. sheet 생성
 			XSSFSheet sheet = wb.createSheet(month);
-			int count = 0;
-			int lastPageIndex = sList.size() / pageSampleRowCount;
+			int index = 0;
+			int lastPageIndex = (sList.size() - 1) / pageSampleRowCount;
 			for (Sample s : sList) {
-				// // #. 시작 rowIndex
-				// int destStartRowIndex = (count / pageSampleRowCount) * pageTotalRowCount;
-				// int destLastPageStartRowIndex = (i / pageSampleRowCount) * pageTotalRowCount;
-				// // #. row 가져오기. rownum = 복사한 양식 시작 index + 페이지별 시작 row index + (i 를 25로 나눈나머지)
-				// int rowNum = destStartRowIndex + pageStartSampleRowIndex + (i % pageSampleRowCount);
-				// int lastPageRowNum = destLastPageStartRowIndex + lastPageStartSampleRowIndex + (i % pageSampleRowCount);
-				
-				// // #. 마지막 페이지 여부
-				// boolean isLastPage = (lastPageIndex == (i / pageSampleRowCount));
-				
-				// // #. 25개 기준으로 1개의 양식을 셋팅하기 때문에 고려하여 양식 복사
-				// if (i > 0 && i % pageSampleRowCount == 0) {
-				// 	// #. 마지막장인 경우 상단에 결재 추가한 sheet 양식 복사
-				// 	if (isLastPage) {
-				// 		// #. 마지막 페이지 양식 복사
-				// 		this.copyExcelRows(wb, wb.getSheetAt(1), destSheet, 0, (lastPageTotalRowCount - 1), destLastPageStartRowIndex);
-				// 	} else {
-				// 		// #. 기본 양식 복사
-				// 		this.copyExcelRows(wb, wb.getSheetAt(0), destSheet, 0, (pageTotalRowCount - 1), destStartRowIndex);
-				// 	}
-				// }
-				boolean isLastPage = (lastPageIndex == (count / pageSampleRowCount));
-				int startRowIndex = (count / pageSampleRowCount) * pageTotalRowCount;
-				int rowNum = startRowIndex + pageStartSampleRowIndex + (count % pageSampleRowCount);
-				int lastPageRowNum = startRowIndex + lastPageStartSampleRowIndex + (count % pageSampleRowCount);
+				boolean isLastPage = (lastPageIndex == (index / pageSampleRowCount));
+				int startRowIndex = (index / pageSampleRowCount) * pageTotalRowCount;
+				int rowNum = startRowIndex + pageStartSampleRowIndex + (index % pageSampleRowCount);
+				int lastPageRowNum = startRowIndex + lastPageStartSampleRowIndex + (index % pageSampleRowCount);
 
 				// #. Sample을 25개씩 나눠서 표시 하기위해 
-				if (count % pageSampleRowCount == 0) {
+				if (index % pageSampleRowCount == 0) {
 					if (isLastPage) {
 						this.createLastTable(wb, sheet, startRowIndex);
 					} else {
@@ -148,11 +114,19 @@ public class CalendarExcelService {
 				} else {
 					row = sheet.getRow(rowNum);
 				}
-				row.getCell(0).setCellValue((count + 1)); // 일련번호
+
+				String sampleTarget = "구강상피세포";
+				String samplingSheep = "면봉 1ea, 가글 15mL";
+				if ("Blood".equals((String)s.getItems().get("sampleType"))) {
+					sampleTarget = "혈액";
+					samplingSheep = "3mL";
+				}
+
+				row.getCell(0).setCellValue((index + 1)); // 일련번호
 				row.getCell(1).setCellValue(s.getLaboratoryId()); // 관리번호
-				row.getCell(2).setCellValue("구강상피세포"); // 인체유래물등/검사대상물 종류
-				row.getCell(3).setCellValue("TODO"); // 수증내역 - 연월일
-				row.getCell(4).setCellValue("면봉 1ea, 가글 15mL"); // 수증내역 - 수증량
+				row.getCell(2).setCellValue(sampleTarget); // 인체유래물등/검사대상물 종류
+				row.getCell(3).setCellValue((s.getItems().get("sampleReceived") != null ? (String)s.getItems().get("sampleReceived") : "")); // 수증내역 - 연월일
+				row.getCell(4).setCellValue(samplingSheep); // 수증내역 - 수증량
 				row.getCell(5).setCellValue("보안책임자 별도관리"); // 수증내역 - 검체기증자 명(기관명)
 				// #. 제공내용은 우선 작성안함
 				// row.getCell(6).setCellValue(""); // 제공내용 - 연월일
@@ -166,106 +140,9 @@ public class CalendarExcelService {
 				row.getCell(14).setCellValue(s.getAnlsCmplMember().getName()); // 결재 - 담당
 				row.getCell(15).setCellValue(s.getJdgmDrctApproveMember().getName()); // 결재 - 관리책임자
 
-				count++;
+				index++;
 			}
 		}
-
-		// #. 실험종료일 기준으로 월별로 list up
-		// List<String> monthlyList = new ArrayList<String>();
-		// Map<String, List<Map<String, Object>>> monthlySampleListMap = new HashMap<String, List<Map<String, Object>>>();
-
-// 			for (Map<String, Object> dataMap : list) {
-// 				String yearMonth = ((String)dataMap.get("resultDate")).substring(0, 7);
-// 				if (!monthlyList.contains(yearMonth)) {
-// 					// #. 연월값이 리스트에 없는 경우
-// 					// #. 연월값을 리스트에 순차적으로 넣기
-// 					monthlyList.add(yearMonth);
-					
-// 					// #. 연월별 검체 목록을 map에 넣기
-// 					List<Map<String, Object>> samples = new ArrayList<Map<String, Object>>();
-// 					samples.add(dataMap);
-// 					monthlySampleListMap.put(yearMonth, samples);
-// 				} else {
-// 					// #. 연월값이 리스트에 있는 경우
-// 					// #. map에서 연월값으로 리스트를 조회하여 해당 리스트에 sample 추가
-// 					List<Map<String, Object>> samples = monthlySampleListMap.get(yearMonth);
-// 					samples.add(dataMap);
-// 				}
-// 			}
-			
-// 			// #. 연월별 순차적으로 excel 만들기
-// 			int pageStartSampleRowIndex = 7;
-// 			int lastPageStartSampleRowIndex = 9;
-// 			int pageSampleRowCount = 25;
-// 			int pageTotalRowCount = 33;
-// 			int lastPageTotalRowCount = 35;
-// 			for (String month : monthlyList) {
-// 				// #. 해당 연월에 실험종료된 목록
-// 				List<Map<String, Object>> samples = monthlySampleListMap.get(month);
-				
-// 				// #. sheet 복사 생성
-// 				Sheet destSheet = null;
-// 				// #. 한페이지만 나오는 경우는 2번째 sheet복사
-// 				if (samples.size() < 26) {
-// 					destSheet = wb.cloneSheet(1, month);
-// 				} else {
-// 					destSheet = wb.cloneSheet(0, month);
-// 				}
-// 				logger.info(">>>>>>>>" + month + " : " + samples.size());
-// 				int lastPageIndex = samples.size() / pageSampleRowCount;
-// 				// #. 값 셋팅
-// 				for (int i = 0; i < samples.size(); i++) {
-// 					Map<String, Object> sample = samples.get(i);
-// 					// #. 35개의 행을 복사하기 위해 
-// 					int destStartRowIndex = (i / pageSampleRowCount) * pageTotalRowCount;
-// 					int destLastPageStartRowIndex = (i / pageSampleRowCount) * pageTotalRowCount;
-// 					// #. row 가져오기. rownum = 복사한 양식 시작 index + 페이지별 시작 row index + (i 를 25로 나눈나머지)
-// 					int rowNum = destStartRowIndex + pageStartSampleRowIndex + (i % pageSampleRowCount);
-// 					int lastPageRowNum = destLastPageStartRowIndex + lastPageStartSampleRowIndex + (i % pageSampleRowCount);
-					
-// 					// #. 마지막 페이지 여부
-// 					boolean isLastPage = (lastPageIndex == (i / pageSampleRowCount));
-					
-// 					// #. 25개 기준으로 1개의 양식을 셋팅하기 때문에 고려하여 양식 복사
-// 					if (i > 0 && i % pageSampleRowCount == 0) {
-// 						// #. 마지막장인 경우 상단에 결재 추가한 sheet 양식 복사
-// 						if (isLastPage) {
-// 							// #. 마지막 페이지 양식 복사
-// 							this.copyExcelRows(wb, wb.getSheetAt(1), destSheet, 0, (lastPageTotalRowCount - 1), destLastPageStartRowIndex);
-// 						} else {
-// 							// #. 기본 양식 복사
-// 							this.copyExcelRows(wb, wb.getSheetAt(0), destSheet, 0, (pageTotalRowCount - 1), destStartRowIndex);
-// 						}
-// 					}
-					
-// 					XSSFRow row = destSheet.getRow(rowNum);
-// 					if (isLastPage) {
-// 						row = destSheet.getRow(lastPageRowNum);
-// 					}
-// 					row.getCell(0).setCellValue((i + 1)); // 일련번호
-// 					row.getCell(1).setCellValue((String)sample.get("laboratory")); // 관리번호
-// 					row.getCell(2).setCellValue("구강상피세포"); // 인체유래물등/검사대상물 종류
-// 					row.getCell(3).setCellValue((String)sample.get("sampleReceived")); // 수증내역 - 연월일
-// 					row.getCell(4).setCellValue("면봉 1ea, 가글 15mL"); // 수증내역 - 수증량
-// 					row.getCell(5).setCellValue("보안책임자 별도관리"); // 수증내역 - 검체기증자 명(기관명)
-// 					// #. 제공내용은 우선 작성안함
-// //					row.getCell(6).setCellValue(""); // 제공내용 - 연월일
-// //					row.getCell(7).setCellValue(""); // 제공내용 - 제공량
-// //					row.getCell(8).setCellValue(""); // 제공내용 - 제공 기관명
-// 					row.getCell(9).setCellValue(((String)sample.get("resultDate")).substring(0, 10)); // 폐기내용 - 연월일
-// 					row.getCell(10).setCellValue("전량 폐기"); // 폐기내용 - 폐기량
-// 					row.getCell(11).setCellValue("-"); // 폐기내용 - 폐기방법 - 자가처리
-// 					row.getCell(12).setCellValue("(주)보광환경"); // 폐기내용 - 폐기방법 - 위탁처리
-// 					row.getCell(13).setCellValue("냉장"); // 기타 - 보관조건
-// 					row.getCell(14).setCellValue((String)sample.get("uploadUserName")); // 결재 - 담당
-// 					row.getCell(15).setCellValue((String)sample.get("ifUserName")); // 결재 - 관리책임자
-// 				}
-// 			}
-			
-// 			// #. template sheet 2개 제거
-// 			wb.removeSheetAt(0);
-// 			wb.removeSheetAt(0);
-			
 		return wb;
 	}
 
@@ -277,11 +154,11 @@ public class CalendarExcelService {
 
 		Font font10 = wb.createFont();
 		font10.setFontHeightInPoints((short)10);
-		font8.setFontName("맑은 고딕");
+		font10.setFontName("맑은 고딕");
 
 		Font font16 = wb.createFont();
 		font16.setFontHeightInPoints((short)16);
-		font8.setFontName("맑은 고딕");
+		font16.setFontName("맑은 고딕");
 
 		CellStyle style1 = wb.createCellStyle();
 		style1.setFont(font8);
@@ -439,11 +316,20 @@ public class CalendarExcelService {
 
 		Font font10 = wb.createFont();
 		font10.setFontHeightInPoints((short)10);
-		font8.setFontName("맑은 고딕");
+		font10.setFontName("맑은 고딕");
 
 		Font font16 = wb.createFont();
 		font16.setFontHeightInPoints((short)16);
-		font8.setFontName("맑은 고딕");
+		font16.setFontName("맑은 고딕");
+
+		CellStyle style0 = wb.createCellStyle();
+		style0.setFont(font10);
+		style0.setAlignment(HorizontalAlignment.CENTER);
+		style0.setVerticalAlignment(VerticalAlignment.CENTER);
+		style0.setBorderRight(BorderStyle.MEDIUM);
+		style0.setBorderBottom(BorderStyle.MEDIUM);
+		style0.setBorderLeft(BorderStyle.MEDIUM);
+		style0.setBorderTop(BorderStyle.MEDIUM);
 
 		CellStyle style1 = wb.createCellStyle();
 		style1.setFont(font8);
@@ -481,12 +367,18 @@ public class CalendarExcelService {
 			else if (ri == 3) { row.setHeight((short)(50 * 15.1)); }
 			else if (ri == 4) { row.setHeight((short)(34 * 15.1)); }
 			else if (ri >= 5 && ri <= 7) { row.setHeight((short)(25 * 15.1)); }
-			else if (ri >= 9 && ri <= 33) { row.setHeight((short)(30 * 15.1)); }
+			else if (ri >= 9 && ri <= 33) { row.setHeight((short)(25 * 15.1)); }
 			else if (ri == 34) { row.setHeight((short)(40 * 15.1)); }
 			for (int ci = 0; ci < cellCount; ci++) {
 				XSSFCell cell = row.createCell(ci);
 
 				if (ri > 4) cell.setCellStyle(defaultStyle);
+
+				if (ri == 0 || ri == 1) {
+					if (ci >= 12) {
+						cell.setCellStyle(style0);
+					}
+				}
 
 				if (ri == 0) {
 					if (ci == 12) { 
@@ -566,11 +458,8 @@ public class CalendarExcelService {
 		sheet.setColumnWidth(15, 85 * 32);
 
 		// #. cell border 셋팅
-		CellRangeAddress region = new CellRangeAddress(startRowIndex, startRowIndex + 1, 12, 15);
-		RegionUtil.setBorderRight(BorderStyle.MEDIUM, region, sheet);
-		RegionUtil.setBorderBottom(BorderStyle.MEDIUM, region, sheet);
-		RegionUtil.setBorderLeft(BorderStyle.MEDIUM, region, sheet);
-		RegionUtil.setBorderTop(BorderStyle.MEDIUM, region, sheet);
+		CellRangeAddress region0 = new CellRangeAddress(startRowIndex + 2, startRowIndex + 2, 0, 15);
+		RegionUtil.setBorderTop(BorderStyle.MEDIUM, region0, sheet);
 
 		CellRangeAddress region1 = new CellRangeAddress(startRowIndex + 2, startRowIndex + 34, 15, 15);
 		RegionUtil.setBorderRight(BorderStyle.MEDIUM, region1, sheet);
@@ -582,7 +471,7 @@ public class CalendarExcelService {
 		RegionUtil.setBorderBottom(BorderStyle.MEDIUM, region3, sheet);
 
 		// #. cell merge
-		sheet.addMergedRegion(new CellRangeAddress(startRowIndex, startRowIndex + 1, 0, 0));
+		sheet.addMergedRegion(new CellRangeAddress(startRowIndex, startRowIndex + 1, 12, 12));
 		sheet.addMergedRegion(new CellRangeAddress(startRowIndex + 2, startRowIndex + 2, 0, 15));
 		sheet.addMergedRegion(new CellRangeAddress(startRowIndex + 3, startRowIndex + 3, 0, 15));
 		sheet.addMergedRegion(new CellRangeAddress(startRowIndex + 4, startRowIndex + 4, 0, 15));
