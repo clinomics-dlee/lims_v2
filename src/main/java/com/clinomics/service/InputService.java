@@ -182,7 +182,9 @@ public class InputService {
 	@Transactional
 	public Map<String, String> delete(List<Integer> ids) {
 		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, Arrays.asList(new StatusCode[] { StatusCode.S020_INPUT_RCV }));
+		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids
+			, Arrays.asList(new StatusCode[] { StatusCode.S020_INPUT_RCV, StatusCode.S000_INPUT_REG })
+		);
 		
 		rtn.put("result", ResultCode.SUCCESS_DELETE.get());
 		rtn.put("message", ResultCode.SUCCESS_DELETE.getMsg());
@@ -196,7 +198,9 @@ public class InputService {
 	@Transactional
 	public Map<String, String> approve(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdIn(ids);
+		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids
+			, Arrays.asList(new StatusCode[] { StatusCode.S020_INPUT_RCV, StatusCode.S000_INPUT_REG })
+		);
 		
 		// sample.set
 		Optional<Member> oMember = memberRepository.findById(memberId);
