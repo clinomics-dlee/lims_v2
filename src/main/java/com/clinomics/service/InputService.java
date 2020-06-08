@@ -196,7 +196,7 @@ public class InputService {
 	@Transactional
 	public Map<String, String> approve(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, Arrays.asList(new StatusCode[] { StatusCode.S020_INPUT_RCV }));
+		List<Sample> samples = sampleRepository.findByIdIn(ids);
 		
 		// sample.set
 		Optional<Member> oMember = memberRepository.findById(memberId);
