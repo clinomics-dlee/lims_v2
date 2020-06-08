@@ -43,12 +43,9 @@ public class CalendarExcelService {
 	ExcelReadComponent excelReadComponent;
 
 	public XSSFWorkbook exportHumanExcelForm(Map<String, String> params) {
-		// #. excel template 파일
-		XSSFWorkbook wb = null;
-		
 		logger.info(">> start writeExcelFileForGsHumanOrigin");
 		// #. excel 읽기
-		wb = new XSSFWorkbook();
+		XSSFWorkbook wb = new XSSFWorkbook();
 
 		// #. 분석완료일 기준으로 목록 조회
 		Specification<Sample> where = Specification
