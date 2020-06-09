@@ -642,6 +642,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.statusCodeGt(400))
 					.and(SampleSpecification.mappingInfoLike(params));
 		
 		total = sampleRepository.count(where);
