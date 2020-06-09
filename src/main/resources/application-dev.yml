@@ -70,4 +70,4 @@ rest:
 logging:
   file: /BiO/Serve/lims_v2/logs/lims_v2.log
 server:
-  port: 9099
+  port: 9095
