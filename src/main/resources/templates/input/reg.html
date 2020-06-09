@@ -393,14 +393,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						max = excelData.length;
 					}
 					headHtml += '<th>'
-						+ '<div class="checkbox checkbox-css text-center">'
+						+ '<div class="form-check checkbox checkbox-css p-5">'
 						+ '<input type="checkbox" value="" id="checkbox_all" name="checkbox_all" data="">'
 						+ '<label for="checkbox_all"></label>'
 						+ '</div>'
 						+ '</th>';
 					for (var ii = 0; ii < max; ii++) {
 						bodyHtml += "<tr>";
-						bodyHtml += '<td><div class="checkbox checkbox-css text-center">'
+						bodyHtml += '<td><div class="form-check checkbox checkbox-css p-5">'
 							+ '<input type="checkbox" value="" id="checkbox_' + ii + '" name="checkbox" data="' + ii + '">'
 							+ '<label for="checkbox_' + ii + '"></label>'
 							+ '</div></td>';
