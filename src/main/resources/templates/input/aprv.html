@@ -150,6 +150,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			setDaterangepicker(start, end);
 		});
 		setDaterangepicker(startDate, endDate);
+
+		rhDiv = '<div class="progress rounded-corner" style="height:20px;">';
+		rhDivAprv = '<div class="progress-bar bg-blue " style="width: 100%">';
+		rhDivNotAprv = '<div class="progress-bar bg-red " style="width: 100%">';
+		dateFormat = "MM-DD HH:mm";
 		
 		UserTable.draw('_collect_grid', {
 			url : "/input/aprv",
@@ -206,11 +211,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'inputApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = '<div class="progress rounded-corner" style="height:20px;">';
-					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
-									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
-					html += '<div class="progress rounded-corner" style="height:20px;">';
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.inputApproveMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
 					return html;
+				}
+			},
+			{
+				title : '승인일시', 
+				data : 'inputApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					return moment(data).format(dateFormat);
 				}
 			},
 			{
@@ -218,11 +232,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'inputMngApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = '<div class="progress rounded-corner" style="height:20px;">';
-					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
-									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
-					html += '<div class="progress rounded-corner" style="height:20px;">';
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.inputMngApproveMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
 					return html;
+				}
+			},
+			{
+				title : '승인일시', 
+				data : 'inputMngApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					return moment(data).format(dateFormat);
 				}
 			},
 			{
@@ -230,11 +253,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'inputDrctApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = '<div class="progress rounded-corner" style="height:20px;">';
-					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
-									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
-					html += '<div class="progress rounded-corner" style="height:20px;">';
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.inputDrctMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
 					return html;
+				}
+			},
+			{
+				title : '승인일시', 
+				data : 'inputDrctApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					return moment(data).format(dateFormat);
 				}
 			}
 		], null);
