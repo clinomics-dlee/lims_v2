@@ -222,10 +222,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			{
 				title : '승인일시', 
 				data : 'inputApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					return moment(data).format(dateFormat);
-				}
+				type : 'date'
 			},
 			{
 				title : '중간관리자', 
@@ -243,10 +240,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			{
 				title : '승인일시', 
 				data : 'inputMngApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					return moment(data).format(dateFormat);
-				}
+				type : 'date'
 			},
 			{
 				title : '검사실책임자', 
@@ -264,10 +258,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			{
 				title : '승인일시', 
 				data : 'inputDrctApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					return moment(data).format(dateFormat);
-				}
+				type : 'date'
 			}
 		], null);
 			
