@@ -20,7 +20,6 @@ import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.SampleRepository;
-import com.clinomics.specification.lims.ResultSpecification;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.google.common.collect.Maps;
 
@@ -35,6 +34,9 @@ public class ChartService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	String[] colors = {"#FF3B30", "#FF9500", "#FFCC00", "#4CD964", "#5AC8FA", "#007AFF", "#5856D6"
+						, "#FF6C64", "#FFD940", "#F7B048", "#79E38B", "#83D6FB", "#5DA5E8", "#8280E0"};
 	
 	DateTimeFormatter yyyymmFormat = DateTimeFormatter.ofPattern("yyyy-MM");
 
@@ -120,7 +122,6 @@ public class ChartService {
 	}
 	
 	private List<Map<String, Object>> getDatasetByBundle(List<Bundle> bundles, LocalDateTime end, LocalDateTime loop, List<Map<String, String>> map) {
-		String[] colors = {"#FF3B30", "#FF9500", "#FFCC00", "#4CD964", "#5AC8FA", "#007AFF"};
 		int co = 0;
 		List<Map<String, Object>> datasets = new ArrayList<>();
 		for (Bundle b : bundles) {
@@ -138,7 +139,6 @@ public class ChartService {
 	}
 	
 	private List<Map<String, Object>> getPieDatasetByBundle(List<Bundle> bundles, LocalDateTime end, List<Map<String, String>> map) {
-		String[] colors = {"#FF3B30", "#FF9500", "#FFCC00", "#4CD964", "#5AC8FA", "#007AFF"};
 		List<String> colorList = Arrays.asList(colors);
 		List<Map<String, Object>> datasets = new ArrayList<>();
 		List<Long> datas = new ArrayList<>();
