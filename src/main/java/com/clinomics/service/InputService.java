@@ -97,7 +97,7 @@ public class InputService {
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		
 		List<Sample> list = page.getContent();
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);

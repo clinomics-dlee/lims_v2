@@ -16,15 +16,17 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Detail Sample</h4>
+				<h4 class="modal-title">검체 정보</h4>
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 			</div>
 			<div class="modal-body">
-				<div id="div_popup_sample_detail_readonly">
+				<div style="">
+					<table id="_readonly_sample_popup_table" class="table table-bordered" style="width: 100%">
+					</table>
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a href="javascript:createReportPdfForPopup(true);" class="btn btn-success">Create Report PDF</a>
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
 			</div>
 		</div>
 	</div>
@@ -32,11 +34,11 @@
 
 <script th:inline="javascript">
 /* <![CDATA[ */    
-	function sampleReadonlyPopupOnload(sampleId, resultId) {
+	function sampleReadonlyPopupOnload(sampleId) {
 		$("#modal-sample-detail-readonly").modal();
 		
 		$.ajax({
-			url : "/work/register/itemby/sample/" + sampleId,
+			url : "/input/itemby/sample/" + sampleId,
 			type : "GET",
 			dataType : "json",
 			contentType : "application/json; charset=utf-8",
@@ -49,39 +51,25 @@
 				var notnull = false, readonly = '', code, value = "";
 				if (data.sampleItem) {
 					
-					html = '<form id="frm_popup_sample_detail" data-parsley-validate="true">';
-					autoComplete = 'autocomplete="off"';
-					html += '<input type="hidden" name="id" value="' + data.sample.id + '">';
-					html += '<input type="hidden" name="resultId" value="' + resultId + '">';
-					console.log(data.sample);
-					html += '<div class="form-group row m-b-15">';
-					html += '<table id="table_form" class="table">';
+					
 					var sitm = data.sampleItem;
 					
 					for (var r in sitm) {
 						code = sitm[r].nameCode;
-						
-						if (code == 'laboratory') value = data.sample.id;
-						else if (code == 'barcode') value = data.sample.barcode;
-						else value = data.sample.items[code];
+						value = data.sample.items[code];
 						if (!value) value = "";
 						
 						if (r % 2 == 0) html += '<tr>'
 						
-						html += '<td>' + sitm[r].name + '</td>';
+						html += '<th>' + sitm[r].name + '</th>';
 						html += '<td><span>' + value + '</span></td>';
 						
 						if (r % 2 == 1) html += '</tr>';
 					}
-					html += '</table>';
-					html += '</div>';
-					
-					//html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
-					html += '</form>';
 					
 					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
 					
-					$("#div_popup_sample_detail_readonly").html(html);
+					$("#_readonly_sample_popup_table").html(html);
 				}
 				
 				

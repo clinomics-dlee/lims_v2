@@ -92,7 +92,7 @@ public class SampleDbService {
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		
 		List<Sample> list = page.getContent();
-		sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 
 		List<Map<String, Object>> sList = new ArrayList<Map<String, Object>>();
@@ -112,7 +112,7 @@ public class SampleDbService {
 		// 	sList.add(map);
 		// }
 
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrderingForMap(sList, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrderingForMap(sList);
 
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, sList, header);
 	}
@@ -131,7 +131,7 @@ public class SampleDbService {
 			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
 		}
 		List<SampleHistory> list = sampleHistoryRepository.findBySample_Id(id, pageable);
-		sampleItemService.filterItemsAndOrdering(list);
+		sampleItemService.filterItemsAndOrderingFromHistory(list);
 		long filtered = total + 1;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
@@ -163,7 +163,7 @@ public class SampleDbService {
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		
 		List<Sample> list = page.getContent();
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
@@ -195,7 +195,7 @@ public class SampleDbService {
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		
 		List<Sample> list = page.getContent();
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);

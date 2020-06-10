@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +23,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.clinomics.entity.lims.Bundle;
@@ -30,8 +33,11 @@ import com.clinomics.entity.lims.Sample;
 import com.clinomics.entity.lims.SampleHistory;
 import com.clinomics.entity.lims.SampleItem;
 import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
 import com.clinomics.repository.lims.BundleRepository;
+import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.ProductRepository;
+import com.clinomics.repository.lims.RoleRepository;
 import com.clinomics.repository.lims.SampleItemRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.google.common.collect.Maps;
@@ -53,6 +59,9 @@ public class SampleItemService {
 	
 	@Autowired
 	DataTableService dataTableService;
+
+	@Autowired
+	RoleService roleService;
 	
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -88,8 +97,9 @@ public class SampleItemService {
 		return rtn;
 	}
 
-	public List<Map<String, Object>> filterItemsAndOrdering(List<Sample> list, boolean all) {
+	public List<Map<String, Object>> filterItemsAndOrdering(List<Sample> list) {
 		
+
 		Set<SampleItem> sampleItems = new HashSet<SampleItem>();
 		List<Map<String, Object>> header = new ArrayList<>();
 		list.stream().forEach(s -> {
@@ -99,8 +109,16 @@ public class SampleItemService {
 			});
 		});
 
+		boolean personalView = roleService.checkPersonalView();
+
 		List<SampleItem> filteredSampleItems = sampleItems.stream()
-				.filter(fs -> fs.isVisible() || all)
+				.filter(fs -> {
+					if (fs.isVisible()) {
+						return personalView;
+					} else {
+						return true;
+					}
+				})
 				.sorted(Comparator.comparing(SampleItem::getOrd))
 				.collect(Collectors.toList());
 
@@ -117,7 +135,7 @@ public class SampleItemService {
 		return header;
 	}
 
-	public List<Map<String, Object>> filterItemsAndOrderingForMap(List<Map<String, Object>> list, boolean all) {
+	public List<Map<String, Object>> filterItemsAndOrderingForMap(List<Map<String, Object>> list) {
 		
 		Set<SampleItem> sampleItems = new HashSet<SampleItem>();
 		List<Map<String, Object>> header = new ArrayList<>();
@@ -128,8 +146,16 @@ public class SampleItemService {
 			});
 		});
 
+		boolean personalView = roleService.checkPersonalView();
+
 		List<SampleItem> filteredSampleItems = sampleItems.stream()
-				.filter(fs -> fs.isVisible() || all)
+				.filter(fs -> {
+					if (fs.isVisible()) {
+						return personalView;
+					} else {
+						return true;
+					}
+				})
 				.sorted(Comparator.comparing(SampleItem::getOrd))
 				.collect(Collectors.toList());
 
@@ -146,36 +172,7 @@ public class SampleItemService {
 		return header;
 	}
 	
-	public List<Map<String, Object>> filterItemsAndOrderingForResult(List<Sample> list, boolean all) {
-		
-		Set<SampleItem> sampleItems = new HashSet<SampleItem>();
-		List<Map<String, Object>> header = new ArrayList<>();
-		list.stream().forEach(s -> {
-			
-			s.getBundle().getProduct().stream().forEach(p -> {
-				sampleItems.addAll(p.getSampleItem());
-			});
-		});
-
-		List<SampleItem> filteredSampleItems = sampleItems.stream()
-				.filter(fs -> fs.isVisible() || all)
-				.sorted(Comparator.comparing(SampleItem::getOrd))
-				.collect(Collectors.toList());
-
-		filteredSampleItems.forEach(f -> {
-			Map<String, Object> tt = Maps.newLinkedHashMap();
-			tt.put("title", f.getName());
-			tt.put("data", "sample.items." + f.getNameCode());
-			if ("date".equals(f.getType())) {
-				tt.put("type", "date");
-			}
-			header.add(tt);
-		});
-		
-		return header;
-	}
-	
-	public void filterItemsAndOrdering(List<SampleHistory> list) {
+	public void filterItemsAndOrderingFromHistory(List<SampleHistory> list) {
 		
 		list.stream().forEach(s -> {
 			Map<String, Object> t = Maps.newLinkedHashMap();

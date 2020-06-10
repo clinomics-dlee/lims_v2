@@ -33,7 +33,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_detail"></th:block>
+		<th:block th:replace="popup/sample_detail_readonly"></th:block>
+		<th:block th:replace="popup/result"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -189,7 +190,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			},
 			{
 				title : '검사실ID', 
-				data : 'laboratoryId'
+				data : 'laboratoryId',
+				render : function(row, data, index) {
+					return '<a href="javascript:sampleReadonlyPopupOnload(\'' + row.id + '\')">' + data + '</string>';
+				}
 			},
 			{
 				title : '서비스', 
@@ -208,12 +212,26 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'genotypingMethodCode'
 			},
 			{
+				title : "결과",
+				data : "id",
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var value = "";
+					if (!jQuery.isEmptyObject(row.data)) {
+						value = '<a href="javascript:resultPopupOnload(\'' + data + '\', \'' + row.genotypingId + '\')" class="btn btn-sm btn-default width-60">VIEW</a>';
+					}
+					return value;
+				}
+			},
+			{
 				title : '검사담당자', 
 				data : 'jdgmApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					var html = '<div class="progress rounded-corner" style="height:20px;">';
+					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
+									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
+					html += '<div class="progress rounded-corner" style="height:20px;">';
 					return html;
 				}
 			},
@@ -222,8 +240,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'jdgmMngApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					var html = '<div class="progress rounded-corner" style="height:20px;">';
+					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
+									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
+					html += '<div class="progress rounded-corner" style="height:20px;">';
 					return html;
 				}
 			},
@@ -232,8 +252,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'jdgmDrctApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					var html = '<div class="progress rounded-corner" style="height:20px;">';
+					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
+									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
+					html += '<div class="progress rounded-corner" style="height:20px;">';
 					return html;
 				}
 			},

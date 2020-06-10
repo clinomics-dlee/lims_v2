@@ -126,13 +126,11 @@ public class CalendarService {
 		Specification<Sample> where = getRegisteredWhere(params);
 		Page<Sample> sample = sampleRepository.findAll(where, pageable);
 		long total = sample.getTotalElements();
+		List<Sample> list = sample.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
-		List<Sample> output = sample.getContent();
-				
-		sampleItemService.filterItemsAndOrdering(output, BooleanUtils.toBoolean(params.getOrDefault("all", "false")));
-		
-		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, output);
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
 	public Map<String, Object> selectAnalysis(Map<String, String> params) {
@@ -151,9 +149,11 @@ public class CalendarService {
 		Specification<Sample> where = getAnalysisWhere(params);
 		Page<Sample> sample = sampleRepository.findAll(where, pageable);
 		long total = sample.getTotalElements();
+		List<Sample> list = sample.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
-		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, sample.getContent());
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
 	public Map<String, Object> selectCompleted(Map<String, String> params) {
@@ -172,9 +172,11 @@ public class CalendarService {
 		Specification<Sample> where = getCompletedWhere(params);
 		Page<Sample> sample = sampleRepository.findAll(where, pageable);
 		long total = sample.getTotalElements();
+		List<Sample> list = sample.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
-		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, sample.getContent());
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
 	public Map<String, Object> selectReported(Map<String, String> params) {
@@ -193,9 +195,11 @@ public class CalendarService {
 		Specification<Sample> where = getReportedWhere(params);
 		Page<Sample> sample = sampleRepository.findAll(where, pageable);
 		long total = sample.getTotalElements();
+		List<Sample> list = sample.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
-		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, sample.getContent());
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
 	private Specification<Sample> getSampleWhere(Map<String, String> params) {

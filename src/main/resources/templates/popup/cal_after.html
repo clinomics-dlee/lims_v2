@@ -63,8 +63,7 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 			return {
 				bundleId : bundleId,
 				sDate : startDate,
-				fDate : endDate,
-				all : true
+				fDate : endDate
 			};
 		},
 		dataType : "json",
@@ -96,6 +95,8 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 			var value = g_statusCodeInfo[data];
 			return value;
 		}
+	}, {
+		serverHeader : true
 	}, {
 		title : "생성일자",
 		data : "createdDate",

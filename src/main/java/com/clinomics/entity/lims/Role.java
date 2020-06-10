@@ -27,6 +27,8 @@ public class Role implements Serializable {
 
 	private String name;
 
+	private boolean isPersonalView;
+
 	@Column(columnDefinition = "boolean default true")
 	private boolean inUse;
 
@@ -60,6 +62,14 @@ public class Role implements Serializable {
 
 	public void setInUse(boolean inUse) {
 		this.inUse = inUse;
+	}
+
+	public boolean isPersonalView() {
+		return isPersonalView;
+	}
+
+	public void setPersonalView(boolean isPersonalView) {
+		this.isPersonalView = isPersonalView;
 	}
 
 
