@@ -1,6 +1,7 @@
 package com.clinomics.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,10 +22,12 @@ import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.service.async.AnalysisService;
 import com.clinomics.specification.lims.SampleSpecification;
+import com.clinomics.util.FileUtil;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,18 @@ public class AnlsService {
 
 	@Value("${lims.workspacePath}")
 	private String workspacePath;
+
+	@Value("${titan.ftp.address}")
+	private String ftpAddress;
+	
+	@Value("${titan.ftp.port}")
+	private int ftpPort;
+
+	@Value("${titan.ftp.username}")
+	private String ftpUsername;
+
+	@Value("${titan.ftp.password}")
+	private String ftpPassword;
 
 	@Autowired
 	SampleRepository sampleRepository;
@@ -89,6 +104,61 @@ public class AnlsService {
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
+	public Map<String, Object> findCelFiles(Map<String, String> params) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		
+		String chipBarcode = params.get("chipBarcode");
+		
+		List<Map<String, Object>> lstMapCelFiles = new ArrayList<>();
+		FTPClient ftp = null;
+		try {
+			ftp = new FTPClient();
+			ftp.setControlEncoding("UTF-8");
+
+			ftp.connect(ftpAddress, ftpPort);
+			ftp.login(ftpUsername, ftpPassword);
+
+			for (String fileName : ftp.listNames()) {
+				if (fileName.indexOf("_") > -1) {
+					String filePrefix = fileName.substring(0, fileName.indexOf("_"));
+					String ext = FileUtil.getFileNameExt(fileName);
+	
+					// #. 파일명 검색
+					if ("CEL".equals(ext) && filePrefix.equals(chipBarcode)) {
+						Map<String, Object> map = Maps.newHashMap();
+						map.put("fileName", fileName);
+						lstMapCelFiles.add(map);
+					}
+				}
+			}
+
+		} catch (IOException e) {
+			logger.info("IO:" + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (ftp != null && ftp.isConnected()) {
+				try {
+					ftp.disconnect();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		long total = lstMapCelFiles.size();
+		long filtered = total;
+		
+		// #. paging 관련 객체
+		Pageable pageable = PageRequest.of(pageNumber, pageRowCount);
+		int start = Math.toIntExact(pageable.getOffset());
+		int end = Math.toIntExact((start + pageable.getPageSize()) > total ? total : (start + pageable.getPageSize()));
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, lstMapCelFiles);
 	}
 
 	public Map<String, String> startAnls(List<String> mappingNos, String userId) {
@@ -321,6 +391,10 @@ public class AnlsService {
 				rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
 				return rtn;
 			}
+
+			sample.setJdgmApproveDate(now);
+			sample.setModifiedDate(now);
+			sample.setJdgmApproveMember(member);
 
 			sample.setModifiedDate(now);
 			sample.setStatusCode(StatusCode.S460_ANLS_CMPL);

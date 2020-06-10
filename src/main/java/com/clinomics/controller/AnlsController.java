@@ -44,6 +44,11 @@ public class AnlsController {
 		return anlsService.findMappingSampleByAnlsRdyStatus(params);
 	}
 
+	@GetMapping("/rdy/celfile/get")
+	public Map<String, Object> getCelFiles(@RequestParam Map<String, String> params) {
+		return anlsService.findCelFiles(params);
+	}
+
 	@PostMapping("/rdy/start")
 	public Map<String, String> startAnls(@RequestBody List<String> mappingNos) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

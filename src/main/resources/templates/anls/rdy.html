@@ -25,6 +25,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
+		<th:block th:replace="popup/cel_files"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -169,6 +170,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				if (data != null && data.length > 0) {
 					value = g_chipTypeCodeInfo[data];
 				}
+				return value;
+			}
+		}, {
+			title : "Cel File 목록",
+			data : "chipBarcode",
+			bodyClassName : 'text-center',
+			render : function(row, data, index) {
+				var value = '<a href="javascript:celfilePopupOnload(\'' + data + '\')" class="btn btn-sm btn-success width-60">VIEW</a>';
 				return value;
 			}
 		}]);
