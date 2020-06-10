@@ -62,7 +62,7 @@
 		
 	}
 
-	function dnaqcPopupSave(reissue) {
+	function dnaqcPopupSave() {
 		if (!$('#frm_popup_dnaqc_detail').parsley().validate()) {
 			return;	
 		}
@@ -78,16 +78,12 @@
 			},
 		    success: function(data, xhr) {
 		    	if (data.result == "00") {
-					if (reissue) {
-						dnaqcPopupRecreate();
-					} else {
-			    		CommonMsg.save(function() {
-			    			$("#modal-dnaqc-detail").modal('hide');
-			    			search();
-						});
-					}
-				} else if (!data.result.startsWith("0")) {
-					CommonMsg.error(function() { });
+					CommonMsg.save(function() {
+						$("#modal-dnaqc-detail").modal('hide');
+						search();
+					});
+				} else {
+					CommonMsg.error(function() { }, data.message);
 				}
 			},
 			error : function(data) {
