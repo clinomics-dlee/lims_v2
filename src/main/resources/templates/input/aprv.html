@@ -206,8 +206,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'inputApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					var html = '<div class="progress rounded-corner" style="height:20px;">';
+					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
+									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
+					html += '<div class="progress rounded-corner" style="height:20px;">';
 					return html;
 				}
 			},
@@ -216,8 +218,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'inputMngApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					var html = '<div class="progress rounded-corner" style="height:20px;">';
+					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
+									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
+					html += '<div class="progress rounded-corner" style="height:20px;">';
 					return html;
 				}
 			},
@@ -226,8 +230,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'inputDrctApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
-					var html = data ? '<span class="label label-success" style="font-size:12px;">확인</span>'
-									: '<span class="label label-danger" style="font-size:12px;">미확인</span>';
+					var html = '<div class="progress rounded-corner" style="height:20px;">';
+					html += data ? '<div class="progress-bar bg-blue " style="width: 100%">확인</div>'
+									: '<div class="progress-bar bg-red " style="width: 100%">미확인</div>';
+					html += '<div class="progress rounded-corner" style="height:20px;">';
 					return html;
 				}
 			}

@@ -34,11 +34,9 @@
 
 <script th:inline="javascript">
 /* <![CDATA[ */    
-	function samplePopupOnload(sampleId, reissue) {
+	function samplePopupOnload(sampleId) {
 		$("#modal-sample-detail").modal();
-		if (reissue) {
-			$('#popup_btn_reissue').removeClass('hide');
-		}
+		
 		$.ajax({
 			url : "/input/itemby/sample/" + sampleId,
 			type : "GET",
@@ -103,7 +101,8 @@
 							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
 								+ 'placeholder="' + sitm[r].exampleValue + '" name="' + code + '" ' + autoComplete;
 							html += readonly
-							html += ' value="' + value + '"'
+							if (typeof value === "number") html += ' value=' + value + ''
+							if (typeof value === "string") html += ' value="' + value + '"'
 							html += '/>';
 						}
 						
@@ -116,6 +115,10 @@
 					
 					//html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
 					html += '</form>';
+
+					if ("S710_OUTPUT_CMPL,S810_RE_OUTPUT_CMPL".includes(data.sample.statusCode)) {
+						$('#popup_btn_reissue').removeClass('hide');
+					}
 					
 					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
 					
