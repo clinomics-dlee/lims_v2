@@ -51,6 +51,9 @@ public class OutputService {
 	SampleItemService sampleItemService;
 
 	@Autowired
+	RoleService roleService;
+
+	@Autowired
 	CustomIndexPublisher customIndexPublisher;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -140,6 +143,7 @@ public class OutputService {
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
 			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
 		}
 		sampleRepository.saveAll(samples);
 		
@@ -183,6 +187,7 @@ public class OutputService {
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
 			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
 		}
 		sampleRepository.saveAll(samples);
 		
@@ -224,6 +229,7 @@ public class OutputService {
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
 			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
 		}
 		sampleRepository.saveAll(samples);
 		

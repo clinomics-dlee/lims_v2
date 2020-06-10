@@ -304,6 +304,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						CommonMsg.save(function() {
 							UserTable.reload('_collect_grid');
 						}, data.message);
+					} else if (data.message) {
+						CommonMsg.info(function() { }, data.message);
 					} else {
 						CommonMsg.error(function() { });
 					}

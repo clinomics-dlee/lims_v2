@@ -85,8 +85,17 @@ public class SampleItemService {
 			sampleItems.addAll(product.getSampleItem());
 			
 		});
+
+		boolean personalView = roleService.checkPersonalView();
 		
 		List<SampleItem> sortedSampleItems = sampleItems.stream()
+				.filter(fs -> {
+					if (fs.isVisible()) {
+						return personalView;
+					} else {
+						return true;
+					}
+				})
 				.sorted(Comparator.comparing(SampleItem::getOrd))
 				.collect(Collectors.toList());
 		

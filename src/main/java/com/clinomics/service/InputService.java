@@ -248,6 +248,7 @@ public class InputService {
 		} else {
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
 			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
 		}
 		sampleRepository.saveAll(samples);
 		

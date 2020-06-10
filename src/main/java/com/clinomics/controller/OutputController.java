@@ -77,6 +77,6 @@ public class OutputController {
 	public Map<String, String> outputReIssue(@RequestBody List<Integer> ids) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		return outputService.outputApprove(ids, userDetails.getUsername());
+		return outputService.outputReIssue(ids, userDetails.getUsername());
 	}
 }

@@ -88,7 +88,7 @@ var CommonMsg = function() {
 		},
 		//save
 		error : function(sfunc, msg) {
-			if (!msg) msg = "Sorry, Please contact the administrator";
+			if (!msg) msg = "실패하였습니다. 관리자에게 문의바랍니다.";
 			swal({
 				title: '실패',
 				text: msg,
@@ -107,7 +107,7 @@ var CommonMsg = function() {
 	  		});
 		},
 		warning : function(sfunc, msg) {
-			if (!msg) msg = "Sorry, Please contact the administrator";
+			if (!msg) msg = "실패하였습니다. 관리자에게 문의바랍니다.";
 			swal({
 				title: '실패',
 				text: msg,
@@ -126,7 +126,7 @@ var CommonMsg = function() {
 	  		});
 		},
 		info : function(sfunc, msg) {
-			if (!msg) msg = "Sorry, Please contact the administrator";
+			if (!msg) msg = "실패하였습니다. 관리자에게 문의바랍니다.";
 			swal({
 				title: '실패',
 				text: msg,
@@ -146,7 +146,7 @@ var CommonMsg = function() {
 		},
 		//yes and no
 		yesNo : function(ofunc, cfunc, msg) {
-			if (!msg) msg = "Do you want to proceed?";
+			if (!msg) msg = "진행하시겠습니까?";
 			swal({
 				title: 'Confirm',
 				text: msg,

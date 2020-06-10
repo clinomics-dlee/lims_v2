@@ -185,21 +185,29 @@
 	}
 	
 	function samplePopupRecreate() {
+		var data = [];
+		var id = $('input[name=id]').val();
+		if (typeof id === 'string') data.push(Number(id));
+		if (typeof id === 'number') data.push(id);
 		CommonMsg.okCancel(function() {
 			$.ajax({
-	            url: '/output/reissue/' + $('input[name=id]').val(),
+	            url: '/output/reissue',
+				type: 'post',
+				data : JSON.stringify(data),
 		        dataType : 'json',
 		        contentType : "application/json;charset=utf-8",
 		        beforeSend: function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
 			    success: function(data, xhr) {
-			    	if (data.result == "00") {
-			    		CommonMsg.save(function() {
+			    	if (data.result.startsWith("0")) {
+						CommonMsg.save(function() {
 			    			$("#modal-sample-detail").modal('hide');
 			    			search();
 						});
-					} else if (!data.result.startsWith("0")) {
+					} else if (data.message) {
+						CommonMsg.info(function() { }, data.message);
+					} else {
 						CommonMsg.error(function() { });
 					}
 				},

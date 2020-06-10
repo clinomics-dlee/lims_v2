@@ -21,6 +21,18 @@ public class RoleService {
 	RoleRepository roleRepository;
 
 	public boolean checkPersonalView() {
+		String userRoles = getRoles();
+		List<Role> roles = roleRepository.findByIsPersonalViewTrue();
+
+		for (Role r : roles) {
+			if (userRoles.contains(r.getCode())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private String getRoles() {
 		// 시큐리티 컨텍스트 객체를 얻습니다.
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		// 사용자가 가진 모든 롤 정보를 얻습니다.
@@ -31,13 +43,6 @@ public class RoleService {
 			GrantedAuthority auth = iter.next();
 			userRoles += "," + auth.getAuthority();
 		}
-		List<Role> roles = roleRepository.findByIsPersonalViewTrue();
-
-		for (Role r : roles) {
-			if (userRoles.contains(r.getCode())) {
-				return true;
-			}
-		}
-		return false;
+		return userRoles;
 	}
 }
