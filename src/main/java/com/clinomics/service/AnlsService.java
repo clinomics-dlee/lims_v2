@@ -80,7 +80,7 @@ public class AnlsService {
 	public Map<String, Object> findMappingSampleByAnlsRdyStatus(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
@@ -97,9 +97,9 @@ public class AnlsService {
 					.and(SampleSpecification.statusEqual(StatusCode.S400_ANLS_READY))
 					.and(SampleSpecification.mappingInfoLike(params));
 		
-		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
+		total = list.size();
 		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
 		long filtered = total;
 		
@@ -109,7 +109,7 @@ public class AnlsService {
 	public Map<String, Object> findCelFiles(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
 		String chipBarcode = params.get("chipBarcode");
@@ -214,7 +214,7 @@ public class AnlsService {
 	public Map<String, Object> findSampleByAnlsSttsStatus(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
@@ -310,7 +310,7 @@ public class AnlsService {
 	public Map<String, Object> findSampleByAnlsSuccStatus(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });

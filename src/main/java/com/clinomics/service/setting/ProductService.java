@@ -61,7 +61,7 @@ public class ProductService {
 	public Map<String, Object> selectBundleAll(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		long total = bundleRepository.countByIsSingleAndIsActiveTrue(true);
 		long filtered = total;
@@ -81,7 +81,7 @@ public class ProductService {
 	
 	public Map<String, Object> selectProductAll(Map<String, String> params) {
 		int draw = 1; // #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 1);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10); // #.count 조회
 		long total = productRepository.count();
 		long filtered = total;
