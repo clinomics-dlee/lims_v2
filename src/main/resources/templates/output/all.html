@@ -119,6 +119,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	<script th:inline="javascript">
 	/* <![CDATA[ */       
 	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	var g_genotypingMethodCodeInfo = /*[[${genotypingMethodCodes}]]*/ {};
 
 	var tables = [];
 	var count;
@@ -151,6 +152,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		});
 		setDaterangepicker(startDate, endDate);
 		
+		rhDiv = '<div class="progress rounded-corner" style="height:20px;">';
+		rhDivAprv = '<div class="progress-bar bg-blue " style="width: 100%">';
+		rhDivNotAprv = '<div class="progress-bar bg-red " style="width: 100%">';
+		dateFormat = "MM-DD HH:mm";
+
 		UserTable.draw('_collect_grid', {
 			url : "/all/list",
 			type : "GET",
@@ -185,6 +191,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'bundle.name'
 			},
 			{
+				title : "Genotyping ID",
+				data : "genotypingId"
+			},
+			{
+				title : "Genotyping Method",
+				data : "genotypingMethodCode",
+				render : function(row, data, index) {
+					var value = "";
+					if (data != null && data.length > 0) {
+						value = g_genotypingMethodCodeInfo[data];
+					}
+					return value;
+				}
+			},
+			{
+				title : "Mapping No",
+				data : "mappingNo"
+			},
+			{
 				title : '상태', 
 				data : "statusCode",
 				render : function(row, data, index) {
@@ -196,13 +221,280 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				serverHeader : true
 			},
 			{
+				title : '등록자', 
+				data : 'createdMember.name'
+			},
+			{
 				title : '검체 등록일자', 
 				data : 'createdDate',
 				type : 'date'
 			},
 			{
-				title : '등록자', 
-				data : 'createdMember.name'
+				title : '입고담당자', 
+				data : 'inputApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.inputApproveMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '입고승인일시', 
+				data : 'inputApproveDate',
+				type : 'date'
+			},
+			{
+				title : '중간관리자', 
+				data : 'inputMngApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.inputMngApproveMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '입고 중간관리자 승인일시', 
+				data : 'inputMngApproveDate',
+				type : 'date'
+			},
+			{
+				title : '입고 검사실책임자', 
+				data : 'inputDrctApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.inputDrctMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '입고 검사실책임자 승인일시', 
+				data : 'inputDrctApproveDate',
+				type : 'date'
+			},
+			{
+				title : '실험 시작담당자', 
+				data : 'expStartDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.expStartMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '실험시작일시', 
+				data : 'expStartDate',
+				type : 'date'
+			},
+			{
+				title : 'STEP1 담당자', 
+				data : 'expStep1Date',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.expStep1Member.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : 'STEP1 완료일시', 
+				data : 'expStep1Date',
+				type : 'date'
+			},
+			{
+				title : 'STEP2 담당자', 
+				data : 'expStep2Date',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.expStep2Member.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : 'STEP2 완료일시', 
+				data : 'expStep2Date',
+				type : 'date'
+			},
+			{
+				title : 'STEP3 담당자', 
+				data : 'expStep3Date',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.expStep3Member.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : 'STEP3 완료일시', 
+				data : 'expStep3Date',
+				type : 'date'
+			},
+			{
+				title : '분석 시작담당자', 
+				data : 'anlsStartDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.anlsStartMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '분석시작일시', 
+				data : 'anlsStartDate',
+				type : 'date'
+			},
+			{
+				title : '분석종료일시', 
+				data : 'anlsEndDate',
+				type : 'date'
+			},
+			{
+				title : '분석 완료담당자', 
+				data : 'anlsCmplDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.anlsCmplMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '분석완료일시', 
+				data : 'anlsCmplDate',
+				type : 'date'
+			},
+			{
+				title : '판정 검사담당자', 
+				data : 'jdgmApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.jdgmApproveMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '판정승인일시', 
+				data : 'jdgmApproveDate',
+				type : 'date'
+			},
+			{
+				title : '판정 중간관리자', 
+				data : 'jdgmMngApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.jdgmMngApproveMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '판정 중간관리자 승인일시', 
+				data : 'jdgmMngApproveDate',
+				type : 'date'
+			},
+			{
+				title : '판정 검사실책임자', 
+				data : 'jdgmDrctApproveDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.jdgmDrctApproveMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '판정 검사실책임자 승인일시', 
+				data : 'jdgmDrctApproveDate',
+				type : 'date'
+			},
+			{
+				title : '출고 담당자', 
+				data : 'outputWaitDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.outputWaitMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '출고대기일시', 
+				data : 'outputWaitDate',
+				type : 'date'
+			},
+			{
+				title : '출고완료일시', 
+				data : 'outputCmplDate',
+				type : 'date'
+			},
+			{
+				title : '재발행 담당자', 
+				data : 'reOutputWaitDate',
+				bodyClassName : 'text-center',
+				render : function(row, data, index) {
+					var html = rhDiv;
+					html += data ? rhDivAprv
+						+ row.reOutputWaitMember.name + '</div>'
+						: rhDivNotAprv;
+					html += '</div></div>';
+					return html;
+				}
+			},
+			{
+				title : '재발행대기일시', 
+				data : 'reOutputWaitDate',
+				type : 'date'
+			},
+			{
+				title : '재발행완료일시', 
+				data : 'reOutputCmplDate',
+				type : 'date'
 			}
 		], null);
 			
