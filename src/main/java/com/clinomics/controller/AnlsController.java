@@ -40,7 +40,6 @@ public class AnlsController {
 
 	@GetMapping("/rdy/get")
 	public Map<String, Object> getRdy(@RequestParam Map<String, String> params) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return anlsService.findMappingSampleByAnlsRdyStatus(params);
 	}
 
@@ -57,7 +56,6 @@ public class AnlsController {
 
 	@GetMapping("/stts/get")
 	public Map<String, Object> getStts(@RequestParam Map<String, String> params) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return anlsService.findSampleByAnlsSttsStatus(params);
 	}
 

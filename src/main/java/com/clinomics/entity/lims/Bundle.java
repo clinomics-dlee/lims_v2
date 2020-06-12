@@ -46,6 +46,10 @@ public class Bundle implements Serializable {
 	@Column(length = 100)
 	private String sequenceRole;
 
+	private int tatDay;
+
+	private boolean isTatTueThu;
+
 	private boolean isAutoBarcode;
 
 	private boolean isAutoSequence;
@@ -154,6 +158,22 @@ public class Bundle implements Serializable {
 
 	public void setProduct(Set<Product> product) {
 		this.product = product;
+	}
+
+	public int getTatDay() {
+		return tatDay;
+	}
+
+	public void setTatDay(int tatDay) {
+		this.tatDay = tatDay;
+	}
+
+	public boolean isTatTueThu() {
+		return isTatTueThu;
+	}
+
+	public void setTatTueThu(boolean isTatTueThu) {
+		this.isTatTueThu = isTatTueThu;
 	}
 
 	

@@ -56,6 +56,9 @@ public class InputService {
 	
 	@Autowired
 	DataTableService dataTableService;
+
+	@Autowired
+	HolidayService holidayService;
 	
 	@Autowired
 	SampleItemService sampleItemService;
@@ -135,6 +138,8 @@ public class InputService {
 			sample.setCreatedDate(now);
 			sample.setCreatedMember(member);
 			sample.setStatusCode(StatusCode.S000_INPUT_REG);
+
+			
 		}
 		
 		datas.remove("memberId");
@@ -147,6 +152,12 @@ public class InputService {
 				if (!seq.isEmpty()) sample.setLaboratoryId(seq);
 			} else {
 				sample.setLaboratoryId(datas.get("laboratory"));
+			}
+
+			String sampleReceived = datas.get("sampleReceived");
+			
+			if (sampleReceived.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+				holidayService.setTat(bundle, datas);
 			}
 		}
 		datas.remove("id");
