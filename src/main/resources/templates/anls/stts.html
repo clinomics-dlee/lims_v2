@@ -203,7 +203,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : "statusCode",
 			render : function(row, data, index) {
 				var value = '<div class="progress rounded-corner " style="height:20px;">';
-				if ("S440_ANLS_FAIL" == data) {
+				if ("S430_ANLS_FAIL" == data) {
 					value += '<div class="progress-bar bg-danger" style="width: 100%;cursor: pointer;" onclick="viewErrorMsg(\'' + row.statusMessage + '\')">';
 					value += 'FAIL';
 					value += '</div>';

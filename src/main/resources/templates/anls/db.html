@@ -188,17 +188,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				return value;
 			}
 		}, {
-			title : "분석결과",
+			title : "상태",
 			data : "statusCode",
 			render : function(row, data, index) {
 				var value = g_statusCodeInfo[data];
 				return value;
 			}
 		}, {
-			title : "검체 입고일",
+			title : "분석 담당자",
 			data : "anlsCmplMember.name"
 		}, {
-			title : "결과 보고일",
+			title : "분석 완료일",
 			data : "anlsCmplDate",
 			type : "date"
 		}, {
@@ -209,6 +209,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				var value = "";
 				if (!jQuery.isEmptyObject(row.data)) {
 					value = '<a href="javascript:resultPopupOnload(\'' + data + '\', \'' + row.genotypingId + '\')" class="btn btn-sm btn-success width-60">VIEW</a>';
+				} else {
+					if ("S450_ANLS_FAIL_CMPL" == row.statusCode) {
+						value = '<a href="javascript:viewErrorMsg(\'' + row.statusMessage + '\')" class="btn btn-sm btn-danger width-60">VIEW</a>';
+					}
 				}
 				return value;
 			}
@@ -217,6 +221,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	function search() {
 		UserTable.reload('_anls_db_grid');
+	}
+
+	function viewErrorMsg(msg) {
+		CommonMsg.error(function() { }, msg);
 	}
 	/* ]]> */
 	</script>
