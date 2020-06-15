@@ -58,7 +58,7 @@ public class HolidayService {
         LocalDate rDate = date;
         int rtn = 0;
         while (rDate.getDayOfWeek() != DayOfWeek.TUESDAY && rDate.getDayOfWeek() != DayOfWeek.THURSDAY) {
-            rDate = date.plusDays(1);
+            rDate = rDate.plusDays(1);
             rtn++;
         }
         return rtn;
