@@ -35,7 +35,7 @@ public class HolidayService {
         int max = bundle.getTatDay();
         
         if (bundle.isTatTueThu()) {
-            max += getNextTueOrThu(start);
+            start = start.plusDays(getNextTueOrThu(start));
         }
 
         for (int i = 0; i < max; i++) {
