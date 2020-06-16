@@ -234,6 +234,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					xhr.setRequestHeader(header, token);
 				},
 				success: function(data, xhr) {
+					console.log(xhr.status);
 					if (data.result.startsWith("0")) {
 						CommonMsg.save(function() {
 							UserTable.reload('_collect_grid');

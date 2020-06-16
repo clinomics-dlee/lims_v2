@@ -72,33 +72,33 @@ var CommonMsg = function() {
 		save : function(sfunc, msg) {
 			if (!msg) msg = "저장이 완료되었습니다";
 			swal({
-				text: ' ',
+				text: msg,
 				icon: 'success',
-				title: msg,
+				title: '정상',
 				buttons : {
 					confirm : {
 						visible : false
 					}
 				},
 				height: '30em',
-				timer: 900
+				timer: 1200
 			}).then(function (result) {
 				sfunc();
 			})
 		},
 		//save
 		error : function(sfunc, msg) {
-			if (!msg) msg = "실패하였습니다. 관리자에게 문의바랍니다.";
+			if (!msg) msg = "에러가 발생하였습니다. 관리자에게 문의바랍니다.";
 			swal({
-				title: '실패',
+				title: '에러',
 				text: msg,
 				icon: 'error',
 				buttons: {
 					confirm: {
-						text: 'Confirm',
+						text: '확인',
 						value: true,
 						visible: true,
-						className: 'btn btn-danger',
+						className: 'btn btn-white',
 						closeModal: true
 					}
 				}
@@ -114,10 +114,10 @@ var CommonMsg = function() {
 				icon: 'warning',
 				buttons: {
 					confirm: {
-						text: 'Confirm',
+						text: '확인',
 						value: true,
 						visible: true,
-						className: 'btn btn-danger',
+						className: 'btn btn-white',
 						closeModal: true
 					}
 				}
@@ -133,10 +133,10 @@ var CommonMsg = function() {
 				icon: 'info',
 				buttons: {
 					confirm: {
-						text: 'Confirm',
+						text: '확인',
 						value: true,
 						visible: true,
-						className: 'btn btn-danger',
+						className: 'btn btn-white',
 						closeModal: true
 					}
 				}
@@ -148,19 +148,18 @@ var CommonMsg = function() {
 		yesNo : function(ofunc, cfunc, msg) {
 			if (!msg) msg = "진행하시겠습니까?";
 			swal({
-				title: 'Confirm',
-				text: msg,
-				icon: 'info',
+				title: msg,
+				icon: 'warning',
 				buttons: {
 					confirm: {
-						text: 'Yes',
+						text: '네',
 						value: true,
 						visible: true,
 						className: 'btn btn-info',
 						closeModal: true
 					},
 					cancel: {
-						text: 'No',
+						text: '아니오',
 						value: null,
 						visible: true,
 						className: 'btn btn-white',
@@ -180,9 +179,8 @@ var CommonMsg = function() {
 		okCancel : function(ofunc, cfunc, msg) {
 			if (!msg) msg = "진행하시겠습니까?";
 			swal({
-				title: '알림',
-				text: msg,
-				icon: 'info',
+				title: msg,
+				icon: 'warning',
 				buttons: {
 					confirm: {
 						text: 'OK',

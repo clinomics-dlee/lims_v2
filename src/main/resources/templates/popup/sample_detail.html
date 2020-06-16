@@ -45,7 +45,8 @@
 			beforeSend : function(xhr) {
 				xhr.setRequestHeader(header, token);
 			},
-			success: function (data) {
+			success: function (data, xhr) {
+				
 				
 				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
 				var notnull = false, readonly = '', code, value = "";
@@ -130,7 +131,11 @@
 				
 				
 			},
-			error : function(data) {
+			error : function(data, xhr) {
+				
+				if (data.status == "200") {
+					location.reload();
+				}
 				CommonMsg.error(function() { });
 			}
 		});

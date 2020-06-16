@@ -88,7 +88,8 @@ $(document).ready(function() {
 
 function sendRedirectErrorLocation(){
 	swal({
-		title: $("#loginFail").val(),
+		title: '로그인 실패',
+		text: $("#loginFail").val(),
 		icon: 'warning',
 		buttons: {
 			confirm: {

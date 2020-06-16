@@ -1,6 +1,7 @@
 package com.clinomics.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -209,9 +210,6 @@ public class InputService {
 	@Transactional
 	public Map<String, String> approve(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids
-			, Arrays.asList(new StatusCode[] { StatusCode.S020_INPUT_RCV, StatusCode.S000_INPUT_REG })
-		);
 		
 		// sample.set
 		Optional<Member> oMember = memberRepository.findById(memberId);
@@ -222,6 +220,13 @@ public class InputService {
 			roles += "," + r.getCode();
 		}
 		roles = roles.substring(1);
+
+		List<StatusCode> status = new ArrayList<>();
+		status.add(StatusCode.S020_INPUT_RCV);
+		if (roles.contains(RoleCode.ROLE_INPUT_20.toString())) {
+			status.add(StatusCode.S000_INPUT_REG);
+		} 
+		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, status);
 
 		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
 		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
