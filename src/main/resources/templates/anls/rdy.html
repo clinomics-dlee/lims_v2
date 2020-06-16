@@ -25,6 +25,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
+		<th:block th:replace="popup/mapping_sample"></th:block>
 		<th:block th:replace="popup/cel_files"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
@@ -157,7 +158,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			}
 		}, {
 			title : "Mapping No",
-			data : "mappingNo"
+			data : "mappingNo",
+			render : function(row, data, index) {
+				return '<a href="javascript:mappingSamplePopupOnload(\'' + data + '\')">' + data + '</a>';
+			}
 		}, {
 			title : "Chip Barcode",
 			data : "chipBarcode"

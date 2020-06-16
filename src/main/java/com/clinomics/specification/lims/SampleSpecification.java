@@ -213,14 +213,8 @@ public class SampleSpecification {
 
 	public static Specification<Sample> mappingInfoGroupBy() {
 		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = null;
-			List<Predicate> predicatesAnds = new ArrayList<>();
-
-			root = query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode")).from(Sample.class);
-			predicatesAnds.add(criteriaBuilder.conjunction());
-			predicatesAnds.add(criteriaBuilder.isNotNull(root.get("mappingNo")));
-
-			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			Predicate rtn = criteriaBuilder.isNotNull(root.get("mappingNo"));
+			query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode")).from(Sample.class);
 			return rtn;
 		};
 	}
