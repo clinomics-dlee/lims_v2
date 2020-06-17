@@ -181,7 +181,7 @@ var UserTable = function() {
 								}
 								
 								if (aColumns[r].render) {
-									var renderValue = aColumns[r].render(rows[Number(s)], val, Number(s));
+									var renderValue = aColumns[r].render(rows[Number(s)], val, Number(s), param);
 									html += '<td' + bodyClassName + '>' + renderValue + '</td>';
 									if (!aColumns[r].hideExcel) {
 										// #. rendering 한 값에 tag 제거

@@ -88,7 +88,7 @@ function calAfterGetItem(bundleId, startDate, endDate) {
 		headClassName : 'width-50',
 		bodyClassName : 'text-center',
 		render : function(row, data, index) {
-			return '<string>' + (index + 1) + '</string>';
+			return '<string>' + (index + 1 + (param.pgNmb * param.pgrwc)) + '</string>';
 		}
 	}, {
 		title : "서비스",

@@ -76,8 +76,9 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 		data : 'id',
 		headClassName : 'width-50',
 		bodyClassName : 'text-center',
-		render : function(row, data, index) {
-			return '<string>' + (index + 1) + '</string>';
+		render : function(row, data, index, param) {
+			
+			return '<string>' + (index + 1 + (param.pgNmb * param.pgrwc)) + '</string>';
 		}
 	}, {
 		title : "서비스",

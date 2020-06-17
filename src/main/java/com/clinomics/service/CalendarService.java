@@ -204,21 +204,21 @@ public class CalendarService {
 	
 	private Specification<Sample> getSampleWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.createdDateOneMonth(params))
+			.where(SampleSpecification.betweenDate(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
 	private Specification<Sample> getRegisteredWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.createdDateOneMonth(params))
+			.where(SampleSpecification.betweenDate(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
 	private Specification<Sample> getAnalysisWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.where(SampleSpecification.betweenModifiedDate(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
@@ -238,7 +238,7 @@ public class CalendarService {
 	
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.where(SampleSpecification.betweenModifiedDate(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(Arrays.asList(
 				StatusCode.S460_ANLS_CMPL
@@ -249,7 +249,7 @@ public class CalendarService {
 	
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
 		return Specification
-				.where(SampleSpecification.modifiedDateOneMonth(params))
+				.where(SampleSpecification.betweenModifiedDate(params))
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.statusIn(Arrays.asList(
 					StatusCode.S710_OUTPUT_CMPL
