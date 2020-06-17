@@ -188,7 +188,15 @@ var UserTable = function() {
 										excelData[aColumns[r].title] = renderValue.replace(/(<([^>]+)>)/ig,"");;
 									}
 								} else {
-									if (aColumns[r].type == 'date') {
+									if (aColumns[r].type == 'index') {
+										
+										val = '<string>' + (Number(s) + 1 + (rtn.pageNumber * page)) + '</string>';
+
+									} else if (aColumns[r].type == 'rindex') {
+										
+										val = '<string>' + (rtn.recordsTotal - (Number(s) + (rtn.pageNumber * page))) + '</string>';
+
+									} else if (aColumns[r].type == 'date') {
 										if (val != null) {
 											val = moment(val).format('YYYY-MM-DD');
 										} else {
