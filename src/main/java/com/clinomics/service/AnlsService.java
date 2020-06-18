@@ -298,6 +298,7 @@ public class AnlsService {
 			nSample.setExpStartMember(sample.getExpStartMember());
 			nSample.setExpStep1Date(sample.getExpStep1Date());
 			nSample.setExpStep1Member(sample.getExpStep1Member());
+			nSample.setModifiedDate(sample.getModifiedDate());
 
 			savedSamples.add(nSample);
 		}
@@ -393,7 +394,6 @@ public class AnlsService {
 			}
 
 			sample.setJdgmApproveDate(now);
-			sample.setModifiedDate(now);
 			sample.setJdgmApproveMember(member);
 
 			sample.setModifiedDate(now);

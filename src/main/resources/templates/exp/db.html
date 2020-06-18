@@ -103,10 +103,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							</div>
 							<hr/>
 							<div id="_mapping_db_grid"></div>
-							<hr/>
-							<div class="row">
-								<button onClick="downloadExcelMapping();" class="btn btn-success m-l-20">Excel Download</button>
-							</div>
 						</div>
 						<!-- end tab-2 -->
 					</div>
@@ -210,12 +206,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			title : 'No', 
 			data : 'id',
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
+			type : 'index',
 			hideExcel : true,
-			render : function(row, data, index) {
-				return '<string>' + (index + 1) + '</string>';
-			}
+			headClassName : 'width-50',
+			bodyClassName : 'text-center'
 		}, {
 			title : "서비스",
 			data : "bundle.name"
@@ -296,12 +290,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			title : 'No', 
 			data : 'id',
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
+			type : 'index',
 			hideExcel : true,
-			render : function(row, data, index) {
-				return '<string>' + (index + 1) + '</string>';
-			}
+			headClassName : 'width-50',
+			bodyClassName : 'text-center'
 		}, {
 			title : "Mapping No",
 			data : "mappingNo",

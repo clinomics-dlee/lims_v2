@@ -162,12 +162,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			title : 'No', 
 			data : 'id',
-			headClassName : 'width-50',
-			bodyClassName : 'text-center',
+			type : 'index',
 			hideExcel : true,
-			render : function(row, data, index) {
-				return '<string>' + (index + 1) + '</string>';
-			}
+			headClassName : 'width-50',
+			bodyClassName : 'text-center'
 		}, {
 			title : "서비스",
 			data : "bundle.name"

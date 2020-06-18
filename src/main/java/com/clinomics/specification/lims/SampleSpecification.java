@@ -214,7 +214,7 @@ public class SampleSpecification {
 	public static Specification<Sample> mappingInfoGroupBy() {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.isNotNull(root.get("mappingNo"));
-			query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode")).from(Sample.class);
+			query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode"));
 			return rtn;
 		};
 	}

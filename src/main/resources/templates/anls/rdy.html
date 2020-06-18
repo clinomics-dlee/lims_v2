@@ -151,11 +151,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, {
 			title : 'No', 
 			data : 'id',
+			type : 'index',
 			headClassName : 'width-50',
-			bodyClassName : 'text-center',
-			render : function(row, data, index) {
-				return '<string>' + (index + 1) + '</string>';
-			}
+			bodyClassName : 'text-center'
 		}, {
 			title : "Mapping No",
 			data : "mappingNo",

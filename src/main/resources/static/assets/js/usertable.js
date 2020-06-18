@@ -3,6 +3,7 @@ var UserTable = function() {
 	var drawnTableFunc = {};
 	var items = {};
 	var pageInfo = {};
+	var excelDatas = {};
 	
 	return {
 		init : function (uid, pageable, pagesView, pagesVal, isDownloadExcel) {
@@ -42,6 +43,20 @@ var UserTable = function() {
 			pageInfo[uid].pageable = pageable;
 			pageInfo[uid].pagesView = pagesView;
 			pageInfo[uid].pagesVal = pagesVal;
+
+			$("#" + uid + "_excel_btn").click(function() {
+				// step 1. workbook 생성
+				var wb = XLSX.utils.book_new();
+				// step 2. 시트 만들기 
+				var newWorksheet = XLSX.utils.json_to_sheet(excelDatas[uid]);
+				// var newWorksheet = XLSX.utils.table_to_sheet(html);
+				// step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
+				XLSX.utils.book_append_sheet(wb, newWorksheet, "sheet1");
+				// step 4. 엑셀 파일 만들기 
+				var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+				// step 5. 엑셀 파일 내보내기 
+				saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Sample.xlsx");
+			});
 		},
 		clear : function (uid) {
 			$('#' + uid + "_table tbody").empty();
@@ -103,12 +118,11 @@ var UserTable = function() {
 				contentType : ajax.contentType,
 				beforeSend : ajax.beforeSend,
 				success: function (rtn) {
+					excelDatas[uid] = [];
 					items[uid] = rtn.data;
 					var rows = rtn.data;
 					var html = '';
 					var headHtml = '';
-
-					var excelDatas = [];
 
 					if (custom_func) {
 						var htmls = custom_func(rows);
@@ -244,7 +258,7 @@ var UserTable = function() {
 							}
 							html += '</tr>';
 							rowIndex++;
-							excelDatas.push(excelData);
+							excelDatas[uid].push(excelData);
 						}
 					}
 					headHtml += '</tr>';
@@ -342,20 +356,6 @@ var UserTable = function() {
 						UserTable.draw(uid, ajax, columns, custom_func);
 					}
 
-					$("#" + uid + "_excel_btn").click(function() {
-						// step 1. workbook 생성
-						var wb = XLSX.utils.book_new();
-						// step 2. 시트 만들기 
-						var newWorksheet = XLSX.utils.json_to_sheet(excelDatas);
-						// var newWorksheet = XLSX.utils.table_to_sheet(html);
-						// step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
-						XLSX.utils.book_append_sheet(wb, newWorksheet, "sheet1");
-						// step 4. 엑셀 파일 만들기 
-						var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-						// step 5. 엑셀 파일 내보내기 
-						saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Sample.xlsx");
-					});
-					
 					$("#" + uid + "_checkbox_all").change(function() {
 						var rowCount = UserTable.getRowCount(uid);
 						if (rowCount > 0) {
