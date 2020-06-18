@@ -76,17 +76,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<div class="form-group row m-b-15">
 									
 									<div class="col-xs-push-0">
-										<button type="button" class="btn btn-default m-r-5 m-b-5" onclick="createRow();">그리드열 생성</button>
+										<button type="button" class="btn btn-default m-b-5" onclick="createRow();">그리드열 생성</button>
 									</div>
 									<div class="col-xs-push-0">
 										<input type="text" id="txt_create_grid" class="form-control width-50" style = "text-align:right;"
 											onkeypress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;"/>
 									</div>
 									<div class="col-xs-push-0">
-										<button type="button" class="btn btn-green m-r-5 m-l-20 m-b-5" onclick="excelForm();">엑셀 양식 다운로드</button>
-									</div>
-									<div class="col-xs-push-0">
-										<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="excelUpload();">엑셀 불러오기</button>
+										<button type="button" class="btn btn-green m-l-20 m-b-5" onclick="excelForm();">엑셀 양식 다운로드</button>
+										<button type="button" class="btn btn-green m-l-5 m-b-5" onclick="excelUpload();">엑셀 불러오기</button>
 									</div>
 									<div class="hide">
 										<input type="file" id="file" name="file">

@@ -59,7 +59,7 @@ public class CalendarService {
 	public Map<String, Object> selectCountByMonthly(Map<String, String> params) {
 		
 		
-		List<Sample> sample = sampleRepository.findAll(getSampleWhere(params));
+		List<Sample> sample = sampleRepository.findAll(getRegisteredWhere(params));
 		List<Sample> resultAnalysis = sampleRepository.findAll(getAnalysisWhere(params));
 		List<Sample> resultComplete = sampleRepository.findAll(getCompletedWhere(params));
 		List<Sample> resultCompletePdf = sampleRepository.findAll(getReportedWhere(params));
@@ -201,24 +201,40 @@ public class CalendarService {
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
-	
-	private Specification<Sample> getSampleWhere(Map<String, String> params) {
-		return Specification
-			.where(SampleSpecification.betweenDate(params))
-			.and(SampleSpecification.bundleId(params))
-			.and(SampleSpecification.statusCodeGt(20));
+
+	private Specification<Sample> getCreateDateWhere(Map<String, String> params) {
+		if (params.containsKey("yyyymm")) {
+			return SampleSpecification.createdDateOneMonth(params);
+		} else {
+			return SampleSpecification.betweenDate(params);
+		}
 	}
+
+	private Specification<Sample> getModifiedDateWhere(Map<String, String> params) {
+		if (params.containsKey("yyyymm")) {
+			return SampleSpecification.modifiedDateOneMonth(params);
+		} else {
+			return SampleSpecification.betweenModifiedDate(params);
+		}
+	}
+	
+	// private Specification<Sample> getSampleWhere(Map<String, String> params) {
+	// 	return Specification
+	// 		.where(getCreateDateWhere(params))
+	// 		.and(SampleSpecification.bundleId(params))
+	// 		.and(SampleSpecification.statusCodeGt(20));
+	// }
 	
 	private Specification<Sample> getRegisteredWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.betweenDate(params))
+			.where(getCreateDateWhere(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
 	private Specification<Sample> getAnalysisWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.betweenModifiedDate(params))
+			.where(getModifiedDateWhere(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
@@ -238,7 +254,7 @@ public class CalendarService {
 	
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.betweenModifiedDate(params))
+			.where(getModifiedDateWhere(params))
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(Arrays.asList(
 				StatusCode.S460_ANLS_CMPL
@@ -249,7 +265,7 @@ public class CalendarService {
 	
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
 		return Specification
-				.where(SampleSpecification.betweenModifiedDate(params))
+			.where(getModifiedDateWhere(params))
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.statusIn(Arrays.asList(
 					StatusCode.S710_OUTPUT_CMPL
