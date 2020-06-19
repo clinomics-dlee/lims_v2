@@ -273,6 +273,7 @@ public class AnlsService {
 			}
 			sample.setAnlsCmplDate(now);
 			sample.setAnlsCmplMember(member);
+			sample.setLastVersion(false);
 
 			savedSamples.add(sample);
 

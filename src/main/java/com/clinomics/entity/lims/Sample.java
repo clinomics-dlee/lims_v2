@@ -43,6 +43,8 @@ public class Sample implements Serializable {
 
 	private int version;
 
+	private boolean isLastVersion = true;
+
 	@ManyToOne()
 	@JoinColumn(name="bundleId")
 	private Bundle bundle = new Bundle();
@@ -644,6 +646,14 @@ public class Sample implements Serializable {
 
 	public void setCheckCelFile(String checkCelFile) {
 		this.checkCelFile = checkCelFile;
+	}
+
+	public boolean isLastVersion() {
+		return isLastVersion;
+	}
+
+	public void setLastVersion(boolean isLastVersion) {
+		this.isLastVersion = isLastVersion;
 	}
 
 }
