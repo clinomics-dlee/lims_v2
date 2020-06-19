@@ -204,6 +204,13 @@ public class SampleSpecification {
 		};
 	}
 
+	public static Specification<Sample> isLastVersionTrue() {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.isTrue(root.get("isLastVersion"));
+			return rtn;
+		};
+	}
+
 	public static Specification<Sample> mappingNoEqual(String mappingNo) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.equal(root.get("mappingNo"), mappingNo);

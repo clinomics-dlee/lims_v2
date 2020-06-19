@@ -159,6 +159,7 @@ public class ChartService {
 	private Specification<Sample> getSampleWhere(Map<String, String> params) {
 		return Specification
 			.where(SampleSpecification.createdDateOneMonth(params))
+			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusCodeGt(20));
 	}
@@ -166,6 +167,7 @@ public class ChartService {
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
 		return Specification
 			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
@@ -186,6 +188,7 @@ public class ChartService {
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
 		return Specification
 			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(Arrays.asList(
 				StatusCode.S460_ANLS_CMPL

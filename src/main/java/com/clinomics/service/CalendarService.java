@@ -228,6 +228,7 @@ public class CalendarService {
 	private Specification<Sample> getRegisteredWhere(Map<String, String> params) {
 		return Specification
 			.where(getCreateDateWhere(params))
+			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusCodeGt(20));
 	}
@@ -235,6 +236,7 @@ public class CalendarService {
 	private Specification<Sample> getAnalysisWhere(Map<String, String> params) {
 		return Specification
 			.where(getModifiedDateWhere(params))
+			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
@@ -255,6 +257,7 @@ public class CalendarService {
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
 		return Specification
 			.where(getModifiedDateWhere(params))
+			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(Arrays.asList(
 				StatusCode.S460_ANLS_CMPL
@@ -266,6 +269,7 @@ public class CalendarService {
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
 		return Specification
 			.where(getModifiedDateWhere(params))
+				.and(SampleSpecification.isLastVersionTrue())
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.statusIn(Arrays.asList(
 					StatusCode.S710_OUTPUT_CMPL
