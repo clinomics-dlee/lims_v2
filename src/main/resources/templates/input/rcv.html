@@ -200,6 +200,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			{
 				title : '등록자', 
 				data : 'createdMember.name'
+			},
+			{
+				title : ' ', 
+				data : 'items.trackingNo',
+				render : function(row, data, index) {
+					var value = "";
+					console.log(data);
+					if (data) {
+						value = '<a href="javascript:openDeliveryPopup(\'' + data + '\')" class="btn btn-sm btn-success width-60">VIEW</a>';
+					}
+					return value;
+				}
 			}
 		], null);
 			
@@ -305,7 +317,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		UserTable.reload('_collect_grid');
 	}
 	
-	
+	function openDeliveryPopup(trackingNo) {
+		var url = "https://www.fedex.com/apps/fedextrack/?action=track&ascend_header=1&clienttype=dotcomreg&cntry_code=kr&language=korean&tracknumbers=" + trackingNo;
+		window.open(url, "", "toolbar=0,location=0,menubar=0,status=1,scrollbars=1,resizable=1,width=800,height=700");
+	}
 	
 	/* ]]> */
 	</script>
