@@ -2,16 +2,21 @@ package com.clinomics.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 import com.clinomics.entity.lims.Bundle;
+import com.clinomics.entity.lims.Sample;
+import com.clinomics.repository.lims.SampleRepository;
 
 @Component
 public class CustomIndexPublisher {
 
 	private static String separator = "-";
+
+	SampleRepository sampleRepository;
 	
 	public String getNextBarcodeByBundle(Bundle bundle) {
 		String role = bundle.getBarcodeRole();
@@ -25,7 +30,7 @@ public class CustomIndexPublisher {
 		return index;
 	}
 
-	public String getNextSequenceByBundle(Bundle bundle) {
+	public String getNextSequenceByBundle(Bundle bundle, String receivedDate) {
 		String role = bundle.getSequenceRole();
 		if (role == null || role.isEmpty()) {
 			return "";
@@ -33,6 +38,12 @@ public class CustomIndexPublisher {
 		String current = bundle.getSequence();
 		
 		String index = getIndex(role.split(separator), current);
+
+		if (bundle.isHospital() && receivedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+			Sample last = sampleRepository.findTopByBundleOrderByLaboratoryIdDesc(bundle);
+			//String lastLabo = last.getLaboratoryId()
+		}
+
 		bundle.setSequence(index);
 		return index;
 	}

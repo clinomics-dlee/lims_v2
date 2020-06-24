@@ -184,8 +184,16 @@ public class InputExcelService {
 //				}
 			}
 			
-			String seq = customIndexPublisher.getNextSequenceByBundle(bundle);
-			if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
+			if (bundle.isAutoSequence()) {
+				String receivedDate = sampleItem.getOrDefault("receiveddate", "") + "";
+				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
+				if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
+			} else if (sampleItem.containsKey("laboratory")) {
+				sampleTemp.setLaboratoryId(sampleItem.get("laboratory").toString());
+			}
+
+			// String seq = customIndexPublisher.getNextSequenceByBundle(bundle);
+			// if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
 
 			sampleTemp.setItems(sampleItem);
 			sampleTemp.setBundle(bundle);

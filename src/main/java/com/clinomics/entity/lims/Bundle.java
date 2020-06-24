@@ -50,6 +50,8 @@ public class Bundle implements Serializable {
 
 	private boolean isTatTueThu;
 
+	private boolean isHospital;
+
 	private boolean isAutoBarcode;
 
 	private boolean isAutoSequence;
@@ -174,6 +176,14 @@ public class Bundle implements Serializable {
 
 	public void setTatTueThu(boolean isTatTueThu) {
 		this.isTatTueThu = isTatTueThu;
+	}
+
+	public boolean isHospital() {
+		return isHospital;
+	}
+
+	public void setHospital(boolean isHospital) {
+		this.isHospital = isHospital;
 	}
 
 	

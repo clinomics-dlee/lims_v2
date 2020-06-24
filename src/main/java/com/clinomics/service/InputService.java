@@ -149,7 +149,7 @@ public class InputService {
 		if (!existsSample) {
 			
 			if (bundle.isAutoSequence()) {
-				String seq = customIndexPublisher.getNextSequenceByBundle(bundle);
+				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, datas);
 				if (!seq.isEmpty()) sample.setLaboratoryId(seq);
 			} else {
 				sample.setLaboratoryId(datas.get("laboratory"));

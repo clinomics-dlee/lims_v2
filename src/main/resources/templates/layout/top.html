@@ -18,11 +18,11 @@
 	<!-- end navbar-header -->
 	<!-- begin header-nav -->
 	<ul class="navbar-nav navbar-right">
-		<li class="dropdown navbar-language" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
+		<!-- <li class="dropdown navbar-language" th:style="${@environment.acceptsProfiles('prd')} ? 'display:none' : ''">
 				
 			<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" th:title="${#locale}">
 				<i class="fas fa-lg fa-fw m-r-10 fa-language"></i>
-				<!-- <span th:class="'flag-icon flag-icon-' + ${#locale}" th:title="${#locale}"></span> -->
+				<span th:class="'flag-icon flag-icon-' + ${#locale}" th:title="${#locale}"></span>
 				<span class="d-none d-md-inline" th:text="#{button.language}">Language</span>
 				<b class="caret"></b>
 			</a>
@@ -32,7 +32,7 @@
 				<li><a href="?lang=kr"><span class="flag-icon flag-icon-kr" title="kr"></span>Korea</a></li>
 				<li class="divider m-b-0"></li>
 			</ul>
-		</li>
+		</li> -->
 		<li class="dropdown navbar-user">
 			<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
 				<!-- <img src="/assets/img/user/user-12.jpg" alt="icon" />  -->

@@ -53,6 +53,12 @@ public class Sample implements Serializable {
 	@Convert(converter = StringMapConverter.class)
 	private Map<String, Object> items = new HashMap<>();
 
+	private LocalDateTime collectedDate;
+
+	private LocalDateTime receivedDate;
+	
+	private String sampleType;
+
 	private String a260280;
 
 	private String cncnt;
@@ -228,6 +234,22 @@ public class Sample implements Serializable {
 		this.laboratoryId = laboratoryId;
 	}
 
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+
+	public boolean isLastVersion() {
+		return isLastVersion;
+	}
+
+	public void setLastVersion(boolean isLastVersion) {
+		this.isLastVersion = isLastVersion;
+	}
+
 	public Bundle getBundle() {
 		return bundle;
 	}
@@ -244,16 +266,60 @@ public class Sample implements Serializable {
 		this.items = items;
 	}
 
+	public LocalDateTime getCollectedDate() {
+		return collectedDate;
+	}
+
+	public void setCollectedDate(LocalDateTime collectedDate) {
+		this.collectedDate = collectedDate;
+	}
+
+	public LocalDateTime getReceivedDate() {
+		return receivedDate;
+	}
+
+	public void setReceivedDate(LocalDateTime receivedDate) {
+		this.receivedDate = receivedDate;
+	}
+
+	public String getSampleType() {
+		return sampleType;
+	}
+
+	public void setSampleType(String sampleType) {
+		this.sampleType = sampleType;
+	}
+
+	public String getA260280() {
+		return a260280;
+	}
+
+	public void setA260280(String a260280) {
+		this.a260280 = a260280;
+	}
+
+	public String getCncnt() {
+		return cncnt;
+	}
+
+	public void setCncnt(String cncnt) {
+		this.cncnt = cncnt;
+	}
+
+	public String getDnaQc() {
+		return dnaQc;
+	}
+
+	public void setDnaQc(String dnaQc) {
+		this.dnaQc = dnaQc;
+	}
+
 	public GenotypingMethodCode getGenotypingMethodCode() {
 		return genotypingMethodCode;
 	}
 
 	public void setGenotypingMethodCode(GenotypingMethodCode genotypingMethodCode) {
 		this.genotypingMethodCode = genotypingMethodCode;
-	}
-
-	public String getGenotypingId() {
-		return this.laboratoryId + "-V" + this.version;
 	}
 
 	public String getMappingNo() {
@@ -326,6 +392,14 @@ public class Sample implements Serializable {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public String getCheckCelFile() {
+		return checkCelFile;
+	}
+
+	public void setCheckCelFile(String checkCelFile) {
+		this.checkCelFile = checkCelFile;
 	}
 
 	public String getOutputProductTypes() {
@@ -608,52 +682,8 @@ public class Sample implements Serializable {
 		this.reOutputCmplDate = reOutputCmplDate;
 	}
 
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
-	}
-
-	public String getA260280() {
-		return a260280;
-	}
-
-	public void setA260280(String a260280) {
-		this.a260280 = a260280;
-	}
-
-	public String getCncnt() {
-		return cncnt;
-	}
-
-	public void setCncnt(String cncnt) {
-		this.cncnt = cncnt;
-	}
-
-	public String getDnaQc() {
-		return dnaQc;
-	}
-
-	public void setDnaQc(String dnaQc) {
-		this.dnaQc = dnaQc;
-	}
-
-	public String getCheckCelFile() {
-		return checkCelFile;
-	}
-
-	public void setCheckCelFile(String checkCelFile) {
-		this.checkCelFile = checkCelFile;
-	}
-
-	public boolean isLastVersion() {
-		return isLastVersion;
-	}
-
-	public void setLastVersion(boolean isLastVersion) {
-		this.isLastVersion = isLastVersion;
+	public String getGenotypingId() {
+		return this.laboratoryId + "-V" + this.version;
 	}
 
 }
