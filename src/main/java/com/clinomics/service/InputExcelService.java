@@ -1,6 +1,9 @@
 package com.clinomics.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -9,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.swing.text.DateFormatter;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
@@ -184,9 +189,21 @@ public class InputExcelService {
 //				}
 			}
 			
+			String strCollectedDate = sampleItem.getOrDefault("receiveddate", "").toString();
+			if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+	
+				sampleTemp.setCollectedDate(LocalDate.parse(strCollectedDate));
+			}
+
+			String strReceivedDate = sampleItem.getOrDefault("receiveddate", "").toString();
+			if (!strReceivedDate.isEmpty() && strReceivedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+	
+				sampleTemp.setReceivedDate(LocalDate.parse(strReceivedDate));
+			}
+			
 			if (bundle.isAutoSequence()) {
-				String receivedDate = sampleItem.getOrDefault("receiveddate", "") + "";
-				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
+				
+				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, LocalDate.parse(strReceivedDate));
 				if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
 			} else if (sampleItem.containsKey("laboratory")) {
 				sampleTemp.setLaboratoryId(sampleItem.get("laboratory").toString());
@@ -196,6 +213,7 @@ public class InputExcelService {
 			// if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
 
 			sampleTemp.setItems(sampleItem);
+
 			sampleTemp.setBundle(bundle);
 			sampleTemp.setCreatedMember(member);
 			sampleTemp.setStatusCode(StatusCode.S000_INPUT_REG);

@@ -1,6 +1,7 @@
 package com.clinomics.entity.lims;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,9 +54,9 @@ public class Sample implements Serializable {
 	@Convert(converter = StringMapConverter.class)
 	private Map<String, Object> items = new HashMap<>();
 
-	private LocalDateTime collectedDate;
+	private LocalDate collectedDate;
 
-	private LocalDateTime receivedDate;
+	private LocalDate receivedDate;
 	
 	private String sampleType;
 
@@ -266,19 +267,19 @@ public class Sample implements Serializable {
 		this.items = items;
 	}
 
-	public LocalDateTime getCollectedDate() {
+	public LocalDate getCollectedDate() {
 		return collectedDate;
 	}
 
-	public void setCollectedDate(LocalDateTime collectedDate) {
+	public void setCollectedDate(LocalDate collectedDate) {
 		this.collectedDate = collectedDate;
 	}
 
-	public LocalDateTime getReceivedDate() {
+	public LocalDate getReceivedDate() {
 		return receivedDate;
 	}
 
-	public void setReceivedDate(LocalDateTime receivedDate) {
+	public void setReceivedDate(LocalDate receivedDate) {
 		this.receivedDate = receivedDate;
 	}
 

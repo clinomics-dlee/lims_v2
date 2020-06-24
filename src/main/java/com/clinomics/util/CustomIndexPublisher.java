@@ -1,9 +1,11 @@
 package com.clinomics.util;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
@@ -30,21 +32,26 @@ public class CustomIndexPublisher {
 		return index;
 	}
 
-	public String getNextSequenceByBundle(Bundle bundle, String receivedDate) {
+	public String getNextSequenceByBundle(Bundle bundle, LocalDate receivedDate) {
 		String role = bundle.getSequenceRole();
 		if (role == null || role.isEmpty()) {
 			return "";
 		}
 		String current = bundle.getSequence();
-		
-		String index = getIndex(role.split(separator), current);
+		String index = "";
 
-		if (bundle.isHospital() && receivedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
-			Sample last = sampleRepository.findTopByBundleOrderByLaboratoryIdDesc(bundle);
-			//String lastLabo = last.getLaboratoryId()
+		if (bundle.isHospital()) {
+			Sample last = sampleRepository.findTopByBundleAndReceivedDateOrderByLaboratoryIdDesc(bundle, receivedDate);
+			String lastLaboratoryId = last.getLaboratoryId();
+			int zeroCount = StringUtils.countMatches(role, "0");
+			int newIndexNumber = NumberUtils.toInt(StringUtils.right(lastLaboratoryId, zeroCount)) + 1;
+
+			index = StringUtils.left(lastLaboratoryId, lastLaboratoryId.length() - zeroCount) + "" + String.format("%04d", newIndexNumber);
+		} else {
+			index = getIndex(role.split(separator), current);
+			bundle.setSequence(index);
 		}
 
-		bundle.setSequence(index);
 		return index;
 	}
 	

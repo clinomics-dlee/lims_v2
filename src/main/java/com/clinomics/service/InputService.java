@@ -1,5 +1,6 @@
 package com.clinomics.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,8 +149,20 @@ public class InputService {
 		
 		if (!existsSample) {
 			
+			String strCollectedDate = datas.getOrDefault("receiveddate", "");
+			if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+	
+				sample.setCollectedDate(LocalDate.parse(strCollectedDate));
+			}
+
+			String strReceivedDate = datas.getOrDefault("receiveddate", "");
+			if (!strReceivedDate.isEmpty() && strReceivedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+	
+				sample.setReceivedDate(LocalDate.parse(strReceivedDate));
+			}
+
 			if (bundle.isAutoSequence()) {
-				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, datas);
+				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, LocalDate.parse(strReceivedDate));
 				if (!seq.isEmpty()) sample.setLaboratoryId(seq);
 			} else {
 				sample.setLaboratoryId(datas.get("laboratory"));
