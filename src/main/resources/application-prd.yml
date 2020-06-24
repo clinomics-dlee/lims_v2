@@ -37,7 +37,7 @@ lims:
   apmraChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis_GSK.py
   customChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis.py
 externalApi: 
-  url: http://api.clinomics-dev.com/
+  url: https://api.genosolutions.net/
   tokenName: apiKey
   token: $2y$10$8FzBfexBXEJa7PYaERjLvOk3zGgCSiAyTWiNqsjWktfcvuoAH/fKq
 titan:
