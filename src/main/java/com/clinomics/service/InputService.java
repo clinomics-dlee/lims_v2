@@ -155,7 +155,7 @@ public class InputService {
 				sample.setLaboratoryId(datas.get("laboratory"));
 			}
 
-			String sampleReceived = datas.get("sampleReceived");
+			String sampleReceived = datas.get("receiveddate");
 			
 			if (sampleReceived.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
 				holidayService.setTat(bundle, datas);

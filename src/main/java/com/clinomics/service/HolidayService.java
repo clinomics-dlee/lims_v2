@@ -24,7 +24,7 @@ public class HolidayService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter yyyymmdd = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate start = LocalDate.parse(items.get("sampleReceived"), formatter);
+        LocalDate start = LocalDate.parse(items.get("receiveddate"), formatter);
         LocalDate end = start.plusYears(1);
 
         List<Holiday> holidays = holidayRepository.findByDateBetween(start.format(yyyymmdd), end.format(yyyymmdd));

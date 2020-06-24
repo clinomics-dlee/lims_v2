@@ -114,7 +114,7 @@ public class CalendarExcelService {
 
 				String sampleTarget = "구강상피세포";
 				String samplingSheep = "면봉 1ea, 가글 15mL";
-				if ("Blood".equals((String)s.getItems().get("sampleType"))) {
+				if ("Blood".equals((String)s.getItems().get("sampletype"))) {
 					sampleTarget = "혈액";
 					samplingSheep = "3mL";
 				}
@@ -122,7 +122,7 @@ public class CalendarExcelService {
 				row.getCell(0).setCellValue((index + 1)); // 일련번호
 				row.getCell(1).setCellValue(s.getLaboratoryId()); // 관리번호
 				row.getCell(2).setCellValue(sampleTarget); // 인체유래물등/검사대상물 종류
-				row.getCell(3).setCellValue((s.getItems().get("sampleReceived") != null ? (String)s.getItems().get("sampleReceived") : "")); // 수증내역 - 연월일
+				row.getCell(3).setCellValue((s.getItems().get("receiveddate") != null ? (String)s.getItems().get("receiveddate") : "")); // 수증내역 - 연월일
 				row.getCell(4).setCellValue(samplingSheep); // 수증내역 - 수증량
 				row.getCell(5).setCellValue("보안책임자 별도관리"); // 수증내역 - 검체기증자 명(기관명)
 				// #. 제공내용은 우선 작성안함
