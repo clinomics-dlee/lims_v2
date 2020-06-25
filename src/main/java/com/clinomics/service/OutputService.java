@@ -266,8 +266,17 @@ public class OutputService {
 
 				if (productTypes.contains(productType)) {
 					Map<String, Object> data = Maps.newHashMap();
-				
-					data.putAll(sample.getItems());
+
+					Map<String, Object> items = sample.getItems();
+					List<String> hTypes = Arrays.asList(new String[] { "GD", "GDF", "GDT", "GDX", "GDH" });
+					if (hTypes.contains(sample.getBundle().getType())) {
+						data.put("barcode", sample.getLaboratoryId());
+						data.put("name", items.get("h_name"));
+						data.put("tel", items.get("h_tel"));
+						data.put("address", items.get("h_address"));
+					}
+
+					data.putAll(items);
 					data.put("genedata", sample.getData());
 					data.put("experimentid", sample.getLaboratoryId());
 					data.put("collecteddate", (sample.getCollectedDate() != null ? sample.getCollectedDate().format(formatter) : ""));
