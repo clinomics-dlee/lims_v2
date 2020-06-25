@@ -2,6 +2,7 @@ package com.clinomics.repository.lims;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,5 +17,5 @@ import com.clinomics.enums.StatusCode;
 public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpecificationExecutor<Sample> {
     List<Sample> findByIdIn(List<Integer> id);
     List<Sample> findByIdInAndStatusCodeIn(List<Integer> id, List<StatusCode> statusCodes);
-    Sample findTopByBundleAndReceivedDateOrderByLaboratoryIdDesc(Bundle bundle, LocalDate receivedDate);
+    Optional<Sample> findTopByBundle_IdAndReceivedDateOrderByLaboratoryIdDesc(int bundleId, LocalDate receivedDate);
 }

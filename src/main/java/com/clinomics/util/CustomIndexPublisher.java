@@ -5,9 +5,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.clinomics.entity.lims.Bundle;
@@ -19,7 +21,8 @@ public class CustomIndexPublisher {
 
 	private static String separator = "-";
 
-	SampleRepository sampleRepository;
+	@Autowired
+	private SampleRepository sampleRepository;
 	
 	public String getNextBarcodeByBundle(Bundle bundle) {
 		String role = bundle.getBarcodeRole();
@@ -42,9 +45,9 @@ public class CustomIndexPublisher {
 		String index = "";
 
 		if (bundle.isHospital()) {
-			Sample last = sampleRepository.findTopByBundleAndReceivedDateOrderByLaboratoryIdDesc(bundle, receivedDate);
-			if (last != null) {
-				String lastLaboratoryId = last.getLaboratoryId();
+			Optional<Sample> last = sampleRepository.findTopByBundle_IdAndReceivedDateOrderByLaboratoryIdDesc(bundle.getId(), receivedDate);
+			if (last.isPresent()) {
+				String lastLaboratoryId = last.get().getLaboratoryId();
 				int zeroCount = StringUtils.countMatches(role, "0");
 				int newIndexNumber = NumberUtils.toInt(StringUtils.right(lastLaboratoryId, zeroCount)) + 1;
 	
