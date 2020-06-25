@@ -60,7 +60,7 @@ public class InputService {
 	DataTableService dataTableService;
 
 	@Autowired
-	HolidayService holidayService;
+	VariousFieldsService variousDayService;
 	
 	@Autowired
 	SampleItemService sampleItemService;
@@ -109,10 +109,12 @@ public class InputService {
 	}
 	
 	@Transactional
-	public Map<String, String> save(Map<String, String> datas) {
+	public Map<String, String> save(Map<String, String> inputItems) {
+		Map<String, Object> items = Maps.newHashMap();
+		items.putAll(inputItems);
 		Map<String, String> rtn = Maps.newHashMap();
 		
-		String id = datas.getOrDefault("id", "0");
+		String id = items.getOrDefault("id", "0") + "";
 		
 		Sample sample = searchExistsSample(NumberUtils.toInt(id));
 		
@@ -127,15 +129,15 @@ public class InputService {
 			bundle = sample.getBundle();
 			
 		} else {
-			if (!datas.containsKey("bundleId")) {
+			if (!items.containsKey("bundleId")) {
 				rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
 				return rtn;
 			}
-			int bundleId = NumberUtils.toInt((String)datas.get("bundleId"));
+			int bundleId = NumberUtils.toInt(items.get("bundleId") + "");
 			Optional<Bundle> oBundle = bundleRepository.findById(bundleId);
 			bundle = oBundle.orElseThrow(NullPointerException::new);
 			
-			Optional<Member> oMember = memberRepository.findById(datas.getOrDefault("memberId", ""));
+			Optional<Member> oMember = memberRepository.findById(items.getOrDefault("memberId", "") + "");
 			Member member = oMember.orElseThrow(NullPointerException::new);
 			sample.setCreatedDate(now);
 			sample.setCreatedMember(member);
@@ -144,40 +146,18 @@ public class InputService {
 			
 		}
 		
-		datas.remove("memberId");
-		datas.remove("bundleId");
+		items.remove("memberId");
+		items.remove("bundleId");
 		
 		if (!existsSample) {
 			
-			String strCollectedDate = datas.getOrDefault("receiveddate", "");
-			if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
-	
-				sample.setCollectedDate(LocalDate.parse(strCollectedDate));
-			}
+			variousDayService.setFields(sample, items);
 
-			String strReceivedDate = datas.getOrDefault("receiveddate", "");
-			if (!strReceivedDate.isEmpty() && strReceivedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
-	
-				sample.setReceivedDate(LocalDate.parse(strReceivedDate));
-			}
-
-			if (bundle.isAutoSequence()) {
-				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, LocalDate.parse(strReceivedDate));
-				if (!seq.isEmpty()) sample.setLaboratoryId(seq);
-			} else {
-				sample.setLaboratoryId(datas.get("laboratory"));
-			}
-
-			String sampleReceived = datas.get("receiveddate");
-			
-			if (sampleReceived.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
-				holidayService.setTat(bundle, datas);
-			}
 		}
-		datas.remove("id");
+		items.remove("id");
 		
 		Map<String, Object> newItems = Maps.newHashMap();
-		newItems.putAll(datas);
+		newItems.putAll(items);
 		sample.setBundle(bundle);
 		sample.setItems(newItems);
 		

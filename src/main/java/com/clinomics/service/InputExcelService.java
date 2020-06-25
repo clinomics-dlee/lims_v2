@@ -59,6 +59,9 @@ public class InputExcelService {
 	ProductRepository productRepository;
 
 	@Autowired
+	VariousFieldsService variousDayService;
+
+	@Autowired
 	ExcelReadComponent excelReadComponent;
 
 	@Autowired
@@ -189,30 +192,12 @@ public class InputExcelService {
 //				}
 			}
 			
-			String strCollectedDate = sampleItem.getOrDefault("receiveddate", "").toString();
-			if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
-	
-				sampleTemp.setCollectedDate(LocalDate.parse(strCollectedDate));
-			}
-
-			String strReceivedDate = sampleItem.getOrDefault("receiveddate", "").toString();
-			if (!strReceivedDate.isEmpty() && strReceivedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
-	
-				sampleTemp.setReceivedDate(LocalDate.parse(strReceivedDate));
-			}
+			variousDayService.setFields(sampleTemp, sampleItem);
 			
-			if (bundle.isAutoSequence()) {
-				
-				String seq = customIndexPublisher.getNextSequenceByBundle(bundle, LocalDate.parse(strReceivedDate));
-				if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
-			} else if (sampleItem.containsKey("laboratory")) {
-				sampleTemp.setLaboratoryId(sampleItem.get("laboratory").toString());
-			}
-
-			// String seq = customIndexPublisher.getNextSequenceByBundle(bundle);
-			// if (!seq.isEmpty()) sampleTemp.setLaboratoryId(seq);
-
-			sampleTemp.setItems(sampleItem);
+			
+			Map<String, Object> newItems = Maps.newHashMap();
+			newItems.putAll(sampleItem);
+			sampleTemp.setItems(newItems);
 
 			sampleTemp.setBundle(bundle);
 			sampleTemp.setCreatedMember(member);
