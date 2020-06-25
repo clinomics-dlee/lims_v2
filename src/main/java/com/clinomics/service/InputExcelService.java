@@ -191,6 +191,7 @@ public class InputExcelService {
 				sampleItem = sht;
 //				}
 			}
+			sampleTemp.setBundle(bundle);
 			
 			variousDayService.setFields(sampleTemp, sampleItem);
 			
@@ -199,7 +200,6 @@ public class InputExcelService {
 			newItems.putAll(sampleItem);
 			sampleTemp.setItems(newItems);
 
-			sampleTemp.setBundle(bundle);
 			sampleTemp.setCreatedMember(member);
 			sampleTemp.setStatusCode(StatusCode.S000_INPUT_REG);
 				

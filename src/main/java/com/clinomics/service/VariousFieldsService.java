@@ -49,9 +49,9 @@ public class VariousFieldsService {
         sample.setSampleType(items.getOrDefault("sampletype", "").toString());
         items.remove("sampletype");
         
-        if (bundle.isAutoSequence() && receivedDate != null) {
+        if (bundle.isAutoSequence()) {
             
-            String seq = customIndexPublisher.getNextSequenceByBundle(bundle, LocalDate.parse(strReceivedDate));
+            String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
             if (!seq.isEmpty()) sample.setLaboratoryId(seq);
         } else if (items.containsKey("laboratory")) {
             sample.setLaboratoryId(items.get("laboratory").toString());

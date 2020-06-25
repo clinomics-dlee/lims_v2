@@ -148,7 +148,8 @@ public class InputService {
 		
 		items.remove("memberId");
 		items.remove("bundleId");
-		
+		sample.setBundle(bundle);
+
 		if (!existsSample) {
 			
 			variousDayService.setFields(sample, items);
@@ -158,7 +159,6 @@ public class InputService {
 		
 		Map<String, Object> newItems = Maps.newHashMap();
 		newItems.putAll(items);
-		sample.setBundle(bundle);
 		sample.setItems(newItems);
 		
 		sampleRepository.save(sample);
