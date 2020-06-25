@@ -1,11 +1,13 @@
 package com.clinomics.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -21,6 +23,7 @@ import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.CustomIndexPublisher;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -254,50 +257,62 @@ public class OutputService {
 		LocalDateTime now = LocalDateTime.now();
 
 		if (samples.size() > 0) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			for (Sample sample : samples) {
-				
-				Map<String, Object> data = Maps.newHashMap();
-				
-				data.putAll(sample.getItems());
-				data.put("genedata", sample.getData());
-				
-				datas.add(data);
-				
-				// #. result status update
-				if (!isTest) {
-					
-					String outputProductTypes = sample.getOutputProductTypes();
-					if (outputProductTypes == null) outputProductTypes = "";
-					if (!outputProductTypes.contains(productTypeData)) {
-						outputProductTypes += productTypeData;
-						outputProductTypes.replace("__", "_");
-						sample.setOutputProductTypes(outputProductTypes);
-					} else {
-						continue;
-					}
+				Set<String> productTypes = Sets.newHashSet();
+				sample.getBundle().getProduct().stream().forEach(p -> {
+					productTypes.add(p.getType());
+				});
 
-					boolean outputAllProduct = true;
-					for (Product p : sample.getBundle().getProduct()) {
-						if (!outputProductTypes.contains(p.getType())) {
-							outputAllProduct = false;
-							break;
+				if (productTypes.contains(productType)) {
+					Map<String, Object> data = Maps.newHashMap();
+				
+					data.putAll(sample.getItems());
+					data.put("genedata", sample.getData());
+					data.put("experimentid", sample.getLaboratoryId());
+					data.put("collecteddate", (sample.getCollectedDate() != null ? sample.getCollectedDate().format(formatter) : ""));
+					data.put("receiveddate", (sample.getReceivedDate() != null ? sample.getReceivedDate().format(formatter) : ""));
+					data.put("sampletype", sample.getSampleType());
+					data.put("pName", sample.getBundle().getName());
+					
+					datas.add(data);
+					
+					// #. result status update
+					if (!isTest) {
+						
+						String outputProductTypes = sample.getOutputProductTypes();
+						if (outputProductTypes == null) outputProductTypes = "";
+						if (!outputProductTypes.contains(productTypeData)) {
+							outputProductTypes += productTypeData;
+							outputProductTypes.replace("__", "_");
+							sample.setOutputProductTypes(outputProductTypes);
+						} else {
+							continue;
 						}
-					}
-					// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
-					if (outputAllProduct) {
-						if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
-							sample.setOutputCmplDate(now);
-							sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
-							sample.setOutputProductTypes("");
-							sample.setModifiedDate(now);
-						} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
-							sample.setReOutputCmplDate(now);
-							sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
-							sample.setOutputProductTypes("");
-							sample.setModifiedDate(now);
+	
+						boolean outputAllProduct = true;
+						for (Product p : sample.getBundle().getProduct()) {
+							if (!outputProductTypes.contains(p.getType())) {
+								outputAllProduct = false;
+								break;
+							}
 						}
+						// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
+						if (outputAllProduct) {
+							if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+								sample.setOutputCmplDate(now);
+								sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
+								sample.setOutputProductTypes("");
+								sample.setModifiedDate(now);
+							} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+								sample.setReOutputCmplDate(now);
+								sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
+								sample.setOutputProductTypes("");
+								sample.setModifiedDate(now);
+							}
+						}
+						sampleRepository.save(sample);
 					}
-					sampleRepository.save(sample);
 				}
 			}
 		}

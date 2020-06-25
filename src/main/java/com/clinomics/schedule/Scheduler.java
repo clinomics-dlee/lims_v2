@@ -146,9 +146,7 @@ public class Scheduler {
                         // #. validate
                         Set<String> productTypes = Sets.newHashSet();
                         sample.getBundle().getProduct().stream().forEach(p -> {
-                            Optional<Product> oProduct = productRepository.findById(p.getId());
-                            Product product = oProduct.orElse(new Product());
-                            productTypes.add(product.getType());
+                            productTypes.add(p.getType());
                         });
                         
                         // #. 상품목록이 가지고 있는 모든 마커 정보 조회
