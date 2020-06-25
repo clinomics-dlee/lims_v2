@@ -28,7 +28,7 @@ public class CustomIndexPublisher {
 		}
 		String current = bundle.getBarcode();
 		
-		String index = getIndex(role.split(separator), current);
+		String index = getIndex(role.split(separator), current, getYYYYMMDD("yyyyMMdd"));
 		bundle.setBarcode(index);
 		return index;
 	}
