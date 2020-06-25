@@ -2,6 +2,7 @@ package com.clinomics.util;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -42,32 +43,38 @@ public class CustomIndexPublisher {
 
 		if (bundle.isHospital()) {
 			Sample last = sampleRepository.findTopByBundleAndReceivedDateOrderByLaboratoryIdDesc(bundle, receivedDate);
-			String lastLaboratoryId = last.getLaboratoryId();
-			int zeroCount = StringUtils.countMatches(role, "0");
-			int newIndexNumber = NumberUtils.toInt(StringUtils.right(lastLaboratoryId, zeroCount)) + 1;
-
-			index = StringUtils.left(lastLaboratoryId, lastLaboratoryId.length() - zeroCount) + "" + String.format("%04d", newIndexNumber);
+			if (last != null) {
+				String lastLaboratoryId = last.getLaboratoryId();
+				int zeroCount = StringUtils.countMatches(role, "0");
+				int newIndexNumber = NumberUtils.toInt(StringUtils.right(lastLaboratoryId, zeroCount)) + 1;
+	
+				index = StringUtils.left(lastLaboratoryId, lastLaboratoryId.length() - zeroCount) + "" + String.format("%04d", newIndexNumber);
+			} else {
+				index = getIndex(role.split(separator), current, receivedDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+			}
+			
 		} else {
-			index = getIndex(role.split(separator), current);
+			index = getIndex(role.split(separator), current, getYYYYMMDD("yyyyMMdd"));
 			bundle.setSequence(index);
 		}
 
 		return index;
 	}
 	
-	private String getIndex(String[] arrRole, String current) {
+	private String getIndex(String[] arrRole, String current, String yyyymmdd) {
 		String index = "";
+		String yyyymm = StringUtils.left(yyyymmdd, 6);
 		for (String r : arrRole) {
 			if (r.startsWith("[")) {
 				String t = r.replaceAll("[\\[|\\]]", "");
 				if (t.equals("YYMM")) {
-					index += separator + getYYYYMMDD("yyyyMM").substring(2);
+					index += separator + yyyymm.substring(2);
 				} else if (t.equals("YYYYMMDD")) {
-					index += separator + getYYYYMMDD("yyyyMMdd");
+					index += separator + yyyymmdd;
 				} else if (t.equals("YYMMDD")) {
-					index += separator + getYYYYMMDD("yyyyMMdd").substring(2);
+					index += separator + yyyymmdd.substring(2);
 				} else if (t.equals("YYYYMM")) {
-					index += separator + getYYYYMMDD("yyyyMM");
+					index += separator + yyyymm;
 				} else if (t.matches("[0]+")) {
 					
 					if (current == null || !current.startsWith(index.substring(1))) {
