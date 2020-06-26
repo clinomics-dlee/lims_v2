@@ -153,12 +153,13 @@
 				autoclose : true,
 				format: "yyyy-mm-dd",
 				changeMonth : true,
-            	changeYear : true
+            	changeYear : true,
+				language: "ko"
 			});
 		}
 	}
 	
-	function samplePopupSave(reissue) {
+	function samplePopupSave() {
 		if (!$('#frm_popup_sample_detail').parsley().validate()) {
 			return;	
 		}
