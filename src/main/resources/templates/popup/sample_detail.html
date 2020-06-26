@@ -25,8 +25,8 @@
 			</div>
 			<div class="modal-footer">
 				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
-				<a href="javascript:samplePopupSave(false);" class="btn btn-success">저장</a>
-				<a id="popup_btn_reissue" href="javascript:samplePopupSave(true);" class="btn btn-success hide">저장하고 재발행</a>
+				<a href="javascript:samplePopupSave();" class="btn btn-success">저장</a>
+				<a id="popup_btn_reissue" href="javascript:samplePopupRecreate();" class="btn btn-success hide">저장하고 재발행</a>
 			</div>
 		</div>
 	</div>
@@ -68,6 +68,9 @@
 						
 						value = data.sample.items[code];
 						//if (!value) data.sample.items
+						if (code == "collecteddate") value = data.sample.collectedDate;
+						else if (code == "sampletype") value = data.sample.sampleType;
+						else if (code == "receiveddate") value = data.sample.receivedDate;
 						if (!value) value = ""; 
 						
 						if (r % 2 == 0) html += '<tr>'
@@ -193,15 +196,19 @@
 	}
 	
 	function samplePopupRecreate() {
-		var data = [];
-		var id = $('input[name=id]').val();
-		if (typeof id === 'string') data.push(Number(id));
-		if (typeof id === 'number') data.push(id);
+		if (!$('#frm_popup_sample_detail').parsley().validate()) {
+			return;	
+		}
+		
+		// var data = [];
+		// var id = $('input[name=id]').val();
+		// if (typeof id === 'string') data.push(Number(id));
+		// if (typeof id === 'number') data.push(id);
 		CommonMsg.okCancel(function() {
 			$.ajax({
 	            url: '/output/reissue',
 				type: 'post',
-				data : JSON.stringify(data),
+	        	data : JSON.stringify($('#frm_popup_sample_detail').serializeObject()),
 		        dataType : 'json',
 		        contentType : "application/json;charset=utf-8",
 		        beforeSend: function(xhr) {

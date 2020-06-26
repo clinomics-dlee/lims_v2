@@ -67,6 +67,15 @@
 						if (r % 2 == 1) html += '</tr>';
 					}
 					
+					html += '<th>검체 채취일</th>';
+					html += '<td><span>' + data.collectedDate + '</span></td>';
+					
+					html += '<th>검체 수령일</th>';
+					html += '<td><span>' + data.receivedDate + '</span></td>';
+					
+					html += '<th>Sample type</th>';
+					html += '<td><span>' + data.sampleType + '</span></td>';
+					
 					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
 					
 					$("#_readonly_sample_popup_table").html(html);

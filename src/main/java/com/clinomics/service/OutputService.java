@@ -52,6 +52,9 @@ public class OutputService {
 	
 	@Autowired
 	SampleItemService sampleItemService;
+	
+	@Autowired
+	InputService inputService;
 
 	@Autowired
 	RoleService roleService;
@@ -198,43 +201,47 @@ public class OutputService {
 	}
 
 	@Transactional
-	public Map<String, String> outputReIssue(List<Integer> ids, String memberId) {
-		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdIn(ids);
+	public Map<String, String> outputReIssue(Map<String, String> inputItems, String memberId) {
+
+
+		Map<String, String> rtn = inputService.save(inputItems, true);
+
+		if ("00".equals(rtn.getOrDefault("result", ""))) {
+			String id = inputItems.getOrDefault("id", "0") + "";
 		
-		// sample.set
-		Optional<Member> oMember = memberRepository.findById(memberId);
-		Member member = oMember.get();
-		LocalDateTime now = LocalDateTime.now();
-		String roles = "";
-		for (Role r : member.getRole()) {
-			roles += "," + r.getCode();
-		}
-		roles = roles.substring(1);
+			Sample sample = inputService.searchExistsSample(NumberUtils.toInt(id));
 
-		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
-		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
+			// sample.set
+			Optional<Member> oMember = memberRepository.findById(memberId);
+			Member member = oMember.get();
+			LocalDateTime now = LocalDateTime.now();
+			String roles = "";
+			for (Role r : member.getRole()) {
+				roles += "," + r.getCode();
+			}
+			roles = roles.substring(1);
 
-		if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
-			
-			samples.stream().forEach(s -> {
+			rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+			rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
+
+			if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
 				
-				StatusCode sc = s.getStatusCode();
+				StatusCode sc = sample.getStatusCode();
 				if (sc.equals(StatusCode.S710_OUTPUT_CMPL)) {
-					s.setOutputWaitDate(now);
-					s.setOutputWaitMember(member);
-					s.setModifiedDate(now);
+					sample.setOutputWaitDate(now);
+					sample.setOutputWaitMember(member);
+					sample.setModifiedDate(now);
 					
-					s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+					sample.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
 				}
-			});
 
-		} else {
-			rtn.put("result", ResultCode.NO_PERMISSION.get());
-			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
-			return rtn;
+			} else {
+				rtn.put("result", ResultCode.NO_PERMISSION.get());
+				rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+				return rtn;
+			}
+			sampleRepository.save(sample);
 		}
-		sampleRepository.saveAll(samples);
 		
 		return rtn;
 	}

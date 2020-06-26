@@ -25,12 +25,12 @@ public class VariousFieldsService {
 	@Autowired
 	CustomIndexPublisher customIndexPublisher;
 
-    public void setFields(Sample sample, Map<String, Object> items) {
+    public void setFields(boolean existsSample, Sample sample, Map<String, Object> items) {
         Bundle bundle = sample.getBundle();
         String strCollectedDate = items.getOrDefault("collecteddate", "").toString();
         if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
 
-            sample.setCollectedDate(LocalDate.parse(strCollectedDate));
+            sample.setCollectedDate(LocalDate.parse(strCollectedDate).plusDays(1));
             items.remove("collecteddate");
         }
 
@@ -42,14 +42,14 @@ public class VariousFieldsService {
         if (!strReceivedDate.isEmpty() && receivedDate != null) {
 
             items.put("tat", getTat(bundle, strReceivedDate));
-            sample.setReceivedDate(LocalDate.parse(strReceivedDate));
+            sample.setReceivedDate(LocalDate.parse(strReceivedDate).plusDays(1));
             items.remove("receiveddate");
         }
 
         sample.setSampleType(items.getOrDefault("sampletype", "").toString());
         items.remove("sampletype");
         
-        if (bundle.isAutoSequence()) {
+        if (!existsSample && bundle.isAutoSequence()) {
             
             String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
             if (!seq.isEmpty()) sample.setLaboratoryId(seq);

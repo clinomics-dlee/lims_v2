@@ -109,7 +109,7 @@ public class InputService {
 	}
 	
 	@Transactional
-	public Map<String, String> save(Map<String, String> inputItems) {
+	public Map<String, String> save(Map<String, String> inputItems, boolean history) {
 		Map<String, Object> items = Maps.newHashMap();
 		items.putAll(inputItems);
 		Map<String, String> rtn = Maps.newHashMap();
@@ -123,7 +123,7 @@ public class InputService {
 		LocalDateTime now = LocalDateTime.now();
 		Bundle bundle;
 		if (existsSample) {
-			if (!sampleRepository.existsById(NumberUtils.toInt(id))) {
+			if (!sampleRepository.existsById(NumberUtils.toInt(id)) && history) {
 				saveSampleHistory(sample);
 			}
 			bundle = sample.getBundle();
@@ -150,11 +150,8 @@ public class InputService {
 		items.remove("bundleId");
 		sample.setBundle(bundle);
 
-		if (!existsSample) {
-			
-			variousDayService.setFields(sample, items);
+		variousDayService.setFields(existsSample, sample, items);
 
-		}
 		items.remove("id");
 		
 		Map<String, Object> newItems = Maps.newHashMap();
@@ -162,10 +159,7 @@ public class InputService {
 		sample.setItems(newItems);
 		
 		sampleRepository.save(sample);
-		if (existsSample) {
-			saveSampleHistory(sample);
-		}
-
+		
 		rtn.put("result", ResultCode.SUCCESS.get());
 		rtn.put("message", ResultCode.SUCCESS.getMsg());
 		return rtn;
@@ -175,7 +169,7 @@ public class InputService {
 		Map<String, String> rtn = Maps.newHashMap();
 		for (Map<String, String> l : list) {
 			l.put("memberId", memberId);
-			Map<String, String> tmp = this.save(l);
+			Map<String, String> tmp = this.save(l, false);
 			if (!ResultCode.SUCCESS.get().equals(tmp.getOrDefault("result", "AA"))) {
 				return tmp;
 			}
@@ -264,7 +258,7 @@ public class InputService {
 		return rtn;
 	}
 
-	private Sample searchExistsSample(int id) {
+	public Sample searchExistsSample(int id) {
 		
 		Optional<Sample> oSample = sampleRepository.findById(id);
 		

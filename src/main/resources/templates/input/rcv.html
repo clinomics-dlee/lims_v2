@@ -222,7 +222,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		for (var e in aDateInputs) {
 			
 			$('input[name="' + aDateInputs[e] + '"]').datepicker({
-				dateFormat : 'yy-mm-dd'
+				dateFormat : 'yy-mm-dd',
+				language: "ko"
 			});
 		}
 	}

@@ -193,7 +193,7 @@ public class InputExcelService {
 			}
 			sampleTemp.setBundle(bundle);
 			
-			variousDayService.setFields(sampleTemp, sampleItem);
+			variousDayService.setFields(false, sampleTemp, sampleItem);
 			
 			
 			Map<String, Object> newItems = Maps.newHashMap();

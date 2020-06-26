@@ -76,7 +76,7 @@ public class InputController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		datas.put("memberId", userDetails.getUsername());
 		
-		return inputService.save(datas);
+		return inputService.save(datas, false);
 	}
 	
 	@PostMapping("/saveall")
