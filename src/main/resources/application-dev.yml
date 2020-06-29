@@ -53,7 +53,7 @@ lims:
   apmraChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis_GSK.py
   customChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis.py
 externalApi: 
-  url: https://api.genosolutions.net/
+  url: https://api.genosolutiony.com/getMarker.php
   tokenName: apiKey
   token: $2y$10$8FzBfexBXEJa7PYaERjLvOk3zGgCSiAyTWiNqsjWktfcvuoAH/fKq
 titan:
