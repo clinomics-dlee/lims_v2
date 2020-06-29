@@ -211,6 +211,7 @@ public class SampleDbService {
 			con.setConnectTimeout(5000); // 서버에 연결되는 Timeout 시간 설정
 			con.setReadTimeout(5000); // InputStream 읽어 오는 Timeout 시간 설정
 			con.addRequestProperty(externalApiTokenName, externalApiToken); // key값 설정
+			con.addRequestProperty("Content-Type", "application/json"); // key값 설정
 			con.setRequestMethod("GET");
 
 			con.setDoOutput(false);
