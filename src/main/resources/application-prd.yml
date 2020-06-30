@@ -1,4 +1,20 @@
 spring:
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    port: 587
+    username: "info@clinomics.co.kr"
+    password: "@1q2w3e4r@"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
+        mime: UTF-8
+        transport:
+          protocol: smtp
   datasource:
     initialization-mode: always
   messages:
@@ -47,16 +63,11 @@ titan:
     port: 21
     username: AFFXUSER
     password: affxpd
-server:
-  port: 8443
-  ssl:
-    key-store: keystore.p12
-    key-store-password: 1234
-    key-alias: airpageserver
-    key-store-type: PKCS12
 rest:
   http:
     auth-token-header-name: limsApiKey
     auth-token: weirjknvi32oinv0923n65lknv993141kln0
 logging:
   file: /BiO/Serve/lims_v2/logs/lims_v2.log
+server:
+  port: 8080
