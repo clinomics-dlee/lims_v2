@@ -122,7 +122,9 @@ public class SampleItemService {
 
 		List<SampleItem> filteredSampleItems = sampleItems.stream()
 				.filter(fs -> {
-					if (fs.isVisible()) {
+					if (!fs.isActive()) {
+						return false;
+					} else if (fs.isVisible()) {
 						return personalView;
 					} else {
 						return true;
@@ -159,7 +161,9 @@ public class SampleItemService {
 
 		List<SampleItem> filteredSampleItems = sampleItems.stream()
 				.filter(fs -> {
-					if (fs.isVisible()) {
+					if (!fs.isActive()) {
+						return false;
+					} else if (fs.isVisible()) {
 						return personalView;
 					} else {
 						return true;

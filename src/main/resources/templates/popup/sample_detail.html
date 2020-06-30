@@ -174,16 +174,14 @@
 				xhr.setRequestHeader(header, token);
 			},
 		    success: function(data, xhr) {
-		    	if (data.result == "00") {
-					if (reissue) {
-						samplePopupRecreate();
-					} else {
-			    		CommonMsg.save(function() {
-			    			$("#modal-sample-detail").modal('hide');
-			    			search();
-						});
-					}
-				} else if (!data.result.startsWith("0")) {
+		    	if (data.result.startsWith("0")) {
+					CommonMsg.save(function() {
+						$("#modal-sample-detail").modal('hide');
+						search();
+					});
+				} else if (data.message) {
+					CommonMsg.info(function() { }, data.message);
+				} else {
 					CommonMsg.error(function() { });
 				}
 			},

@@ -217,13 +217,28 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				serverHeader : true
 			},
 			{
-				title : '등록자', 
-				data : 'createdMember.name'
+				title : '검체 채취일', 
+				data : 'collectedDate',
+				type : 'date'
+			},
+			{
+				title : '검체 수령일', 
+				data : 'receivedDate',
+				type : 'date'
+			},
+			{
+				title : 'Sample type', 
+				data : 'sampleType',
+				type : 'date'
 			},
 			{
 				title : '검체 등록일자', 
 				data : 'createdDate',
 				type : 'date'
+			},
+			{
+				title : '등록자', 
+				data : 'createdMember.name'
 			},
 			{
 				title : '입고담당자', 
