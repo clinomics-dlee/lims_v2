@@ -240,6 +240,9 @@ public class AnlsExcelService {
 				Map<String, Object> data = Maps.newHashMap();
 				data.putAll(sht);
 
+				// #. 첫번째열 genotyping id값은 제거
+				data.remove(genotypingIdCellName);
+
 				s.setData(data);
 				s.setAnlsEndDate(LocalDateTime.now());
 
