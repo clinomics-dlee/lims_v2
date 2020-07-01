@@ -1,8 +1,8 @@
 package com.clinomics.enums;
 
 public enum ChipTypeCode {
-	APMRA_CHIP("APMRA Chip", "(Axiom_KORV1-1)", "/BiO/Research/Cel2GSSInput/Script/runAnalysis_GSK.py"),
-	CUSTOM_CHIP("Custom Chip", "(Axiom_GSChip-1)", "/BiO/Research/Cel2GSSInput/Script/runAnalysis.py")
+	APMRA_CHIP("APMRA Chip", "(Axiom_KORV1-1)", "/BiO/Research/Cel2GSSInput/Script2/runAnalysis_APMRA.py"),
+	CUSTOM_CHIP("Custom Chip", "(Axiom_GSChip-1)", "/BiO/Research/Cel2GSSInput/Script2/runAnalysis_GSChip.py")
 	;
 
 	private final String value;

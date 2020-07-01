@@ -289,7 +289,7 @@ public class OutputService {
 					data.put("collecteddate", (sample.getCollectedDate() != null ? sample.getCollectedDate().format(formatter) : ""));
 					data.put("receiveddate", (sample.getReceivedDate() != null ? sample.getReceivedDate().format(formatter) : ""));
 					data.put("sampletype", sample.getSampleType());
-					data.put("pName", sample.getBundle().getName());
+					data.put("p_name", sample.getBundle().getName());
 					
 					datas.add(data);
 					
