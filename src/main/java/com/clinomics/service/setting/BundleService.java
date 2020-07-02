@@ -49,7 +49,7 @@ public class BundleService {
 	}
 
 	public List<Bundle> selectAll() {
-		return bundleRepository.findAll();
+		return bundleRepository.findByIsActiveTrue();
 	}
 
 	public Map<String, Object> selectAll(Map<String, String> params) {

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.clinomics.entity.lims.Bundle;
 
 public interface BundleRepository extends JpaRepository<Bundle, Integer> {
+	List<Bundle> findByIsActiveTrue();
 	List<Bundle> findByNameAndIsActiveTrue(String name);
 	List<Bundle> findByIsSingleAndIsActiveTrue(boolean isSingle);
 	List<Bundle> findByIsSingleAndIsActiveTrue(boolean isSingle, Pageable pageable);
