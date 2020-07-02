@@ -66,8 +66,11 @@ titan:
 rest:
   http:
     auth-token-header-name: limsApiKey
-    auth-token: weirjknvi32oinv0923n65lknv993141kln0
+    auth-token: fyhwp9e48fuq90p348yhtg09pq3874yhgt
 logging:
   file: /BiO/Serve/lims_v2/logs/lims_v2.log
 server:
   port: 8080
+  servlet:
+    session:
+      timeout: 1800

@@ -5,6 +5,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,5 +57,15 @@ public class MemberController {
 	public Map<String, String> changeRole(@RequestBody Map<String, String> datas) {
 		System.out.println(datas.toString());
 		return memberService.changeRole(datas);
+	}
+
+	@PostMapping("/password/change")
+	@ResponseBody
+	public Map<String, String> changePassword(@RequestBody Map<String, String> datas) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String memberId = userDetails.getUsername();
+		datas.put("id", memberId);
+		System.out.println(datas.toString());
+		return memberService.save(datas);
 	}
 }
