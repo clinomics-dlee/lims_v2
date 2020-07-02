@@ -97,12 +97,14 @@ public class SampleSpecification {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
 			if (params.containsKey("bundleId") && !params.get("bundleId").isEmpty()) {
-				List<Predicate> predicatesAnds = new ArrayList<>();
 				int bundleId = NumberUtils.toInt(params.get("bundleId"));
 				predicatesAnds.add(criteriaBuilder.equal(root.get("bundle").get("id"), bundleId));
-				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			} else {
+				predicatesAnds.add(criteriaBuilder.equal(root.get("bundle").get("isActive"), true));
 			}
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
 			return rtn;
 		};
 	}
