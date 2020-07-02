@@ -275,6 +275,7 @@ public class CalendarService {
 					StatusCode.S710_OUTPUT_CMPL
 					, StatusCode.S800_RE_OUTPUT_WAIT
 					, StatusCode.S810_RE_OUTPUT_CMPL
+					, StatusCode.S900_OUTPUT_CMPL
 				)));
 	}
 	
