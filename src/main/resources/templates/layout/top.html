@@ -39,6 +39,7 @@
 				<i class="fas fa-lg fa-fw m-r-10 fa-user"></i>
 				<span class="d-none d-md-inline"><span sec:authentication="principal.username"/></span> <b class="caret"></b>
 			</a>
+
 			<div class="dropdown-menu dropdown-menu-right">
 				<!-- <a href="javascript:;" class="dropdown-item">Edit Profile</a>
 				<a href="javascript:;" class="dropdown-item"><span class="badge badge-danger pull-right">2</span> Inbox</a>
@@ -46,11 +47,10 @@
 				<div class="dropdown-divider"></div>
 				<a href="javascript:void(0)" class="dropdown-item" id="profile">사용자 정보</a>
 				<a href="javascript:;" class="dropdown-item">Setting</a> -->
-				<!-- <a href="javascript:void(0)" class="dropdown-item" id="changePw">
-					<i class="fas fa-lg fa-fw m-r-10 fa-key"></i><span th:text="#{button.changePassword}">Change password</span>
+				<a href="javascript:void(0)" class="dropdown-item" id="changePw">
+					<i class="fas fa-lg fa-fw m-r-10 fa-key"></i><span>Password 변경</span>
 				</a>
 				<div class="dropdown-divider"></div>
-				 -->
 				<a href="javascript:document.getElementById('logoutForm').submit();" class="dropdown-item" id="logout">
 					<i class="fas fa-lg fa-fw m-r-10 fa-sign-out-alt"></i><span th:text="#{button.logout}"></span>
 				</a>
