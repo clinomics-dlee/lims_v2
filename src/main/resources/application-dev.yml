@@ -38,12 +38,12 @@ spring:
 datasource:
   lims:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://192.168.0.201:13306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=UTC
+    jdbcUrl: jdbc:mysql://192.168.0.201:13306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: clinomics
     password: uiop7890
   pdf:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://192.168.0.201:13306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=UTC
+    jdbcUrl: jdbc:mysql://192.168.0.201:13306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: clinomics
     password: uiop7890
 lims:
