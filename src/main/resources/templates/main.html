@@ -263,9 +263,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: moment().subtract('days', 30),
-			endDate: moment(),
-			minDate: '2018/01/01',
-			maxDate: moment(),
+			endDate: moment()
 		},
 		function (start, end) {
 			$('#startDate').val(start.format('YYYYMMDD'));

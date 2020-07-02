@@ -398,10 +398,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					}
 					loop++;
 				});
-				$("#total1").text('' + t1);
-				$("#total2").text('' + t2);
-				$("#total3").text('' + t3);
-				$("#total4").text('' + t4);
+				$("#total1").html('<a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
+								+ ' style="color: white;">' + t1 + '</a>');
+				$("#total2").html('<a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
+								+ ' style="color: white;">' + t2 + '</a>');
+				$("#total3").html('<a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
+								+ ' style="color: white;">' + t3 + '</a>');
+				$("#total4").html('<a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
+								+ ' style="color: white;">' + t4 + '</a>');
 				
 				
 				
@@ -420,6 +424,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	function dayToBetweenDate(day) {
 		return "'" + idate + "-" + fillzero(day - 6, 2) + "'"
 			+ ",'" + idate + "-" + fillzero(day, 2) + "'";
+	}
+	
+	function dayToBetweenDateMonth() {
+		return "'" + idate + "-01'"
+			+ ",'" + idate + "-" + rdate.daysInMonth() + "'";
 	}
 	
 	function fillzero(obj, len) {

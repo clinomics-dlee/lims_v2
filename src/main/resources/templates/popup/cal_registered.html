@@ -59,7 +59,7 @@
 function calPopupOnload(bundleId, startDate, endDate) {
 	$("#modal-sample-all").modal();
 	
-	UserTable.init('_cal_all_popup', true, [10] , [10]);
+	UserTable.init('_cal_all_popup', true, [10, 50] , [10, 50], true);
 			
 	calAfterGetItem(bundleId, startDate, endDate);
 	

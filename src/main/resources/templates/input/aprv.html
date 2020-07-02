@@ -142,9 +142,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: startDate,
-			endDate: endDate,
-			minDate: '2018/01/01',
-			maxDate: moment(),
+			endDate: endDate
 		}, function (start, end) {
 			
 			setDaterangepicker(start, end);
@@ -162,6 +160,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : function() {
 				var param = {
 					bundleId : $("#sel_bundle").val(),
+					keyword : $("#keyword").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
 					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
 				};

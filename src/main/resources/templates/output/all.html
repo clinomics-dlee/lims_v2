@@ -129,7 +129,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		
 		TableManageDefault.init();
 		
-		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_collect_grid', true, [10, 50] , [10, 50], true);
 		
 		var startDate = moment().subtract(1, 'months');
 		var endDate = moment();
@@ -139,9 +139,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: startDate,
-			endDate: endDate,
-			minDate: '2018/01/01',
-			maxDate: moment(),
+			endDate: endDate
 		}, function (start, end) {
 			
 			setDaterangepicker(start, end);
@@ -159,6 +157,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : function() {
 				var param = {
 					bundleId : $("#sel_bundle").val(),
+					keyword : $("#keyword").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
 					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
 				};
