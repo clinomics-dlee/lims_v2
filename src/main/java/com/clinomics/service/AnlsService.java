@@ -100,7 +100,7 @@ public class AnlsService {
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
 		total = list.size();
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrderingForExpAnls(list);
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
@@ -235,7 +235,7 @@ public class AnlsService {
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrderingForExpAnls(list);
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
@@ -333,7 +333,7 @@ public class AnlsService {
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
-		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrderingForExpAnls(list);
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
