@@ -59,7 +59,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> outputCmplDateOneMonth(Map<String, String> params) {
+	public static Specification<Sample> customDateOneMonth(String field, Map<String, String> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -71,7 +71,7 @@ public class SampleSpecification {
 				LocalDateTime start = LocalDateTime.parse(yyyymm + "-01 00:00:00", formatter);
 				LocalDateTime end = start.plusMonths(1).minusSeconds(1);
 				
-				predicatesAnds.add(criteriaBuilder.between(root.get("outputCmplDate"), start, end));
+				predicatesAnds.add(criteriaBuilder.between(root.get(field), start, end));
 				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
 			}
 			return rtn;
@@ -79,7 +79,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> outputCmplDateBetween(Map<String, String> params) {
+	public static Specification<Sample> customDateBetween(String field, Map<String, String> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -88,7 +88,7 @@ public class SampleSpecification {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
 				LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
-				predicatesAnds.add(criteriaBuilder.between(root.get("outputCmplDate"), start, end));
+				predicatesAnds.add(criteriaBuilder.between(root.get(field), start, end));
 				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
 			}
 			return rtn;

@@ -53,10 +53,13 @@ public class ChartService {
 		String paramEnd = params.get("end");
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDateTime start = LocalDateTime.parse(paramStart + "-01 00:00:00", formatter);
 		LocalDateTime end = LocalDateTime.parse(paramEnd + "-01 00:00:00", formatter);
 		end = end.plusMonths(1).minusSeconds(1);
 		
+		params.put("sDate", start.format(formatter2));
+		params.put("fDate", end.format(formatter2));
 		List<Bundle> bundles = bundleRepository.findAll();
 		
 		List<Sample> sample = sampleRepository.findAll(getSampleWhere(params));
@@ -166,34 +169,27 @@ public class ChartService {
 	
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.where(SampleSpecification.customDateBetween("anlsCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
-					StatusCode.S200_EXP_READY
-					, StatusCode.S210_EXP_STEP1
-					, StatusCode.S220_EXP_STEP2
-					, StatusCode.S230_EXP_STEP3
-					, StatusCode.S400_ANLS_READY
-					, StatusCode.S410_ANLS_RUNNING
-					, StatusCode.S420_ANLS_SUCC
-					, StatusCode.S440_ANLS_SUCC_CMPL
-					, StatusCode.S430_ANLS_FAIL
-					, StatusCode.S450_ANLS_FAIL_CMPL
+					StatusCode.S460_ANLS_CMPL
+					, StatusCode.S600_JDGM_APPROVE
+					, StatusCode.S700_OUTPUT_WAIT
 				})
 			));
 	}
 	
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.modifiedDateOneMonth(params))
+			.where(SampleSpecification.customDateBetween("outputCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(Arrays.asList(
-				StatusCode.S460_ANLS_CMPL
-				, StatusCode.S600_JDGM_APPROVE
-				, StatusCode.S700_OUTPUT_WAIT
+				StatusCode.S710_OUTPUT_CMPL
+				, StatusCode.S810_RE_OUTPUT_CMPL
+				, StatusCode.S900_OUTPUT_CMPL
 			)));
 	}
 

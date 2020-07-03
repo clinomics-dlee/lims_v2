@@ -12,6 +12,8 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +49,8 @@ public class CalendarService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public Bundle selectOne(int id) {
 		return bundleRepository.findById(id).orElse(new Bundle());
@@ -91,7 +95,7 @@ public class CalendarService {
 		List<Map<String, String>> mapCompletePdf = resultCompletePdf.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
-				t.put("day", s.getModifiedDate().getDayOfMonth() + "");
+				t.put("day", s.getOutputCmplDate().getDayOfMonth() + "");
 				return t;
 			}).collect(Collectors.toList());
 		
@@ -218,11 +222,27 @@ public class CalendarService {
 		}
 	}
 
+	// private Specification<Sample> getAnalysisDateWhere(Map<String, String> params) {
+	// 	if (params.containsKey("yyyymm")) {
+	// 		return SampleSpecification.customDateOneMonth("expStartDate", params);
+	// 	} else {
+	// 		return SampleSpecification.customDateBetween("expStartDate", params);
+	// 	}
+	// }
+
+	private Specification<Sample> getCompleteDateWhere(Map<String, String> params) {
+		if (params.containsKey("yyyymm")) {
+			return SampleSpecification.customDateOneMonth("anlsCmplDate", params);
+		} else {
+			return SampleSpecification.customDateBetween("anlsCmplDate", params);
+		}
+	}
+
 	private Specification<Sample> getOutputCmplDateWhere(Map<String, String> params) {
 		if (params.containsKey("yyyymm")) {
-			return SampleSpecification.outputCmplDateOneMonth(params);
+			return SampleSpecification.customDateOneMonth("outputCmplDate", params);
 		} else {
-			return SampleSpecification.outputCmplDateBetween(params);
+			return SampleSpecification.customDateBetween("outputCmplDate", params);
 		}
 	}
 	
@@ -264,7 +284,7 @@ public class CalendarService {
 	
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
 		return Specification
-			.where(getModifiedDateWhere(params))
+			.where(getCompleteDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.statusIn(Arrays.asList(

@@ -168,8 +168,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				xhr.setRequestHeader(header, token);
 			}
 		}, [ 
-			
 			{
+				title : ' ', 
+				data : 'id',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				type : {
+					name : "checkbox"
+				}
+			}, {
 				title : 'No', 
 				type : 'index',
 				headClassName : 'width-50',
