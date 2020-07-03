@@ -252,7 +252,41 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 
 	function excelForm() {
-		location.href = '/exp/step1/excel/form';
+		var checkedRows = UserTable.getCheckedRows("_step1_grid");
+		var excelDatas = [];
+		if (checkedRows.length > 0) {
+			for (var i = 0; i < checkedRows.length; i++) {
+				var row = checkedRows[i];
+				var data = {
+					"검사실 ID" : row.laboratoryId,
+					"A 260/280" : row.a260280,
+					"농도 (ng/μL)" : row.cncnt,
+					"DNA QC" : row.dnaQc
+				};
+				excelDatas.push(data);
+			}
+		} else {
+			excelDatas = [{
+				"검사실 ID" : "",
+				"A 260/280" : "",
+				"농도 (ng/μL)" : "",
+				"DNA QC" : ""
+			}];
+		}
+
+		// step 1. workbook 생성
+		var wb = XLSX.utils.book_new();
+		// step 2. 시트 만들기 
+		var newWorksheet = XLSX.utils.json_to_sheet(excelDatas);
+		// var newWorksheet = XLSX.utils.table_to_sheet(html);
+		// step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
+		XLSX.utils.book_append_sheet(wb, newWorksheet, "sheet1");
+		// step 4. 엑셀 파일 만들기 
+		var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+		// step 5. 엑셀 파일 내보내기 
+		saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Dna_Qc_Template.xlsx");
+
+		// location.href = '/exp/step1/excel/form';
 	}
 	
 	function excelUpload() {
