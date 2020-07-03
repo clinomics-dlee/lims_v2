@@ -29,6 +29,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/result/get")
 	public Map<String, Object> getResultWithWaitStatus(@RequestParam Map<String, String> params) {
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ IN interface : /result/get ");
 		return outputService.getResultsForRest(params);
 	}
 	
