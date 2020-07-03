@@ -47,9 +47,9 @@ public class CalendarExcelService {
 		// #. excel 읽기
 		XSSFWorkbook wb = new XSSFWorkbook();
 
-		// #. 분석완료일 기준으로 목록 조회
+		// #. 발행완료일 기준으로 목록 조회
 		Specification<Sample> where = Specification
-				.where(SampleSpecification.anlsCmplDatebetween(params))
+				.where(SampleSpecification.outputCmplDateBetween(params))
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.bundleIsActive())
 				.and(SampleSpecification.statusCodeGt(600));
