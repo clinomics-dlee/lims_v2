@@ -146,6 +146,41 @@ public class SampleItemService {
 		return header;
 	}
 
+	public List<Map<String, Object>> filterItemsAndOrderingForExpAnls(List<Sample> list) {
+		
+
+		Set<SampleItem> sampleItems = new HashSet<SampleItem>();
+		List<Map<String, Object>> header = new ArrayList<>();
+		list.stream().forEach(s -> {
+			
+			s.getBundle().getProduct().stream().forEach(p -> {
+				sampleItems.addAll(p.getSampleItem());
+			});
+		});
+
+		List<SampleItem> filteredSampleItems = sampleItems.stream()
+				.filter(fs -> {
+					if (!fs.isActive()) {
+						return false;
+					} else {
+						return true;
+					}
+				})
+				.sorted(Comparator.comparing(SampleItem::getOrd))
+				.collect(Collectors.toList());
+
+		filteredSampleItems.forEach(f -> {
+			if ("barcode".equals(f.getNameCode())) {
+				Map<String, Object> tt = Maps.newLinkedHashMap();
+				tt.put("title", f.getName());
+				tt.put("data", "items." + f.getNameCode());
+				header.add(tt);
+			}
+		});
+		
+		return header;
+	}
+
 	public List<Map<String, Object>> filterItemsAndOrderingForMap(List<Map<String, Object>> list) {
 		
 		Set<SampleItem> sampleItems = new HashSet<SampleItem>();
