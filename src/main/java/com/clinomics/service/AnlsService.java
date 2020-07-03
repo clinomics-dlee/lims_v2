@@ -83,7 +83,7 @@ public class AnlsService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -217,7 +217,7 @@ public class AnlsService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -315,7 +315,7 @@ public class AnlsService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {

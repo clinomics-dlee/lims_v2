@@ -27,7 +27,7 @@ public class PageController {
 	
 	@GetMapping()
 	public String calendar(Model model) {
-		Map<String, String> statusCodeMap = Maps.newHashMap();
+		Map<String, String> statusCodeMap = Maps.newLinkedHashMap();
 		for (StatusCode statusCode : StatusCode.values()) {
 			statusCodeMap.put(statusCode.getKey(), statusCode.getValue());
 		}

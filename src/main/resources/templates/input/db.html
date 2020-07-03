@@ -160,30 +160,30 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			}
 		}, [
 			{
+				title : 'No', 
+				type : 'index',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center'
+			}, {
 				title : '검사실ID', 
 				data : 'laboratoryId'
-			},
-			{
+			}, {
 				title : '서비스', 
 				data : 'bundle.name'
-			},
-			{
+			}, {
 				title : '상태', 
 				data : "statusCode",
 				render : function(row, data, index) {
 					var value = g_statusCodeInfo[data];
 					return value;
 				}
-			},
-			{
+			}, {
 				serverHeader : true
-			},
-			{
+			}, {
 				title : '검체 등록일자', 
 				data : 'createdDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '등록자', 
 				data : 'createdMember.name'
 			}

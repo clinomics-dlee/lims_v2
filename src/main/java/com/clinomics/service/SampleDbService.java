@@ -76,7 +76,7 @@ public class SampleDbService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -125,7 +125,7 @@ public class SampleDbService {
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
 		long total = sampleHistoryRepository.countBySample_Id(id);
-		List<Order> orders = Arrays.asList(new Order[] { Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -144,7 +144,7 @@ public class SampleDbService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -170,13 +170,13 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> find(Map<String, String> params, StatusCode statusCode) {
+	public Map<String, Object> find(Map<String, String> params, String statusCode) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -189,7 +189,7 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusEqual(statusCode));
+					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)));
 					
 		
 		total = sampleRepository.count(where);
@@ -208,7 +208,7 @@ public class SampleDbService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -234,13 +234,13 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> findByModifiedDate(Map<String, String> params, StatusCode statusCode) {
+	public Map<String, Object> findByModifiedDate(Map<String, String> params, String statusCode) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("createdDate"), Order.asc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -253,7 +253,7 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusEqual(statusCode));
+					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)));
 					
 		
 		total = sampleRepository.count(where);

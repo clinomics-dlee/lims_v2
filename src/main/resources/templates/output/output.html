@@ -64,6 +64,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
+								<label class="col-form-label m-l-2">상태</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_status">
+										<option value>전체</option>
+										<option selected value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
+										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option>
+										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option>
+										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option>
+										<option value="S810_RE_OUTPUT_CMPL" th:text="${statusCodes.get('S810_RE_OUTPUT_CMPL')}"></option>
+									</select>
+								</div>
 								
 								<label class="col-form-label m-l-5">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
@@ -155,6 +166,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data : function() {
 				var param = {
 					bundleId : $("#sel_bundle").val(),
+					statusCode : $("#sel_status").val(),
 					keyword : $("#keyword").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
 					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()

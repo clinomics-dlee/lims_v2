@@ -49,10 +49,8 @@ public class OutputController {
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
 		
-		if (params.containsKey("complete")) {
-			if ("0".equals(params.get("complete"))) {
-				return sampleDbService.findByModifiedDate(params, StatusCode.S460_ANLS_CMPL);
-			}
+		if (params.containsKey("statusCode") && !params.get("statusCode").isEmpty()) {
+			return sampleDbService.findByModifiedDate(params, params.get("statusCode"));
 		}
 		return sampleDbService.findByModifiedDate(params, 600);
 		
@@ -69,6 +67,10 @@ public class OutputController {
 	@GetMapping("/output/list")
 	@ResponseBody
 	public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
+		if (params.containsKey("statusCode") && !params.get("statusCode").isEmpty()) {
+			return sampleDbService.findByModifiedDate(params, params.get("statusCode"));
+		}
+
 		return sampleDbService.findByModifiedDate(params, 600);
 	}
 	

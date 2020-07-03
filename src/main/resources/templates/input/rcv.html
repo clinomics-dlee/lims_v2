@@ -170,52 +170,40 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}, [ 
 			
 			{
-				title : ' ', 
-				data : 'id',
+				title : 'No', 
+				type : 'index',
 				headClassName : 'width-50',
-				bodyClassName : 'text-center',
-				type : {
-					name : "checkbox"
-				}
-			},
-			{
+				bodyClassName : 'text-center'
+			}, {
 				title : "검사실ID",
 				data : "laboratoryId",
 				render : function(row, data, index) {
 					return '<a href="javascript:samplePopupOnload(\'' + row.id + '\', false)">' + data + '</string>';
 				}
-			},
-			{
+			}, {
 				title : '서비스', 
 				data : 'bundle.name'
-			},
-			{
+			}, {
 				serverHeader : true
-			},
-			{
+			}, {
 				title : '검체 채취일', 
 				data : 'collectedDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '검체 수령일', 
 				data : 'receivedDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '검체 종류', 
 				data : 'sampleType'
-			},
-			{
+			}, {
 				title : '검체 등록일자', 
 				data : 'createdDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '등록자', 
 				data : 'createdMember.name'
-			},
-			{
+			}, {
 				title : ' ', 
 				data : 'items.trackingNo',
 				render : function(row, data, index) {

@@ -60,10 +60,8 @@ public class InputController {
 	@GetMapping("/aprv")
 	@ResponseBody
 	public Map<String, Object> aprv(@RequestParam Map<String, String> params) {
-		if (params.containsKey("complete")) {
-			if ("0".equals(params.get("complete"))) {
-				return sampleDbService.find(params, StatusCode.S020_INPUT_RCV);
-			}
+		if (params.containsKey("statusCode") && !params.get("statusCode").isEmpty()) {
+			return sampleDbService.find(params, params.get("statusCode"));
 		}
 		return sampleDbService.find(params, 40);
 	}

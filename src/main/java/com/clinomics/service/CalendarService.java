@@ -217,6 +217,14 @@ public class CalendarService {
 			return SampleSpecification.betweenModifiedDate(params);
 		}
 	}
+
+	private Specification<Sample> getOutputCmplDateWhere(Map<String, String> params) {
+		if (params.containsKey("yyyymm")) {
+			return SampleSpecification.outputCmplDateOneMonth(params);
+		} else {
+			return SampleSpecification.outputCmplDateBetween(params);
+		}
+	}
 	
 	// private Specification<Sample> getSampleWhere(Map<String, String> params) {
 	// 	return Specification
@@ -268,7 +276,7 @@ public class CalendarService {
 	
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
 		return Specification
-			.where(getModifiedDateWhere(params))
+			.where(getOutputCmplDateWhere(params))
 				.and(SampleSpecification.isLastVersionTrue())
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.statusIn(Arrays.asList(

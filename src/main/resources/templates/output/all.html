@@ -64,6 +64,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
+								<label class="col-form-label m-l-2">상태</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_status">
+										<option value>전체</option>
+										<option th:each="key : ${statusCodes.keySet()}" th:value="${key}" th:text="${statusCodes.get(key)}"></option>
+									</select>
+								</div>
 								
 								<label class="col-form-label m-l-5">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
@@ -170,12 +177,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			}
 		}, [
 			{
-				title : 'No',
+				title : 'No', 
+				type : 'index',
 				headClassName : 'width-50',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					return '<strong>' + (index + 1) + '</strong>';
-				}
+				bodyClassName : 'text-center'
 			}, {
 				title : '검사실ID', 
 				data : 'laboratoryId'

@@ -65,11 +65,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
-								<label class="col-form-label m-l-2">결제여부</label>
+								<label class="col-form-label m-l-2">상태</label>
 								<div class="col-xs-push-0">
-									<select class="form-control width-200" id="sel_complete">
-										<option value="0" selected>대기</option>
-										<option value="1">완료</option>
+									<select class="form-control width-200" id="sel_status">
+										<option value>전체</option>
+										<option selected value="S460_ANLS_CMPL" th:text="${statusCodes.get('S460_ANLS_CMPL')}"></option>
+										<option value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
+										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option>
+										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option>
+										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option>
+										<option value="S810_RE_OUTPUT_CMPL" th:text="${statusCodes.get('S810_RE_OUTPUT_CMPL')}"></option>
 									</select>
 								</div>
 								
@@ -166,8 +171,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : function() {
 				var param = {
-					complete : $("#sel_complete").val(),
 					bundleId : $("#sel_bundle").val(),
+					statusCode : $("#sel_status").val(),
 					keyword : $("#keyword").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
 					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
