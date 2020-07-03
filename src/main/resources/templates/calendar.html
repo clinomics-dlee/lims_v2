@@ -90,7 +90,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						</div>
                     </div>
                 </div>
-            </div>
+			</div>
+			
+		    
             <div class="row">
 				<!-- begin col-3 -->
 				<div class="col-xl-3 col-md-6">
@@ -180,17 +182,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				<!-- begin panel -->
 					<div class="table-responsive" style="height: 100%; padding: 0; overflow-y: hidden;">
 						
-						<table id="cal1" class="table table-bordered widget-table widget-table-rounded" height="100%" data-id="widget">
+						<table id="cal1" class="table table-bordered widget-table widget-table-rounded hide" height="100%" data-id="widget">
 							<thead>
 	           					<tr>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Sun</th>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Mon</th>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Tue</th>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Wed</th>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Thu</th>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Fri</th>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Sat</th>
-	           						<th style="width: 12.5%; height: 12.5%" class="">Total</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">일</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">월</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">화</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">수</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">목</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">금</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">토</th>
+	           						<th style="width: 12.5%; height: 12.5%" class="">주간합계</th>
 	           					</tr>
 							</thead>
 							<tbody>
@@ -332,7 +334,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				xhr.setRequestHeader(header, token);
 			},
 			success: function (data) {
-				
+				$("#cal1").addClass('hide');
 				var startWeek = rdate.startOf('month').isoWeekday();
 				startWeek = (startWeek == 7 ? 1 : startWeek + 1);
 				endDay = rdate.endOf('month').format("DD");
@@ -377,19 +379,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					} else if (loop % 8 == 0 && loop != 0) {
 						html = '&nbsp;<div>';
 						if (w1 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + w1 + '</a>';
 						}
 						if (w2 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-info btn-xs p-l-10 p-r-10 m-b-5">' + w2 + '</a>';
 						}
 						if (w3 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-orange btn-xs p-l-10 p-r-10 m-b-5">' + w3 + '</a>';
 						}
 						if (w4 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToBetweenDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-red btn-xs p-l-10 p-r-10 m-b-5">' + w4 + '</a>';
 						}
 						html += '</div>';
@@ -406,9 +408,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								+ ' style="color: white;">' + t3 + '</a>');
 				$("#total4").html('<a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
 								+ ' style="color: white;">' + t4 + '</a>');
-				
-				
-				
+				$("#cal1").removeClass('hide');
 			},
 			error : function(data) {
 				
@@ -422,8 +422,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function dayToBetweenDate(day) {
-		return "'" + idate + "-" + fillzero(day - 6, 2) + "'"
-			+ ",'" + idate + "-" + fillzero(day, 2) + "'";
+		sday = day - 6;
+		fday = day;
+		if (sday < 1) sday = 1;
+		if (fday < 1) fday = 1;
+		return "'" + idate + "-" + fillzero(sday, 2) + "'"
+			+ ",'" + idate + "-" + fillzero(fday, 2) + "'";
 	}
 	
 	function dayToBetweenDateMonth() {

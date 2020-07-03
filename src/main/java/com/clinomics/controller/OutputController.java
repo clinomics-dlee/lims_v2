@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.clinomics.service.setting.BundleService;
 import com.clinomics.service.OutputService;
 import com.clinomics.service.SampleDbService;
+import com.clinomics.enums.StatusCode;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
 
@@ -47,7 +48,14 @@ public class OutputController {
 	@GetMapping("/jdgm/list")
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
-		return sampleDbService.findByModifiedDate(params, 460);
+		
+		if (params.containsKey("complete")) {
+			if ("0".equals(params.get("complete"))) {
+				return sampleDbService.findByModifiedDate(params, StatusCode.S460_ANLS_CMPL);
+			}
+		}
+		return sampleDbService.findByModifiedDate(params, 600);
+		
 	}
 	
 	@PostMapping("/jdgm/approve")

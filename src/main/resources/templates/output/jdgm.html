@@ -65,6 +65,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
+								<label class="col-form-label m-l-2">결제여부</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_complete">
+										<option value="0" selected>대기</option>
+										<option value="1">완료</option>
+									</select>
+								</div>
 								
 								<label class="col-form-label m-l-5">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
@@ -159,6 +166,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : function() {
 				var param = {
+					complete : $("#sel_complete").val(),
 					bundleId : $("#sel_bundle").val(),
 					keyword : $("#keyword").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),

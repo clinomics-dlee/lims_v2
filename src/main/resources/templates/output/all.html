@@ -176,20 +176,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				render : function(row, data, index) {
 					return '<strong>' + (index + 1) + '</strong>';
 				}
-			},
-			{
+			}, {
 				title : '검사실ID', 
 				data : 'laboratoryId'
-			},
-			{
+			}, {
 				title : '서비스', 
 				data : 'bundle.name'
-			},
-			{
+			}, {
 				title : "Genotyping ID",
 				data : "genotypingId"
-			},
-			{
+			}, {
 				title : "Genotyping Method",
 				data : "genotypingMethodCode",
 				render : function(row, data, index) {
@@ -199,46 +195,41 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					}
 					return value;
 				}
-			},
-			{
+			}, {
 				title : "Mapping No",
 				data : "mappingNo"
-			},
-			{
+			}, {
 				title : '상태', 
 				data : "statusCode",
 				render : function(row, data, index) {
 					var value = g_statusCodeInfo[data];
 					return value;
 				}
-			},
-			{
+			}, {
 				serverHeader : true
-			},
-			{
+			}, {
 				title : '검체 채취일', 
 				data : 'collectedDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '검체 수령일', 
 				data : 'receivedDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '검체 종류', 
 				data : 'sampleType'
-			},
-			{
+			}, {
+				title : "최근수정일자",
+				data : "modifiedDate",
+				type : "date"
+			}, {
 				title : '검체 등록일자', 
 				data : 'createdDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '등록자', 
 				data : 'createdMember.name'
-			},
-			{
+			}, {
 				title : '입고담당자', 
 				data : 'inputApproveDate',
 				bodyClassName : 'text-center',
@@ -250,13 +241,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '입고승인일시', 
 				data : 'inputApproveDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '중간관리자', 
 				data : 'inputMngApproveDate',
 				bodyClassName : 'text-center',
@@ -268,13 +257,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '입고 중간관리자 승인일시', 
 				data : 'inputMngApproveDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '입고 검사실책임자', 
 				data : 'inputDrctApproveDate',
 				bodyClassName : 'text-center',
@@ -286,13 +273,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '입고 검사실책임자 승인일시', 
 				data : 'inputDrctApproveDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '실험 시작담당자', 
 				data : 'expStartDate',
 				bodyClassName : 'text-center',
@@ -304,13 +289,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '실험시작일시', 
 				data : 'expStartDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : 'STEP1 담당자', 
 				data : 'expStep1Date',
 				bodyClassName : 'text-center',
@@ -322,13 +305,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : 'STEP1 완료일시', 
 				data : 'expStep1Date',
 				type : 'date'
-			},
-			{
+			}, {
 				title : 'STEP2 담당자', 
 				data : 'expStep2Date',
 				bodyClassName : 'text-center',
@@ -340,13 +321,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : 'STEP2 완료일시', 
 				data : 'expStep2Date',
 				type : 'date'
-			},
-			{
+			}, {
 				title : 'STEP3 담당자', 
 				data : 'expStep3Date',
 				bodyClassName : 'text-center',
@@ -358,13 +337,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : 'STEP3 완료일시', 
 				data : 'expStep3Date',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '분석 시작담당자', 
 				data : 'anlsStartDate',
 				bodyClassName : 'text-center',
@@ -376,18 +353,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '분석시작일시', 
 				data : 'anlsStartDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '분석종료일시', 
 				data : 'anlsEndDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '분석 완료담당자', 
 				data : 'anlsCmplDate',
 				bodyClassName : 'text-center',
@@ -399,13 +373,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '분석완료일시', 
 				data : 'anlsCmplDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '판정 검사담당자', 
 				data : 'jdgmApproveDate',
 				bodyClassName : 'text-center',
@@ -417,13 +389,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '판정승인일시', 
 				data : 'jdgmApproveDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '판정 중간관리자', 
 				data : 'jdgmMngApproveDate',
 				bodyClassName : 'text-center',
@@ -435,13 +405,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '판정 중간관리자 승인일시', 
 				data : 'jdgmMngApproveDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '판정 검사실책임자', 
 				data : 'jdgmDrctApproveDate',
 				bodyClassName : 'text-center',
@@ -453,13 +421,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '판정 검사실책임자 승인일시', 
 				data : 'jdgmDrctApproveDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '출고 담당자', 
 				data : 'outputWaitDate',
 				bodyClassName : 'text-center',
@@ -471,18 +437,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '출고대기일시', 
 				data : 'outputWaitDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '출고완료일시', 
 				data : 'outputCmplDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '재발행 담당자', 
 				data : 'reOutputWaitDate',
 				bodyClassName : 'text-center',
@@ -494,13 +457,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					html += '</div></div>';
 					return html;
 				}
-			},
-			{
+			}, {
 				title : '재발행대기일시', 
 				data : 'reOutputWaitDate',
 				type : 'date'
-			},
-			{
+			}, {
 				title : '재발행완료일시', 
 				data : 'reOutputCmplDate',
 				type : 'date'
