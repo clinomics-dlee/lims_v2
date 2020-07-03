@@ -248,6 +248,7 @@ public class OutputService {
 
 	@Transactional
 	public Map<String, Object> getResultsForRest(Map<String, String> params) {
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ getResultsForRest ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ IN interface : " + params.toString());
 		Map<String, Object> rtn = Maps.newHashMap();
 		// #. productType 추가
 		String productType = params.get("productType");
@@ -295,6 +296,7 @@ public class OutputService {
 					
 					// #. result status update
 					if (!isTest) {
+						logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ isTest : " + isTest);
 						
 						String outputProductTypes = sample.getOutputProductTypes();
 						if (outputProductTypes == null) outputProductTypes = "";
