@@ -232,7 +232,7 @@ public class OutputService {
 					sample.setOutputWaitMember(member);
 					sample.setModifiedDate(now);
 					
-					sample.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+					sample.setStatusCode(StatusCode.S800_RE_OUTPUT_WAIT);
 				}
 
 			} else {
