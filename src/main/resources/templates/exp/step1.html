@@ -137,7 +137,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
 		
-		UserTable.init('_step1_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_step1_grid', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500]);
 		drawStep1Grid();
 
 		$('#file').on('change', function () {

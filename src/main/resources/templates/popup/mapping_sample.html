@@ -46,7 +46,7 @@ function mappingSamplePopupOnload(sampleId, bundleId) {
 	$("#modal-mapping-sample").modal();
 	$("#_mapping_sample_popup").empty();
 	
-	UserTable.init('_mapping_sample_popup', true);
+	UserTable.init('_mapping_sample_popup', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500]);
 	drawMappingSample(sampleId);
 }
 

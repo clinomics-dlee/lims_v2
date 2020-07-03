@@ -267,7 +267,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		
 		TableManageDefault.init();
 		
-		UserTable.init('_collect_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_collect_grid', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500]);
 		
 		$('#sel_bundle3, #sel_bundle4').on('change', function () {
 			initForm($(this).attr('id'));
@@ -605,7 +605,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		var bundleId = $("#sel_bundle4").val();
 		
 		
-		UserTable.init('_import_grid', true, [10, 50] , [10, 50]);
+		UserTable.init('_import_grid', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500]);
 		
 		UserTable.draw('_import_grid', {
 			url : "/work/register/get/temp",
