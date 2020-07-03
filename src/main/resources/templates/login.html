@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 <head>
-    <th:block th:replace="layout/head_login"></th:block>
+	<th:block th:replace="layout/head_login"></th:block>
+	<style>
+		.custom-checkbox-label {
+			padding-left: 24px !important;
+		}
+		
+		.custom-checkbox-label:before,
+		.custom-checkbox-label:after {
+			left: 0 !important;
+		}
+	</style>
 </head>
 <body class="pace-top">
 	<!-- begin #page-loader -->
@@ -46,7 +56,10 @@
                         <div class="form-group m-b-15">
                             <input type="password" class="form-control form-control-lg" name="password" id="password" placeholder="Password" required />
                         </div>
-                        
+                        <div class="checkbox checkbox-css m-b-20">
+							<input type="checkbox" id="remember_me_checkbox" value="">
+							<label class="custom-checkbox-label" for="remember_me_checkbox">Remember Me</label>
+						</div>
                         <div class="login-buttons">
                             <button type="button" class="btn btn-default btn-block btn-lg" id="loginBtn" th:text="#{button.login}"></button>
                         </div>
@@ -83,6 +96,11 @@ $(document).ready(function() {
 	});
 	
 	$('.selectpicker').selectpicker();
+
+	if (Cookies.get('lims_v2_username') != null && Cookies.get('lims_v2_username') != ''){
+		$("#username").val(Cookies.get('lims_v2_username'));
+		$("#remember_me_checkbox").prop('checked', true);
+	}
 });
 //Error page redirect ()
 
@@ -131,6 +149,12 @@ function doSave(){
 				
 				setTimeout(function(){
 					if(data.result == '0000'){
+						if ($("#remember_me_checkbox").is(":checked")) {  
+							Cookies.set('lims_v2_username', $("#username").val(), {path: '/', expires: 7});  
+						} else {
+							Cookies.set('lims_v2_username', '', {path:'/'}); 
+						}
+						
 						$(location).attr('href','/');
 					} else{
 						$('#password').val('');

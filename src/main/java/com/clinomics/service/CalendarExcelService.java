@@ -49,10 +49,10 @@ public class CalendarExcelService {
 
 		// #. 발행완료일 기준으로 목록 조회
 		Specification<Sample> where = Specification
-				.where(SampleSpecification.outputCmplDateBetween(params))
+				.where(SampleSpecification.customDateBetween("outputCmplDate", params))
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.bundleIsActive())
-				.and(SampleSpecification.statusCodeGt(600));
+				.and(SampleSpecification.statusCodeGt(710));
 		List<Sample> samples = sampleRepository.findAll(where);
 
 
@@ -64,7 +64,7 @@ public class CalendarExcelService {
 		List<String> monthlyList = new ArrayList<String>();
 		Map<String, List<Sample>> monthlySamplesMap = Maps.newHashMap();
 		for (Sample sample : samples) {
-			String month = sample.getAnlsCmplDate().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+			String month = sample.getOutputCmplDate().format(DateTimeFormatter.ofPattern("yyyy-MM"));
 			if (!monthlyList.contains(month)) {
 				monthlyList.add(month);
 
@@ -129,12 +129,12 @@ public class CalendarExcelService {
 				// row.getCell(6).setCellValue(""); // 제공내용 - 연월일
 				// row.getCell(7).setCellValue(""); // 제공내용 - 제공량
 				// row.getCell(8).setCellValue(""); // 제공내용 - 제공 기관명
-				row.getCell(9).setCellValue(s.getAnlsCmplDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))); // 폐기내용 - 연월일
+				row.getCell(9).setCellValue(s.getOutputCmplDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))); // 폐기내용 - 연월일
 				row.getCell(10).setCellValue("전량 폐기"); // 폐기내용 - 폐기량
 				row.getCell(11).setCellValue("-"); // 폐기내용 - 폐기방법 - 자가처리
 				row.getCell(12).setCellValue("(주)보광환경"); // 폐기내용 - 폐기방법 - 위탁처리
 				row.getCell(13).setCellValue("냉장"); // 기타 - 보관조건
-				row.getCell(14).setCellValue(s.getAnlsCmplMember().getName()); // 결재 - 담당
+				row.getCell(14).setCellValue(s.getOutputWaitMember().getName()); // 결재 - 담당
 				row.getCell(15).setCellValue(s.getJdgmDrctApproveMember().getName()); // 결재 - 관리책임자
 
 				index++;
