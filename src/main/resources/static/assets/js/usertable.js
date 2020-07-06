@@ -3,6 +3,7 @@ var UserTable = function() {
 	var drawnTableFunc = {};
 	var items = {};
 	var pageInfo = {};
+	var pageOrder = [];
 	var excelDatas = {};
 	
 	return {
@@ -30,7 +31,7 @@ var UserTable = function() {
 			h += '</div>';
 			h += '<div style="clear:both;"></div>';
 			h += '<div class="dataTables_scroll" style="overflow: auto;">';
-			h += '<table id="' + uid + '_table" class="table table-striped table-bordered" style="width: 100%; margin-bottom: 0;">';
+			h += '<table id="' + uid + '_table" class="table table-striped table-bordered dataTable" style="width: 100%; margin-bottom: 0;">';
 			h += '<thead></thead><tbody></tbody>';
 			h += '</table>';
 			h += '</div>';
@@ -39,6 +40,7 @@ var UserTable = function() {
 			h += '</div>';
 			$('#' + uid).html(h);
 			
+			pageOrder[uid] = [];
 			pageInfo[uid] = {};
 			pageInfo[uid].pageable = pageable;
 			pageInfo[uid].pagesView = pagesView;
@@ -97,6 +99,8 @@ var UserTable = function() {
 			} else {
 				param = ajax.data();
 			}
+
+			if (pageOrder[uid]) param.order = pageOrder[uid];
 			param.pgNmb = start;
 			param.pgrwc = page;
 			
@@ -136,6 +140,11 @@ var UserTable = function() {
 								
 								if (aColumns[r].serverHeader) {
 									var sHeader = rtn.header;
+									if (aColumns[r].sorting) {
+										for (var sh in sHeader) {
+											sHeader[sh].sorting = true;
+										}
+									}
 									sHeader.reverse();
 									aColumns.splice(r, 1);
 									
@@ -158,12 +167,18 @@ var UserTable = function() {
 								} catch(ex) {
 									val = '';
 								}
-								var width = '', headClassName = '', bodyClassName = '';
+								var width = '', headClassName = ' class="', bodyClassName = '';
+								
 								if (aColumns[r].width) {
 									width = ' style="width:' + aColumns[r].width + ';"';
 								}
 								if (aColumns[r].headClassName) {
-									headClassName = ' class="' + aColumns[r].headClassName + '"';
+									headClassName = ' ' + aColumns[r].headClassName;
+								}
+								if (aColumns[r].sorting) {
+									headClassName += 'sorting px-lg-4" sort="' + aColumns[r].data + '"'
+								} else {
+									headClassName += '"';
 								}
 								if (aColumns[r].bodyClassName) {
 									bodyClassName = ' class="' + aColumns[r].bodyClassName + '"';
@@ -368,6 +383,26 @@ var UserTable = function() {
 								$("#" + uid + "_checkbox_" + i).prop("checked", checkedValue);
 							}
 						}
+					});
+
+					$("#" + uid + " th").click(function() {
+						var sort = '';
+						if ($(this).hasClass('sorting_asc')) {
+							$(this).removeClass('sorting');
+							$(this).removeClass('sorting_asc');
+							sort = 'desc';
+						} else {
+							$(this).removeClass('sorting');
+							$(this).removeClass('sorting_desc');
+							sort = 'asc';
+						}
+						$(this).addClass('sorting_' + sort);
+						var headId = $(this).attr('sort');
+						const idx = pageOrder[uid].findIndex(function(item) { return item.key === headId }); // findIndex = find + indexOf if (idx > -1)
+						pageOrder[uid].splice(idx, 1);
+						pageOrder[uid].push({ "key" : headId, "order" : sort });
+						
+						drawnTableFunc[uid]();
 					});
 					
 					$("#" + uid + "_page").change(function() {

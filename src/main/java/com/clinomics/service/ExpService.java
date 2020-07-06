@@ -58,11 +58,11 @@ public class ExpService {
 	@Autowired
 	DataTableService dataTableService;
 
-	public Map<String, Object> findSampleByExpRdyStatus(Map<String, String> params) {
+	public Map<String, Object> findSampleByExpRdyStatus(Map<String, Object> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -138,11 +138,11 @@ public class ExpService {
 		return rtn;
 	}
 
-	public Map<String, Object> findSampleByExpStep1Status(Map<String, String> params) {
+	public Map<String, Object> findSampleByExpStep1Status(Map<String, Object> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -285,11 +285,11 @@ public class ExpService {
 		return rtn;
 	}
 
-	public Map<String, Object> findSampleByExpStep2Status(Map<String, String> params) {
+	public Map<String, Object> findSampleByExpStep2Status(Map<String, Object> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -491,8 +491,8 @@ public class ExpService {
 	public Map<String, Object> findMappingInfosByExpStep3Status(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -628,8 +628,8 @@ public class ExpService {
 	public Map<String, Object> findMappingInfosForDb(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -657,8 +657,8 @@ public class ExpService {
 	public Map<String, Object> findMappingSample(Map<String, String> params, String mappingNo) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체

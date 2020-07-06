@@ -53,22 +53,22 @@ public class InputController {
 	
 	@GetMapping("/rvc")
 	@ResponseBody
-	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
+	public Map<String, Object> rvc(@RequestParam Map<String, Object> params) {
 		return inputService.find(params, Arrays.asList(new StatusCode[] { StatusCode.S000_INPUT_REG }));
 	}
 	
 	@GetMapping("/aprv")
 	@ResponseBody
-	public Map<String, Object> aprv(@RequestParam Map<String, String> params) {
-		if (params.containsKey("statusCode") && !params.get("statusCode").isEmpty()) {
-			return sampleDbService.find(params, params.get("statusCode"));
+	public Map<String, Object> aprv(@RequestParam Map<String, Object> params) {
+		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
+			return sampleDbService.find(params, params.get("statusCode") + "");
 		}
 		return sampleDbService.find(params, 40);
 	}
 	
 	@GetMapping("/db")
 	@ResponseBody
-	public Map<String, Object> db(@RequestParam Map<String, String> params) {
+	public Map<String, Object> db(@RequestParam Map<String, Object> params) {
 		return sampleDbService.find(params, 0);
 	}
 	
@@ -134,7 +134,7 @@ public class InputController {
 	}
 	
 	private void requestExcel(XSSFWorkbook xlsx, HttpServletResponse response) {
-		response.setHeader("Content-Disposition", "attachment;filename=sample.xlsx");
+		response.setHeader("Content-Disposition", "attachment;filename=UploadTemplate.xlsx");
         // 엑셀파일명 한글깨짐 조치
         response.setHeader("Content-Transfer-Encoding", "binary;");
         response.setHeader("Pragma", "no-cache;");

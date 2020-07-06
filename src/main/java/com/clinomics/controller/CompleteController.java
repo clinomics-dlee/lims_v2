@@ -45,13 +45,13 @@
 
 // 	@GetMapping("/get")
 // 	@ResponseBody
-// 	public Map<String, Object> getList(@RequestParam Map<String, String> params) {
+// 	public Map<String, Object> getList(@RequestParam Map<String, Object> params) {
 // 		return completeService.getCompleteList(params);
 // 	}
 
 // 	@GetMapping("/history/{id}")
 // 	@ResponseBody
-// 	public Map<String, Object> history(@RequestParam Map<String, String> params, @PathVariable String id) {
+// 	public Map<String, Object> history(@RequestParam Map<String, Object> params, @PathVariable String id) {
 // 		return completeService.getSampleHistory(params, id);
 // 	}
 	

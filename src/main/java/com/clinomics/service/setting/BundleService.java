@@ -55,8 +55,8 @@ public class BundleService {
 	public Map<String, Object> selectAll(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		long total = bundleRepository.countByIsSingleAndIsActiveTrue(false);
 		long filtered = total;
 		

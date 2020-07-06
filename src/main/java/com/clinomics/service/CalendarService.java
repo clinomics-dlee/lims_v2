@@ -60,7 +60,7 @@ public class CalendarService {
 		return bundleRepository.findAll();
 	}
 
-	public Map<String, Object> selectCountByMonthly(Map<String, String> params) {
+	public Map<String, Object> selectCountByMonthly(Map<String, Object> params) {
 		
 		
 		List<Sample> sample = sampleRepository.findAll(getRegisteredWhere(params));
@@ -70,31 +70,31 @@ public class CalendarService {
 		
 //		TemporalField weekFields = WeekFields.of(Locale.getDefault()).weekOfMonth();
 		
-		List<Map<String, String>> mapSample = sample.stream()
+		List<Map<String, Object>> mapSample = sample.stream()
 			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
+				Map<String, Object> t = Maps.newHashMap();
 				t.put("day", s.getCreatedDate().getDayOfMonth() + "");
 //				t.put("weekOfMonth", s.getCreatedDate().get(weekFields) + "");
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapAnalysis = resultAnalysis.stream()
+		List<Map<String, Object>> mapAnalysis = resultAnalysis.stream()
 			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
+				Map<String, Object> t = Maps.newHashMap();
 				t.put("day", (s.getModifiedDate().getDayOfMonth() + ""));
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapComplete = resultComplete.stream()
+		List<Map<String, Object>> mapComplete = resultComplete.stream()
 			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
+				Map<String, Object> t = Maps.newHashMap();
 				t.put("day", (s.getModifiedDate().getDayOfMonth() + ""));
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapCompletePdf = resultCompletePdf.stream()
+		List<Map<String, Object>> mapCompletePdf = resultCompletePdf.stream()
 			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
+				Map<String, Object> t = Maps.newHashMap();
 				t.put("day", s.getOutputCmplDate().getDayOfMonth() + "");
 				return t;
 			}).collect(Collectors.toList());
@@ -114,11 +114,11 @@ public class CalendarService {
 		
 	}
 	
-	public Map<String, Object> selectRegistered(Map<String, String> params) {
+	public Map<String, Object> selectRegistered(Map<String, Object> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 
 		List<Order> orders = Arrays.asList(new Order[] { Order.asc("id") });
 		// #. paging 관련 객체
@@ -137,11 +137,11 @@ public class CalendarService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
-	public Map<String, Object> selectAnalysis(Map<String, String> params) {
+	public Map<String, Object> selectAnalysis(Map<String, Object> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 
 		List<Order> orders = Arrays.asList(new Order[] { Order.asc("id") });
 		// #. paging 관련 객체
@@ -160,11 +160,11 @@ public class CalendarService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
-	public Map<String, Object> selectCompleted(Map<String, String> params) {
+	public Map<String, Object> selectCompleted(Map<String, Object> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 
 		List<Order> orders = Arrays.asList(new Order[] { Order.asc("id") });
 		// #. paging 관련 객체
@@ -183,11 +183,11 @@ public class CalendarService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 	
-	public Map<String, Object> selectReported(Map<String, String> params) {
+	public Map<String, Object> selectReported(Map<String, Object> params) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 
 		List<Order> orders = Arrays.asList(new Order[] { Order.asc("id") });
 		// #. paging 관련 객체
@@ -206,7 +206,7 @@ public class CalendarService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	private Specification<Sample> getCreateDateWhere(Map<String, String> params) {
+	private Specification<Sample> getCreateDateWhere(Map<String, Object> params) {
 		if (params.containsKey("yyyymm")) {
 			return SampleSpecification.createdDateOneMonth(params);
 		} else {
@@ -214,7 +214,7 @@ public class CalendarService {
 		}
 	}
 
-	private Specification<Sample> getModifiedDateWhere(Map<String, String> params) {
+	private Specification<Sample> getModifiedDateWhere(Map<String, Object> params) {
 		if (params.containsKey("yyyymm")) {
 			return SampleSpecification.modifiedDateOneMonth(params);
 		} else {
@@ -230,7 +230,7 @@ public class CalendarService {
 	// 	}
 	// }
 
-	private Specification<Sample> getCompleteDateWhere(Map<String, String> params) {
+	private Specification<Sample> getCompleteDateWhere(Map<String, Object> params) {
 		if (params.containsKey("yyyymm")) {
 			return SampleSpecification.customDateOneMonth("anlsCmplDate", params);
 		} else {
@@ -238,7 +238,7 @@ public class CalendarService {
 		}
 	}
 
-	private Specification<Sample> getOutputCmplDateWhere(Map<String, String> params) {
+	private Specification<Sample> getOutputCmplDateWhere(Map<String, Object> params) {
 		if (params.containsKey("yyyymm")) {
 			return SampleSpecification.customDateOneMonth("outputCmplDate", params);
 		} else {
@@ -253,7 +253,7 @@ public class CalendarService {
 	// 		.and(SampleSpecification.statusCodeGt(20));
 	// }
 	
-	private Specification<Sample> getRegisteredWhere(Map<String, String> params) {
+	private Specification<Sample> getRegisteredWhere(Map<String, Object> params) {
 		return Specification
 			.where(getCreateDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
@@ -261,7 +261,7 @@ public class CalendarService {
 			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
-	private Specification<Sample> getAnalysisWhere(Map<String, String> params) {
+	private Specification<Sample> getAnalysisWhere(Map<String, Object> params) {
 		return Specification
 			.where(getModifiedDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
@@ -282,7 +282,7 @@ public class CalendarService {
 			));
 	}
 	
-	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
+	private Specification<Sample> getCompletedWhere(Map<String, Object> params) {
 		return Specification
 			.where(getCompleteDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
@@ -294,7 +294,7 @@ public class CalendarService {
 			)));
 	}
 	
-	private Specification<Sample> getReportedWhere(Map<String, String> params) {
+	private Specification<Sample> getReportedWhere(Map<String, Object> params) {
 		return Specification
 			.where(getOutputCmplDateWhere(params))
 				.and(SampleSpecification.isLastVersionTrue())
@@ -307,9 +307,9 @@ public class CalendarService {
 				)));
 	}
 	
-	private Map<String, Long> getGroupingMap(List<Map<String, String>> map, String key) {
+	private Map<String, Long> getGroupingMap(List<Map<String, Object>> map, String key) {
 		return map.stream().collect(
-			Collectors.groupingBy(m -> m.get(key), Collectors.counting())
+			Collectors.groupingBy(m -> m.get(key) + "", Collectors.counting())
 		);
 	}
 	

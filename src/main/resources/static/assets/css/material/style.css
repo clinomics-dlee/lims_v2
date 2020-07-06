@@ -5685,10 +5685,10 @@ table.dt-rowReorder-float tr td {
     background: #fff !important;
 }
 table.dataTable thead .sorting_asc:after {
-	content: '\f0dd' !important;
+	content: '\f0de' !important;
 }
 table.dataTable thead .sorting_desc:after {
-	content: '\f0de' !important;
+	content: '\f0dd' !important;
 }
 table.dataTable thead .sorting:after {
     content: '\f0dc' !important;

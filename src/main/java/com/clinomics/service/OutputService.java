@@ -64,11 +64,11 @@ public class OutputService {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
     
-    public Map<String, Object> find(Map<String, String> params, List<StatusCode> statusCodes) {
+    public Map<String, Object> find(Map<String, Object> params, List<StatusCode> statusCodes) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체

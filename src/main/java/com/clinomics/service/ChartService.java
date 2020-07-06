@@ -48,9 +48,9 @@ public class ChartService {
 		return bundleRepository.findAll();
 	}
 
-	public Map<String, Object> selectCountByMonthly(Map<String, String> params) {
-		String paramStart = params.get("start");
-		String paramEnd = params.get("end");
+	public Map<String, Object> selectCountByMonthly(Map<String, Object> params) {
+		String paramStart = params.get("start") + "";
+		String paramEnd = params.get("end") + "";
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -159,7 +159,7 @@ public class ChartService {
 		return datasets;
 	}
 	
-	private Specification<Sample> getSampleWhere(Map<String, String> params) {
+	private Specification<Sample> getSampleWhere(Map<String, Object> params) {
 		return Specification
 			.where(SampleSpecification.createdDateOneMonth(params))
 			.and(SampleSpecification.isLastVersionTrue())
@@ -167,7 +167,7 @@ public class ChartService {
 			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
-	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
+	private Specification<Sample> getCompletedWhere(Map<String, Object> params) {
 		return Specification
 			.where(SampleSpecification.customDateBetween("anlsCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())
@@ -181,7 +181,7 @@ public class ChartService {
 			));
 	}
 	
-	private Specification<Sample> getReportedWhere(Map<String, String> params) {
+	private Specification<Sample> getReportedWhere(Map<String, Object> params) {
 		return Specification
 			.where(SampleSpecification.customDateBetween("outputCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())

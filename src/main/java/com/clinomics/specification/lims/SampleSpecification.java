@@ -19,13 +19,13 @@ import com.clinomics.enums.StatusCode;
 
 public class SampleSpecification {
 
-	public static Specification<Sample> createdDateOneMonth(Map<String, String> params) {
+	public static Specification<Sample> createdDateOneMonth(Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("yyyymm")) {
 				List<Predicate> predicatesAnds = new ArrayList<>();
-				String yyyymm = params.get("yyyymm");
+				String yyyymm = params.get("yyyymm") + "";
 				
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				LocalDateTime start = LocalDateTime.parse(yyyymm + "-01 00:00:00", formatter);
@@ -39,13 +39,13 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> modifiedDateOneMonth(Map<String, String> params) {
+	public static Specification<Sample> modifiedDateOneMonth(Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("yyyymm")) {
 				List<Predicate> predicatesAnds = new ArrayList<>();
-				String yyyymm = params.get("yyyymm");
+				String yyyymm = params.get("yyyymm") + "";
 				
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				LocalDateTime start = LocalDateTime.parse(yyyymm + "-01 00:00:00", formatter);
@@ -59,13 +59,13 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> customDateOneMonth(String field, Map<String, String> params) {
+	public static Specification<Sample> customDateOneMonth(String field, Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("yyyymm")) {
 				List<Predicate> predicatesAnds = new ArrayList<>();
-				String yyyymm = params.get("yyyymm");
+				String yyyymm = params.get("yyyymm") + "";
 				
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				LocalDateTime start = LocalDateTime.parse(yyyymm + "-01 00:00:00", formatter);
@@ -79,7 +79,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> customDateBetween(String field, Map<String, String> params) {
+	public static Specification<Sample> customDateBetween(String field, Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -96,7 +96,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> betweenDate(Map<String, String> params) {
+	public static Specification<Sample> betweenDate(Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -113,7 +113,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> betweenModifiedDate(Map<String, String> params) {
+	public static Specification<Sample> betweenModifiedDate(Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -130,13 +130,13 @@ public class SampleSpecification {
 		};
 	}
 	
-	public static Specification<Sample> bundleId(Map<String, String> params) {
+	public static Specification<Sample> bundleId(Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
-			if (params.containsKey("bundleId") && !params.get("bundleId").isEmpty()) {
-				int bundleId = NumberUtils.toInt(params.get("bundleId"));
+			if (params.containsKey("bundleId") && !params.get("bundleId").toString().isEmpty()) {
+				int bundleId = NumberUtils.toInt(params.get("bundleId") + "");
 				predicatesAnds.add(criteriaBuilder.equal(root.get("bundle").get("id"), bundleId));
 			} else {
 				predicatesAnds.add(criteriaBuilder.equal(root.get("bundle").get("isActive"), true));
@@ -146,13 +146,13 @@ public class SampleSpecification {
 		};
 	}
 	
-	public static Specification<Sample> keywordLike(Map<String, String> params) {
+	public static Specification<Sample> keywordLike(Map<String, Object> params) {
 		
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicateLikes = new ArrayList<>();
 			
-			if (params.containsKey("keyword") && !params.get("keyword").isEmpty()) {
+			if (params.containsKey("keyword") && !params.get("keyword").toString().isEmpty()) {
 				String text = "%" + params.get("keyword") + "%";
 				predicateLikes.add(criteriaBuilder.like(criteriaBuilder.function("JSON_EXTRACT", String.class, root.get("items"), criteriaBuilder.literal("$.*")), text));
 				

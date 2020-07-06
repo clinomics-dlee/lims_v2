@@ -21,6 +21,7 @@ import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.CustomIndexPublisher;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -62,6 +63,9 @@ public class SampleDbService {
 	
 	@Autowired
 	DataTableService dataTableService;
+
+	@Autowired
+	VariousFieldsService variousFieldsService;
 	
 	@Autowired
 	SampleItemService sampleItemService;
@@ -69,12 +73,12 @@ public class SampleDbService {
 	@Autowired
 	CustomIndexPublisher customIndexPublisher;
 
-	public Map<String, Object> getSampleDbList(Map<String, String> params) {
+	public Map<String, Object> getSampleDbList(Map<String, Object> params) {
 		logger.info("getDbList Params=" + params.toString());
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -121,8 +125,8 @@ public class SampleDbService {
 	public Map<String, Object> getSampleHistory(Map<String, String> params, String id) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		long total = sampleHistoryRepository.countBySample_Id(id);
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
@@ -138,11 +142,11 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
 	}
 
-	public Map<String, Object> find(Map<String, String> params, int statusCodeNumber) {
+	public Map<String, Object> find(Map<String, Object> params, int statusCodeNumber) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -170,18 +174,14 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> find(Map<String, String> params, String statusCode) {
+	public Map<String, Object> find(Map<String, Object> params, String statusCode) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
-		Pageable pageable = Pageable.unpaged();
-		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
-		}
+		Pageable pageable = variousFieldsService.getPageable(params, pageNumber, pageRowCount);
 		long total;
 		
 		Specification<Sample> where = Specification
@@ -202,11 +202,11 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> findByModifiedDate(Map<String, String> params, int statusCodeNumber) {
+	public Map<String, Object> findByModifiedDate(Map<String, Object> params, int statusCodeNumber) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
@@ -234,11 +234,11 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> findByModifiedDate(Map<String, String> params, String statusCode) {
+	public Map<String, Object> findByModifiedDate(Map<String, Object> params, String statusCode) {
 		int draw = 1;
 		// #. paging param
-		int pageNumber = NumberUtils.toInt(params.get("pgNmb"), 0);
-		int pageRowCount = NumberUtils.toInt(params.get("pgrwc"), 10);
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체

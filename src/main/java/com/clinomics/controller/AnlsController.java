@@ -55,7 +55,7 @@ public class AnlsController {
 	}
 
 	@GetMapping("/stts/get")
-	public Map<String, Object> getStts(@RequestParam Map<String, String> params) {
+	public Map<String, Object> getStts(@RequestParam Map<String, Object> params) {
 		return anlsService.findSampleByAnlsSttsStatus(params);
 	}
 
@@ -66,7 +66,7 @@ public class AnlsController {
 	}
 
 	@GetMapping("/rslt/get")
-	public Map<String, Object> getRslt(@RequestParam Map<String, String> params) {
+	public Map<String, Object> getRslt(@RequestParam Map<String, Object> params) {
 		return anlsService.findSampleByAnlsSuccStatus(params);
 	}
 
@@ -91,7 +91,7 @@ public class AnlsController {
 	}
 
 	@GetMapping("/db/get")
-	public Map<String, Object> getSampleDb(@RequestParam Map<String, String> params) {
+	public Map<String, Object> getSampleDb(@RequestParam Map<String, Object> params) {
 		return sampleDbService.find(params, 440);
 	}
 }

@@ -3,6 +3,7 @@ package com.clinomics.service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,8 +13,13 @@ import com.clinomics.entity.lims.Holiday;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.repository.lims.HolidayRepository;
 import com.clinomics.util.CustomIndexPublisher;
+import com.google.common.collect.Lists;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +29,30 @@ public class VariousFieldsService {
     HolidayRepository holidayRepository;
 
 	@Autowired
-	CustomIndexPublisher customIndexPublisher;
+    CustomIndexPublisher customIndexPublisher;
+    
+    public Pageable getPageable(Map<String, Object> params, int pageNumber, int pageRowCount) {
+        Pageable pageable = Pageable.unpaged();
+        List<Order> orders = Lists.newArrayList();;
+		if (params.containsKey("order") && params.get("order") instanceof List) {
+			List<?> sorting = (List<?>) params.get("order");
+			
+			for (Object obj : sorting) {
+				if (obj instanceof Map) {
+					Map<String, String> m = (Map<String, String>) obj;
+					if ("asc".equals(m.get("order"))) {
+						orders.add(Order.asc(m.get("key")));
+					} else {
+						orders.add(Order.desc(m.get("key")));
+                    }
+				}
+			}
+		} else {
+			orders = Arrays.asList(new Order[] { Order.desc("id") });
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+        return pageable;
+    }
 
     public void setFields(boolean existsSample, Sample sample, Map<String, Object> items) {
         Bundle bundle = sample.getBundle();
