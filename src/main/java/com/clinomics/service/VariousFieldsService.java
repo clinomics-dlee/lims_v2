@@ -30,29 +30,6 @@ public class VariousFieldsService {
 
 	@Autowired
     CustomIndexPublisher customIndexPublisher;
-    
-    public Pageable getPageable(Map<String, Object> params, int pageNumber, int pageRowCount) {
-        Pageable pageable = Pageable.unpaged();
-        List<Order> orders = Lists.newArrayList();;
-		if (params.containsKey("order") && params.get("order") instanceof List) {
-			List<?> sorting = (List<?>) params.get("order");
-			
-			for (Object obj : sorting) {
-				if (obj instanceof Map) {
-					Map<String, String> m = (Map<String, String>) obj;
-					if ("asc".equals(m.get("order"))) {
-						orders.add(Order.asc(m.get("key")));
-					} else {
-						orders.add(Order.desc(m.get("key")));
-                    }
-				}
-			}
-		} else {
-			orders = Arrays.asList(new Order[] { Order.desc("id") });
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
-		}
-        return pageable;
-    }
 
     public void setFields(boolean existsSample, Sample sample, Map<String, Object> items) {
         Bundle bundle = sample.getBundle();

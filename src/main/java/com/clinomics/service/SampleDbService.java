@@ -73,25 +73,26 @@ public class SampleDbService {
 	@Autowired
 	CustomIndexPublisher customIndexPublisher;
 
-	public Map<String, Object> getSampleDbList(Map<String, Object> params) {
+	public Map<String, Object> getSampleDbList(Map<String, String> params) {
 		logger.info("getDbList Params=" + params.toString());
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params));
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -129,7 +130,7 @@ public class SampleDbService {
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		long total = sampleHistoryRepository.countBySample_Id(id);
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
+		List<Order> orders = Arrays.asList(new Order[] { Order.asc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
@@ -142,18 +143,14 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
 	}
 
-	public Map<String, Object> find(Map<String, Object> params, int statusCodeNumber) {
+	public Map<String, Object> find(Map<String, String> params, int statusCodeNumber) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
-		Pageable pageable = Pageable.unpaged();
-		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
-		}
+		Pageable pageable = PageRequest.of(pageNumber, pageRowCount);
 		long total;
 		
 		Specification<Sample> where = Specification
@@ -161,7 +158,8 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusCodeGt(statusCodeNumber));
+					.and(SampleSpecification.statusCodeGt(statusCodeNumber))
+					.and(SampleSpecification.orderBy(params));
 					
 		
 		total = sampleRepository.count(where);
@@ -174,14 +172,14 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> find(Map<String, Object> params, String statusCode) {
+	public Map<String, Object> find(Map<String, String> params, String statusCode) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
 		// #. paging 관련 객체
-		Pageable pageable = variousFieldsService.getPageable(params, pageNumber, pageRowCount);
+		Pageable pageable = PageRequest.of(pageNumber, pageRowCount);
 		long total;
 		
 		Specification<Sample> where = Specification
@@ -189,7 +187,8 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)));
+					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)))
+					.and(SampleSpecification.orderBy(params));
 					
 		
 		total = sampleRepository.count(where);
@@ -202,17 +201,15 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> findByModifiedDate(Map<String, Object> params, int statusCodeNumber) {
+	public Map<String, Object> findByModifiedDate(Map<String, String> params, int statusCodeNumber) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
-		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -221,7 +218,8 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusCodeGt(statusCodeNumber));
+					.and(SampleSpecification.statusCodeGt(statusCodeNumber))
+					.and(SampleSpecification.orderBy(params));
 					
 		
 		total = sampleRepository.count(where);
@@ -234,17 +232,15 @@ public class SampleDbService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
-	public Map<String, Object> findByModifiedDate(Map<String, Object> params, String statusCode) {
+	public Map<String, Object> findByModifiedDate(Map<String, String> params, String statusCode) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
-		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -253,7 +249,8 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)));
+					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)))
+					.and(SampleSpecification.orderBy(params));
 					
 		
 		total = sampleRepository.count(where);

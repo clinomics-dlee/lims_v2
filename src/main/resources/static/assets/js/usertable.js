@@ -40,7 +40,7 @@ var UserTable = function() {
 			h += '</div>';
 			$('#' + uid).html(h);
 			
-			pageOrder[uid] = [];
+			pageOrder[uid] = "";
 			pageInfo[uid] = {};
 			pageInfo[uid].pageable = pageable;
 			pageInfo[uid].pagesView = pagesView;
@@ -100,9 +100,9 @@ var UserTable = function() {
 				param = ajax.data();
 			}
 
-			if (pageOrder[uid]) param.order = pageOrder[uid];
 			param.pgNmb = start;
 			param.pgrwc = page;
+			param.order = pageOrder[uid];
 			
 			if (!ajax.type) {
 				ajax.type = "GET";
@@ -176,7 +176,15 @@ var UserTable = function() {
 									headClassName = ' ' + aColumns[r].headClassName;
 								}
 								if (aColumns[r].sorting) {
-									headClassName += 'sorting px-lg-4" sort="' + aColumns[r].data + '"'
+									var sort = '';
+									if (pageOrder[uid].includes(aColumns[r].data + ":asc")) {
+										sort = 'sorting_asc';
+									} else if (pageOrder[uid].includes(aColumns[r].data + ":desc")) {
+										sort = 'sorting_desc';
+									} else {
+										sort = 'sorting';
+									}
+									headClassName += sort + ' px-lg-4" sort="' + aColumns[r].data + '"';
 								} else {
 									headClassName += '"';
 								}
@@ -387,20 +395,30 @@ var UserTable = function() {
 
 					$("#" + uid + " th").click(function() {
 						var sort = '';
-						if ($(this).hasClass('sorting_asc')) {
+
+						if ($(this).hasClass('sorting')) {
 							$(this).removeClass('sorting');
-							$(this).removeClass('sorting_asc');
-							sort = 'desc';
-						} else {
-							$(this).removeClass('sorting');
-							$(this).removeClass('sorting_desc');
+							$(this).addClass('sorting_asc');
 							sort = 'asc';
+						} else if ($(this).hasClass('sorting_asc')) {
+							$(this).removeClass('sorting_asc');
+							$(this).addClass('sorting_desc');
+							sort = 'desc';
+						} else if ($(this).hasClass('sorting_desc')) {
+							$(this).removeClass('sorting_desc');
+							$(this).addClass('sorting_asc');
+							sort = 'asc';
+						} else {
+							return;
 						}
 						$(this).addClass('sorting_' + sort);
 						var headId = $(this).attr('sort');
-						const idx = pageOrder[uid].findIndex(function(item) { return item.key === headId }); // findIndex = find + indexOf if (idx > -1)
-						pageOrder[uid].splice(idx, 1);
-						pageOrder[uid].push({ "key" : headId, "order" : sort });
+						if (pageOrder[uid].includes("," + headId + ":asc")) {
+							pageOrder[uid] = pageOrder[uid].replace("," + headId + ":asc", "");
+						} else if (pageOrder[uid].includes("," + headId + ":desc")) {
+							pageOrder[uid] = pageOrder[uid].replace("," + headId + ":desc", "");
+						}
+						pageOrder[uid] += "," + headId + ":" + sort;
 						
 						drawnTableFunc[uid]();
 					});

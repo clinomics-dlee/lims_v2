@@ -70,19 +70,19 @@
 	
 // //	@GetMapping("/get")
 // //	@ResponseBody
-// //	public Map<String, Object> get(@RequestParam Map<String, Object> params) {
+// //	public Map<String, Object> get(@RequestParam Map<String, String> params) {
 // //		return resultUploadService.selectAll(params);
 // //	}
 // //	
 // //	@GetMapping("/resultby/upload")
 // //	@ResponseBody
-// //	public Map<String, Object> getByBundle(@RequestParam Map<String, Object> params) {
+// //	public Map<String, Object> getByBundle(@RequestParam Map<String, String> params) {
 // //		return resultService.selectByResultUploadId(params);
 // //	}
 	
 // 	@GetMapping("/get")
 // 	@ResponseBody
-// 	public Map<String, Object> get(@RequestParam Map<String, Object> params) {
+// 	public Map<String, Object> get(@RequestParam Map<String, String> params) {
 // 		return sampleService.findSampleByBundleAndDateResultNullStatusFail(params);
 // 	}
 	
@@ -112,14 +112,14 @@
 	
 // 	@GetMapping("/excel/form")
 // 	@ResponseBody
-// 	public void exportExcelForm(@RequestParam Map<String, Object> params, HttpServletResponse response) {
+// 	public void exportExcelForm(@RequestParam Map<String, String> params, HttpServletResponse response) {
 // 		XSSFWorkbook xlsx = exprService.exportExcelForm(params);
 // 		requestExcel(xlsx, response);
 // 	}
 	
 // 	@GetMapping("/files")
 // 	@ResponseBody
-// 	public Map<String, Object> getCelFiles(@RequestParam Map<String, Object> params) {
+// 	public Map<String, Object> getCelFiles(@RequestParam Map<String, String> params) {
 // 		return exprService.getCelFileList(params);
 // 	}
 	
@@ -131,19 +131,19 @@
 	
 // 	@GetMapping("/resultsby/analyzing")
 // 	@ResponseBody
-// 	public Map<String, Object> getAnalyzingResults(@RequestParam Map<String, Object> params) {
+// 	public Map<String, Object> getAnalyzingResults(@RequestParam Map<String, String> params) {
 // 		return exprService.getAnalyzingResults(params);
 // 	}
 	
 // 	@GetMapping("/resultsby/failed")
 // 	@ResponseBody
-// 	public Map<String, Object> getFailedResults(@RequestParam Map<String, Object> params) {
+// 	public Map<String, Object> getFailedResults(@RequestParam Map<String, String> params) {
 // 		return exprService.getFailedResults(params);
 // 	}
 	
 // //	@GetMapping("/csv/file")
 // //	@ResponseBody
-// //	public void exportCsvFile(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
+// //	public void exportCsvFile(@RequestParam Map<String, String> params, HttpServletRequest request, HttpServletResponse response) {
 // //		// #. csv file 생성
 // //		File file = exprExcelService.exportCsvFile(params);
 // //		Map<String, Object> param = Maps.newHashMap();
@@ -156,7 +156,7 @@
 	
 // 	@GetMapping("/get/mapping")
 // 	@ResponseBody
-// 	public Map<String, Object> getMappingList(@RequestParam Map<String, Object> params) {
+// 	public Map<String, Object> getMappingList(@RequestParam Map<String, String> params) {
 // 		return sampleService.findSampleByBundleAndDate(params);
 // 	}
 	

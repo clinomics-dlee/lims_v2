@@ -83,11 +83,10 @@ public class AnlsService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -95,7 +94,8 @@ public class AnlsService {
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.S400_ANLS_READY))
-					.and(SampleSpecification.mappingInfoLike(params));
+					.and(SampleSpecification.mappingInfoLike(params))
+					.and(SampleSpecification.orderBy(params));
 		
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
@@ -211,17 +211,16 @@ public class AnlsService {
 		return rtn;
 	}
 
-	public Map<String, Object> findSampleByAnlsSttsStatus(Map<String, Object> params) {
+	public Map<String, Object> findSampleByAnlsSttsStatus(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -230,7 +229,8 @@ public class AnlsService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S410_ANLS_RUNNING, StatusCode.S430_ANLS_FAIL})));
+					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S410_ANLS_RUNNING, StatusCode.S430_ANLS_FAIL})))
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -309,17 +309,16 @@ public class AnlsService {
 		return rtn;
 	}
 
-	public Map<String, Object> findSampleByAnlsSuccStatus(Map<String, Object> params) {
+	public Map<String, Object> findSampleByAnlsSuccStatus(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -328,7 +327,8 @@ public class AnlsService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusEqual(StatusCode.S420_ANLS_SUCC));
+					.and(SampleSpecification.statusEqual(StatusCode.S420_ANLS_SUCC))
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);

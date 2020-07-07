@@ -48,7 +48,7 @@ public class ChartService {
 		return bundleRepository.findAll();
 	}
 
-	public Map<String, Object> selectCountByMonthly(Map<String, Object> params) {
+	public Map<String, Object> selectCountByMonthly(Map<String, String> params) {
 		String paramStart = params.get("start") + "";
 		String paramEnd = params.get("end") + "";
 		
@@ -159,19 +159,21 @@ public class ChartService {
 		return datasets;
 	}
 	
-	private Specification<Sample> getSampleWhere(Map<String, Object> params) {
+	private Specification<Sample> getSampleWhere(Map<String, String> params) {
 		return Specification
 			.where(SampleSpecification.createdDateOneMonth(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
-	private Specification<Sample> getCompletedWhere(Map<String, Object> params) {
+	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
 		return Specification
 			.where(SampleSpecification.customDateBetween("anlsCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
 					StatusCode.S460_ANLS_CMPL
@@ -181,11 +183,12 @@ public class ChartService {
 			));
 	}
 	
-	private Specification<Sample> getReportedWhere(Map<String, Object> params) {
+	private Specification<Sample> getReportedWhere(Map<String, String> params) {
 		return Specification
 			.where(SampleSpecification.customDateBetween("outputCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(Arrays.asList(
 				StatusCode.S710_OUTPUT_CMPL
 				, StatusCode.S810_RE_OUTPUT_CMPL

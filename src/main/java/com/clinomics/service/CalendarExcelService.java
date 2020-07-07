@@ -42,7 +42,7 @@ public class CalendarExcelService {
 	@Autowired
 	ExcelReadComponent excelReadComponent;
 
-	public XSSFWorkbook exportHumanExcelForm(Map<String, Object> params) {
+	public XSSFWorkbook exportHumanExcelForm(Map<String, String> params) {
 		logger.info(">> start writeExcelFileForGsHumanOrigin");
 		// #. excel 읽기
 		XSSFWorkbook wb = new XSSFWorkbook();

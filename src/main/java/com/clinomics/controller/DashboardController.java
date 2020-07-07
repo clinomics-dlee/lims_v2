@@ -39,42 +39,42 @@ public class DashboardController {
 
 	@GetMapping("/calendar/get/statistics")
 	@ResponseBody
-	public Map<String, Object> calendar(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> calendar(@RequestParam Map<String, String> params) {
 		return calendarService.selectCountByMonthly(params);
 	}
 
 	@GetMapping("/popup/registered")
 	@ResponseBody
-	public Map<String, Object> registered(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> registered(@RequestParam Map<String, String> params) {
 		return calendarService.selectRegistered(params);
 	}
 
 	@GetMapping("/popup/analysis")
 	@ResponseBody
-	public Map<String, Object> analysis(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> analysis(@RequestParam Map<String, String> params) {
 		return calendarService.selectAnalysis(params);
 	}
 
 	@GetMapping("/popup/completed")
 	@ResponseBody
-	public Map<String, Object> completed(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> completed(@RequestParam Map<String, String> params) {
 		return calendarService.selectCompleted(params);
 	}
 
 	@GetMapping("/popup/reported")
 	@ResponseBody
-	public Map<String, Object> reported(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> reported(@RequestParam Map<String, String> params) {
 		return calendarService.selectReported(params);
 	}
 
 	@GetMapping("/chart/get/statistics")
 	@ResponseBody
-	public Map<String, Object> chart(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> chart(@RequestParam Map<String, String> params) {
 		return chartService.selectCountByMonthly(params);
 	}
 
 	@GetMapping("/human/excel/form")
-	public void exportExcelForm(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
+	public void exportExcelForm(@RequestParam Map<String, String> params, HttpServletRequest request, HttpServletResponse response) {
 		XSSFWorkbook xlsx = calendarExcelService.exportHumanExcelForm(params);
 		String sDate = params.get("sDate") + "";
 		String fDate = params.get("fDate") + "";

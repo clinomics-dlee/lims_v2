@@ -58,17 +58,16 @@ public class ExpService {
 	@Autowired
 	DataTableService dataTableService;
 
-	public Map<String, Object> findSampleByExpRdyStatus(Map<String, Object> params) {
+	public Map<String, Object> findSampleByExpRdyStatus(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -77,7 +76,8 @@ public class ExpService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusEqual(StatusCode.S200_EXP_READY));
+					.and(SampleSpecification.statusEqual(StatusCode.S200_EXP_READY))
+					.and(SampleSpecification.orderBy(params));
 					
 		
 		total = sampleRepository.count(where);
@@ -138,17 +138,16 @@ public class ExpService {
 		return rtn;
 	}
 
-	public Map<String, Object> findSampleByExpStep1Status(Map<String, Object> params) {
+	public Map<String, Object> findSampleByExpStep1Status(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -157,7 +156,8 @@ public class ExpService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusEqual(StatusCode.S210_EXP_STEP1));
+					.and(SampleSpecification.statusEqual(StatusCode.S210_EXP_STEP1))
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -285,17 +285,16 @@ public class ExpService {
 		return rtn;
 	}
 
-	public Map<String, Object> findSampleByExpStep2Status(Map<String, Object> params) {
+	public Map<String, Object> findSampleByExpStep2Status(Map<String, String> params) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -304,7 +303,8 @@ public class ExpService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
-					.and(SampleSpecification.statusEqual(StatusCode.S220_EXP_STEP2));
+					.and(SampleSpecification.statusEqual(StatusCode.S220_EXP_STEP2))
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -494,11 +494,10 @@ public class ExpService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -506,7 +505,8 @@ public class ExpService {
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.S230_EXP_STEP3))
-					.and(SampleSpecification.mappingInfoLike(params));
+					.and(SampleSpecification.mappingInfoLike(params))
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -631,11 +631,10 @@ public class ExpService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -643,7 +642,8 @@ public class ExpService {
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusCodeGt(400))
-					.and(SampleSpecification.mappingInfoLike(params));
+					.and(SampleSpecification.mappingInfoLike(params))
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
@@ -660,17 +660,17 @@ public class ExpService {
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingNoEqual(mappingNo))
-					.and(SampleSpecification.bundleIsActive());
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);

@@ -43,7 +43,7 @@ public class ExpController {
     SampleDbService sampleDbService;
 
 	@GetMapping("/rdy/get")
-	public Map<String, Object> getRdy(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> getRdy(@RequestParam Map<String, String> params) {
 		return expService.findSampleByExpRdyStatus(params);
 	}
 
@@ -54,7 +54,7 @@ public class ExpController {
 	}
 
 	@GetMapping("/step1/get")
-	public Map<String, Object> getStep1(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> getStep1(@RequestParam Map<String, String> params) {
 		return expService.findSampleByExpStep1Status(params);
 	}
 
@@ -91,7 +91,7 @@ public class ExpController {
 	}
 
 	@GetMapping("/step2/get")
-	public Map<String, Object> getStep2(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> getStep2(@RequestParam Map<String, String> params) {
 		return expService.findSampleByExpStep2Status(params);
 	}
 
@@ -138,7 +138,7 @@ public class ExpController {
 	}
 
 	@GetMapping("/db/sample/get")
-	public Map<String, Object> getSampleDb(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> getSampleDb(@RequestParam Map<String, String> params) {
 		return sampleDbService.find(params, 400);
 	}
 

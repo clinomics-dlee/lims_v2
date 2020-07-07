@@ -41,13 +41,13 @@ public class OutputController {
 	
 	@GetMapping("/all/list")
 	@ResponseBody
-	public Map<String, Object> all(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> all(@RequestParam Map<String, String> params) {
 		return sampleDbService.find(params, 0);
 	}
 	
 	@GetMapping("/jdgm/list")
 	@ResponseBody
-	public Map<String, Object> rvc(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
 		
 		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
 			return sampleDbService.findByModifiedDate(params, params.get("statusCode") + "");
@@ -66,7 +66,7 @@ public class OutputController {
 	
 	@GetMapping("/output/list")
 	@ResponseBody
-	public Map<String, Object> outputList(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
 		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
 			return sampleDbService.findByModifiedDate(params, params.get("statusCode") + "");
 		}

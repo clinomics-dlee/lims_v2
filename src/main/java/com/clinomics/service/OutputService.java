@@ -64,17 +64,16 @@ public class OutputService {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
     
-    public Map<String, Object> find(Map<String, Object> params, List<StatusCode> statusCodes) {
+    public Map<String, Object> find(Map<String, String> params, List<StatusCode> statusCodes) {
 		int draw = 1;
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
 		
-		List<Order> orders = Arrays.asList(new Order[] { Order.desc("id") });
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
 		if (pageRowCount > 1) {
-			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+			pageable = PageRequest.of(pageNumber, pageRowCount);
 		}
 		long total;
 		
@@ -83,7 +82,8 @@ public class OutputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusIn(statusCodes));
+					.and(SampleSpecification.statusIn(statusCodes))
+					.and(SampleSpecification.orderBy(params));
 					
 		
 		total = sampleRepository.count(where);
@@ -227,7 +227,7 @@ public class OutputService {
 			if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
 				
 				StatusCode sc = sample.getStatusCode();
-				if (sc.equals(StatusCode.S710_OUTPUT_CMPL)) {
+				if (sc.equals(StatusCode.S710_OUTPUT_CMPL) || sc.equals(StatusCode.S810_RE_OUTPUT_CMPL)) {
 					sample.setOutputWaitDate(now);
 					sample.setOutputWaitMember(member);
 					sample.setModifiedDate(now);

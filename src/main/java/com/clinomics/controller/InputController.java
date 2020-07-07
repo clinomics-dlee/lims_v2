@@ -53,13 +53,13 @@ public class InputController {
 	
 	@GetMapping("/rvc")
 	@ResponseBody
-	public Map<String, Object> rvc(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
 		return inputService.find(params, Arrays.asList(new StatusCode[] { StatusCode.S000_INPUT_REG }));
 	}
 	
 	@GetMapping("/aprv")
 	@ResponseBody
-	public Map<String, Object> aprv(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> aprv(@RequestParam Map<String, String> params) {
 		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
 			return sampleDbService.find(params, params.get("statusCode") + "");
 		}
@@ -68,7 +68,7 @@ public class InputController {
 	
 	@GetMapping("/db")
 	@ResponseBody
-	public Map<String, Object> db(@RequestParam Map<String, Object> params) {
+	public Map<String, Object> db(@RequestParam Map<String, String> params) {
 		return sampleDbService.find(params, 0);
 	}
 	
