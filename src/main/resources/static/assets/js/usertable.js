@@ -70,6 +70,7 @@ var UserTable = function() {
 
 			$("#" + uid + "_sort_btn").click(function() {
 				pageOrder[uid] = "";
+				drawnTableFunc[uid]();
 			});
 		},
 		clear : function (uid) {
@@ -125,6 +126,16 @@ var UserTable = function() {
 			if (!ajax.contentType) {
 				ajax.contentType = "application/json; charset=utf-8";
 			}
+
+			$('#' + uid + '_table thead').html('');
+			$('#' + uid + '_table tbody').html(
+				'<td class="text-center">'
+				+ '<div class="m-40">'
+				+ '<strong>Loading</strong><br/>'
+				+ '<img src="/assets/img/table-loader.gif">'
+				+ '</div>'
+				+ '</td>'
+			);
 			
 			$.ajax({
 				url : ajax.url,
@@ -230,6 +241,7 @@ var UserTable = function() {
 								}
 								
 								if (aColumns[r].render) {
+									
 									var renderValue = aColumns[r].render(rows[Number(s)], val, Number(s), param);
 									html += '<td' + bodyClassName + '>' + renderValue + '</td>';
 									if (!aColumns[r].hideExcel) {
@@ -429,11 +441,11 @@ var UserTable = function() {
 						}
 						$(this).addClass('sorting_' + sort);
 						var headId = $(this).attr('sort');
-						if (pageOrder[uid].includes("," + headId + removeSort)) {
-							pageOrder[uid] = pageOrder[uid].replace("," + headId + removeSort, "");
+						if (pageOrder[uid].includes("," + headId + ":" + removeSort)) {
+							pageOrder[uid] = pageOrder[uid].replace("," + headId + ":" + removeSort, "");
 						}
 						pageOrder[uid] = "," + headId + ":" + sort + pageOrder[uid];
-						
+						console.log(pageOrder[uid]);
 						drawnTableFunc[uid]();
 					});
 					

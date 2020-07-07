@@ -67,8 +67,27 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<label class="col-form-label m-l-2">상태</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200" id="sel_status">
-										<option value>전체</option>
-										<option th:each="key : ${statusCodes.keySet()}" th:value="${key}" th:text="${statusCodes.get(key)}"></option>
+										<option selected value>전체</option>
+										<option value="S000_INPUT_REG" th:text="${statusCodes.get('S000_INPUT_REG')}"></option>
+										<option value="S020_INPUT_RCV" th:text="${statusCodes.get('S020_INPUT_RCV')}"></option>
+										<option value="S040_INPUT_APPROVE" th:text="${statusCodes.get('S040_INPUT_APPROVE')}"></option>
+										<option value="S200_EXP_READY" th:text="${statusCodes.get('S200_EXP_READY')}"></option>
+										<option value="S210_EXP_STEP1" th:text="${statusCodes.get('S210_EXP_STEP1')}"></option>
+										<option value="S220_EXP_STEP2" th:text="${statusCodes.get('S220_EXP_STEP2')}"></option>
+										<option value="S230_EXP_STEP3" th:text="${statusCodes.get('S230_EXP_STEP3')}"></option>
+										<option value="S400_ANLS_READY" th:text="${statusCodes.get('S400_ANLS_READY')}"></option>
+										<option value="S410_ANLS_RUNNING" th:text="${statusCodes.get('S410_ANLS_RUNNING')}"></option>
+										<option value="S420_ANLS_SUCC" th:text="${statusCodes.get('S420_ANLS_SUCC')}"></option>
+										<option value="S430_ANLS_FAIL" th:text="${statusCodes.get('S430_ANLS_FAIL')}"></option>
+										<option value="S440_ANLS_SUCC_CMPL" th:text="${statusCodes.get('S440_ANLS_SUCC_CMPL')}"></option>
+										<option value="S450_ANLS_FAIL_CMPL" th:text="${statusCodes.get('S450_ANLS_FAIL_CMPL')}"></option>
+										<option value="S460_ANLS_CMPL" th:text="${statusCodes.get('S460_ANLS_CMPL')}"></option>
+										<option value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
+										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option>
+										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option>
+										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option>
+										<option value="S810_RE_OUTPUT_CMPL" th:text="${statusCodes.get('S810_RE_OUTPUT_CMPL')}"></option>
+										<option value="S900_OUTPUT_CMPL">이전 LIMS 데이터</option>
 									</select>
 								</div>
 								
@@ -243,12 +262,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'createdMember.name'
 			}, {
 				title : '입고담당자', 
-				data : 'inputApproveDate',
+				data : 'inputApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.inputApproveMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -259,12 +278,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '중간관리자', 
-				data : 'inputMngApproveDate',
+				data : 'inputMngApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.inputMngApproveMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -275,12 +294,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '입고 검사실책임자', 
-				data : 'inputDrctApproveDate',
+				data : 'inputDrctMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.inputDrctMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -291,12 +310,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '실험 시작담당자', 
-				data : 'expStartDate',
+				data : 'expStartMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.expStartMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -307,12 +326,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : 'STEP1 담당자', 
-				data : 'expStep1Date',
+				data : 'expStep1Member.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.expStep1Member.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -323,12 +342,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : 'STEP2 담당자', 
-				data : 'expStep2Date',
+				data : 'expStep2Member.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.expStep2Member.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -339,12 +358,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : 'STEP3 담당자', 
-				data : 'expStep3Date',
+				data : 'expStep3Member.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.expStep3Member.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -355,12 +374,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '분석 시작담당자', 
-				data : 'anlsStartDate',
+				data : 'anlsStartMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.anlsStartMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -375,12 +394,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '분석 완료담당자', 
-				data : 'anlsCmplDate',
+				data : 'anlsCmplMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.anlsCmplMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -391,12 +410,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '판정 검사담당자', 
-				data : 'jdgmApproveDate',
+				data : 'jdgmApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.jdgmApproveMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -407,12 +426,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '판정 중간관리자', 
-				data : 'jdgmMngApproveDate',
+				data : 'jdgmMngApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.jdgmMngApproveMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -423,12 +442,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '판정 검사실책임자', 
-				data : 'jdgmDrctApproveDate',
+				data : 'jdgmDrctApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.jdgmDrctApproveMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -439,12 +458,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '출고 담당자', 
-				data : 'outputWaitDate',
+				data : 'outputWaitMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.outputWaitMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
@@ -459,12 +478,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			}, {
 				title : '재발행 담당자', 
-				data : 'reOutputWaitDate',
+				data : 'reOutputWaitMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
 					var html = rhDiv;
 					html += data ? rhDivAprv
-						+ row.reOutputWaitMember.name + '</div>'
+						+ data + '</div>'
 						: rhDivNotAprv;
 					html += '</div></div>';
 					return html;
