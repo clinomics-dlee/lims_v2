@@ -13,30 +13,38 @@ var UserTable = function() {
 			h += '<div class="dataTables_length m-b-10" id="' + uid + '_length">';
 			
 			if (pageable) {
-				h += '<label>Show <select id="' + uid + '_page" aria-controls="' + uid + '_ctrl" class="form-control input-sm">';
+				h += '<label>최대 <select id="' + uid + '_page" aria-controls="' + uid + '_ctrl" class="form-control input-sm">';
 				
 				if (!pagesView) pagesVal = [ 10, 50 ], pagesView = [ 10, 50 ];
 				for (var p in pagesView) {
 					h += '<option value="' + pagesVal[p] + '">' + pagesView[p] + '</option>';
 				}
-				h += '</select> entries</label>';
+				h += '</select> 페이지 표시</label>';
 				h += '<input type="hidden" id="' + uid + '_page_start" value="0"/>';
 			}
 			
 			h += '</div>';
 			h += '<div class="dt-buttons btn-group pull-right">';
 			if (isDownloadExcel) {
-				h += '<button id="' + uid + '_excel_btn" class="btn btn-success">Download</button>';
+				h += '<button id="' + uid + '_sort_btn" class="btn btn-success">정렬 초기화</button>';
+				h += '<button id="' + uid + '_excel_btn" class="btn btn-success">엑셀 다운로드</button>';
 			}
 			h += '</div>';
 			h += '<div style="clear:both;"></div>';
 			h += '<div class="dataTables_scroll" style="overflow: auto;">';
-			h += '<table id="' + uid + '_table" class="table table-striped table-bordered dataTable" style="width: 100%; margin-bottom: 0;">';
+			h += '<table id="' + uid + '_table" class="table table-striped table-bordered dataTable" style="width: 100%; margin: 0 0 !important;">';
 			h += '<thead></thead><tbody></tbody>';
 			h += '</table>';
 			h += '</div>';
-			h += '<div id="' + uid + '_paginate" class="m-t-10">';
+			h += '<div class="row">';
+			h += ' <div class="col-sm-5">';
+			h += '  <div class="dataTables_info" id="' + uid + '_polite" role="status" aria-live="polite"></div>';
+			h += ' </div>';
+			h += ' <div class="col-sm-7">';
+			h += '  <div id="' + uid + '_paginate" class="m-t-10"></div>';
+			h += ' </div>';
 			h += '</div>';
+
 			h += '</div>';
 			$('#' + uid).html(h);
 			
@@ -58,6 +66,10 @@ var UserTable = function() {
 				var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
 				// step 5. 엑셀 파일 내보내기 
 				saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Sample.xlsx");
+			});
+
+			$("#" + uid + "_sort_btn").click(function() {
+				pageOrder[uid] = "";
 			});
 		},
 		clear : function (uid) {
@@ -351,6 +363,7 @@ var UserTable = function() {
 						html += '</div>';
 						
 						$('#' + uid + '_paginate').html(html);
+						$('#' + uid + '_polite').text('총 ' + t + ' 건의 데이터 / ' + (n * p + 1) + ' ~ ' + (n * p + p) + '');
 					}
 					
 					$('#' + uid + " table thead th").css({'white-space' : 'nowrap', 'word-break' : 'nowrap'});
@@ -394,31 +407,32 @@ var UserTable = function() {
 					});
 
 					$("#" + uid + " th").click(function() {
-						var sort = '';
+						var sort = '', removeSort = '';
 
 						if ($(this).hasClass('sorting')) {
 							$(this).removeClass('sorting');
 							$(this).addClass('sorting_asc');
 							sort = 'asc';
+							removeSort = 'desc';
 						} else if ($(this).hasClass('sorting_asc')) {
 							$(this).removeClass('sorting_asc');
 							$(this).addClass('sorting_desc');
 							sort = 'desc';
+							removeSort = 'asc';
 						} else if ($(this).hasClass('sorting_desc')) {
 							$(this).removeClass('sorting_desc');
 							$(this).addClass('sorting_asc');
 							sort = 'asc';
+							removeSort = 'desc';
 						} else {
 							return;
 						}
 						$(this).addClass('sorting_' + sort);
 						var headId = $(this).attr('sort');
-						if (pageOrder[uid].includes("," + headId + ":asc")) {
-							pageOrder[uid] = pageOrder[uid].replace("," + headId + ":asc", "");
-						} else if (pageOrder[uid].includes("," + headId + ":desc")) {
-							pageOrder[uid] = pageOrder[uid].replace("," + headId + ":desc", "");
+						if (pageOrder[uid].includes("," + headId + removeSort)) {
+							pageOrder[uid] = pageOrder[uid].replace("," + headId + removeSort, "");
 						}
-						pageOrder[uid] += "," + headId + ":" + sort;
+						pageOrder[uid] = "," + headId + ":" + sort + pageOrder[uid];
 						
 						drawnTableFunc[uid]();
 					});

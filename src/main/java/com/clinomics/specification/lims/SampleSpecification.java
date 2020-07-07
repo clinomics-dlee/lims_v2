@@ -378,7 +378,12 @@ public class SampleSpecification {
 					Order objQuery = null;
 
 					if (key.contains("items")) {
-						expression = criteriaBuilder.function("JSON_EXTRACT", String.class, root.get("items"), criteriaBuilder.literal("$." + key));
+						expression = criteriaBuilder.function(
+							"JSON_EXTRACT"
+							, String.class
+							, root.get("items")
+							, criteriaBuilder.literal("$." + key.replace("items.", ""))
+						);
 					} else {
 						int dots = StringUtils.countMatches(key, ".");
 						if (dots == 0) {
@@ -400,7 +405,7 @@ public class SampleSpecification {
 				if (orderList.size() > 0) query.orderBy(orderList);
 				
 			} else {
-				query.orderBy(criteriaBuilder.desc(root.get("laboratoryId")));
+				//query.orderBy(criteriaBuilder.desc(root.get("laboratoryId")));
 			}
 			return rtn;
 		

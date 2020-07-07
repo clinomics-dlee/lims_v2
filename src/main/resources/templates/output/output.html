@@ -206,11 +206,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : "laboratoryId",
 				render : function(row, data, index) {
 					return '<a href="javascript:samplePopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
-				}
+				},
+				sorting : true
 			},
 			{
 				title : '서비스', 
-				data : 'bundle.name'
+				data : 'bundle.name',
+				sorting : true
 			},
 			{
 				title : '상태', 
@@ -218,7 +220,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				render : function(row, data, index) {
 					var value = g_statusCodeInfo[data];
 					return value;
-				}
+				},
+				sorting : true
 			},
 			{
 				serverHeader : true

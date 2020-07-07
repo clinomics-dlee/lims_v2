@@ -97,7 +97,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 									</div>
 									<div class="col-xl-4 text-right p-t-10">
 										<div class="col-xs-push-0">
-											<span id="rowCountSpan">0 Count</span>
+											<strong style="font-size: 1.2em;" id="rowCountSpan">0 Count</strong>
 										</div>
 									</div>
 								</div>
@@ -559,7 +559,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	function setGridRowCount() {
 		var rowCount = $("#_input_grid table tbody tr").length;
-		$("#rowCountSpan").text(rowCount + " Count");
+		$("#rowCountSpan").text("" + rowCount + " Count");
 	}
 	
 	/* ]]> */
