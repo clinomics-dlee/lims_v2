@@ -26,15 +26,19 @@ var UserTable = function() {
 			h += '</div>';
 			h += '<div class="dt-buttons btn-group pull-right">';
 			if (isDownloadExcel) {
-				h += '<button id="' + uid + '_sort_btn" class="btn btn-success">정렬 초기화</button>';
+				h += '<button id="' + uid + '_sort_btn" class="btn btn-default">정렬 초기화</button>';
 				h += '<button id="' + uid + '_excel_btn" class="btn btn-success">엑셀 다운로드</button>';
 			}
 			h += '</div>';
 			h += '<div style="clear:both;"></div>';
 			h += '<div class="dataTables_scroll" style="overflow: auto;">';
-			h += '<table id="' + uid + '_table" class="table table-striped table-bordered dataTable" style="width: 100%; margin: 0 0 !important;">';
-			h += '<thead></thead><tbody></tbody>';
-			h += '</table>';
+			h += ' <table id="' + uid + '_table" class="table table-striped table-bordered dataTable" style="width: 100%; margin: 0 0 !important;">';
+			h += '  <thead></thead><tbody></tbody>';
+			h += ' </table>';
+			h += ' <div style="position: absolute; top: 50%; left: 50%; background-color: #555; opacity: 0.7; transform:translate(-50%, -50%); display:none;" class="text-center p-10" id="' + uid + '_loading">';
+			h += '  <strong style="color: white;">Loading</strong><br/>';
+			h += '  <img src="/assets/img/table-loader.gif">';
+			h += ' </div>';
 			h += '</div>';
 			h += '<div class="row">';
 			h += ' <div class="col-sm-5">';
@@ -127,15 +131,8 @@ var UserTable = function() {
 				ajax.contentType = "application/json; charset=utf-8";
 			}
 
-			$('#' + uid + '_table thead').html('');
-			$('#' + uid + '_table tbody').html(
-				'<td class="text-center">'
-				+ '<div class="m-40">'
-				+ '<strong>Loading</strong><br/>'
-				+ '<img src="/assets/img/table-loader.gif">'
-				+ '</div>'
-				+ '</td>'
-			);
+			$('#' + uid + '_loading').show();
+			
 			
 			$.ajax({
 				url : ajax.url,
@@ -469,9 +466,11 @@ var UserTable = function() {
 					});
 					
 					$(".default-select2").select2();
+					$('#' + uid + '_loading').hide();
 				},
 				error : function(data) {
 					CommonMsg.error(function() { });
+					$('#' + uid + '_loading').hide();
 				}
 			});
 		}
