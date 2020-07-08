@@ -36,7 +36,7 @@ public class VariousFieldsService {
         String strCollectedDate = items.getOrDefault("collecteddate", "").toString();
         if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
 
-            sample.setCollectedDate(LocalDate.parse(strCollectedDate).plusDays(1));
+            sample.setCollectedDate(LocalDate.parse(strCollectedDate));
             items.remove("collecteddate");
         }
 
@@ -48,7 +48,7 @@ public class VariousFieldsService {
         if (!strReceivedDate.isEmpty() && receivedDate != null) {
 
             items.put("tat", getTat(bundle, strReceivedDate));
-            sample.setReceivedDate(LocalDate.parse(strReceivedDate).plusDays(1));
+            sample.setReceivedDate(LocalDate.parse(strReceivedDate));
             items.remove("receiveddate");
         }
 
