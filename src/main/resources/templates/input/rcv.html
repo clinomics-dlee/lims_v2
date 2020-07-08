@@ -215,7 +215,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'items.trackingNo',
 				render : function(row, data, index) {
 					var value = "";
-					console.log(data);
+					
 					if (data) {
 						value = '<a href="javascript:openDeliveryPopup(\'' + data + '\')" class="btn btn-sm btn-success width-60">VIEW</a>';
 					}

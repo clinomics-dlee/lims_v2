@@ -60,7 +60,7 @@ public class ChartService {
 		
 		params.put("sDate", start.format(formatter2));
 		params.put("fDate", end.format(formatter2));
-		List<Bundle> bundles = bundleRepository.findAll();
+		List<Bundle> bundles = bundleRepository.findByIsActiveTrue();
 		
 		List<Sample> sample = sampleRepository.findAll(getSampleWhere(params));
 		List<Sample> complete = sampleRepository.findAll(getCompletedWhere(params));

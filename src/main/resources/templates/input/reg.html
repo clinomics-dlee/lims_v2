@@ -288,21 +288,23 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}
 		if ($("#sel_bundle").parsley().validate() != true) return;
 		var frmData = $('#frm_new').serializeObject();
+		
 		var data = [];
-		var rows = $("#_input_grid table tbody tr").length;
-		for (var r = 0; r < rows; r++) {
+		var rows = $("#_input_grid table tbody tr");
+		for (var r = 0; r < rows.length; r++) {
+			var inputs = $(rows[r]).find('input:text, select');
+			
 			var map = {};
-			for (const [key, value] of Object.entries(frmData)) {
-				if (rows > 1) {
-					map[key] = value[r];
-				} else {
-					map[key] = value;
-				}
+			for (var ii = 0; ii < inputs.length; ii++) {
+				
+				let key = $(inputs[ii]).attr('name');
+				
+				let value = $(inputs[ii]).val();
+				map[key] = value;
 			}
 			map.bundleId = $("#sel_bundle").val();
 			data.push(map);
 		}
-		
 		
 		$.ajax({
             url: '/input/saveall',
