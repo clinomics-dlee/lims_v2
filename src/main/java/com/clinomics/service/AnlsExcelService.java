@@ -160,82 +160,84 @@ public class AnlsExcelService {
 					return rtn;
 				}
 
-				Set<String> productTypes = Sets.newHashSet();
-				s.getBundle().getProduct().stream().forEach(p -> {
-					productTypes.add(p.getType());
-				});
+				// ##################### begin marker validate #############################
+				// Set<String> productTypes = Sets.newHashSet();
+				// s.getBundle().getProduct().stream().forEach(p -> {
+				// 	productTypes.add(p.getType());
+				// });
 							
-				// #. 상품목록이 가지고 있는 모든 마커 정보 조회
-				Map<String, List<Map<String, String>>> productTypeMarkerInfos = sampleDbService.getMarkerInfo(new ArrayList<String>(productTypes));
-				// #. marker 정보가 없는 경우
-				if (productTypeMarkerInfos.isEmpty()) {
-					// #. 조회한 마커 목록이 비어있는경우
-					logger.info(">> not found marker infomation error sample id=[" + genotypingId + "]");
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-					rtn.put("message", "마커 정보를 조회할 수 없습니다.[" + genotypingId + "]");
-					return rtn;
-				}
+				// // #. 상품목록이 가지고 있는 모든 마커 정보 조회
+				// Map<String, List<Map<String, String>>> productTypeMarkerInfos = sampleDbService.getMarkerInfo(new ArrayList<String>(productTypes));
+				// // #. marker 정보가 없는 경우
+				// if (productTypeMarkerInfos.isEmpty()) {
+				// 	// #. 조회한 마커 목록이 비어있는경우
+				// 	logger.info(">> not found marker infomation error sample id=[" + genotypingId + "]");
+				// 	rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+				// 	rtn.put("message", "마커 정보를 조회할 수 없습니다.[" + genotypingId + "]");
+				// 	return rtn;
+				// }
 
-				// #. 해당 product에 마커정보 목록
-				List<Map<String, String>> allMarkerInfos = new ArrayList<Map<String, String>>();
-				for (String key : productTypeMarkerInfos.keySet()) {
-					List<Map<String, String>> mks = productTypeMarkerInfos.get(key);
-					for (Map<String, String> mi : mks) {
-						if (!allMarkerInfos.contains(mi)) {
-							allMarkerInfos.add(mi);
-						}
-					}
-				}
+				// // #. 해당 product에 마커정보 목록
+				// List<Map<String, String>> allMarkerInfos = new ArrayList<Map<String, String>>();
+				// for (String key : productTypeMarkerInfos.keySet()) {
+				// 	List<Map<String, String>> mks = productTypeMarkerInfos.get(key);
+				// 	for (Map<String, String> mi : mks) {
+				// 		if (!allMarkerInfos.contains(mi)) {
+				// 			allMarkerInfos.add(mi);
+				// 		}
+				// 	}
+				// }
 
-				List<String> notExistMarkers = new ArrayList<String>();
+				// List<String> notExistMarkers = new ArrayList<String>();
 
-				// #. 현재 상품에 마커 목록
-				List<String> checkMarkers = new ArrayList<String>();
-				for (Map<String, String> mi : allMarkerInfos) {
-					checkMarkers.add(mi.get("name"));
-				}
+				// // #. 현재 상품에 마커 목록
+				// List<String> checkMarkers = new ArrayList<String>();
+				// for (Map<String, String> mi : allMarkerInfos) {
+				// 	checkMarkers.add(mi.get("name"));
+				// }
 
-				// #. 분석완료 파일에 마커 목록
-				List<String> markers = sht.keySet().stream().collect(Collectors.toList());
+				// // #. 분석완료 파일에 마커 목록
+				// List<String> markers = sht.keySet().stream().collect(Collectors.toList());
 
-				// #. 마커 목록이 전부 있는 지 체크
-				for (String marker : checkMarkers) {
-					if (!markers.contains(marker)) {
-						notExistMarkers.add(marker);
-					}
-				}
+				// // #. 마커 목록이 전부 있는 지 체크
+				// for (String marker : checkMarkers) {
+				// 	if (!markers.contains(marker)) {
+				// 		notExistMarkers.add(marker);
+				// 	}
+				// }
 
-				if (notExistMarkers.size() > 0) {
-					// #. 마커가 존재하지 않는것이 있는 경우
-					logger.info(">> Not Exist Markers error sample id=[" + genotypingId + "]" + notExistMarkers.toString());
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-					rtn.put("message", "해당 마커 정보가 없습니다.[" + genotypingId + "]" + notExistMarkers.toString());
-					return rtn;
-				}
+				// if (notExistMarkers.size() > 0) {
+				// 	// #. 마커가 존재하지 않는것이 있는 경우
+				// 	logger.info(">> Not Exist Markers error sample id=[" + genotypingId + "]" + notExistMarkers.toString());
+				// 	rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+				// 	rtn.put("message", "해당 마커 정보가 없습니다.[" + genotypingId + "]" + notExistMarkers.toString());
+				// 	return rtn;
+				// }
 
-				// #. 마커는 있으나 값이 허용되지않은 값이 셋팅된것 체크
-				List<String> invalidMarkers = new ArrayList<String>();
-				for (Map<String, String> mi : allMarkerInfos) {
-					String name = mi.get("name");
-					String ref = mi.get("refValue");
-					String alt = mi.get("altValue");
-					// #. 마커는 있으나 값이 다른것
-					String value = (String) sht.get(name);
+				// // #. 마커는 있으나 값이 허용되지않은 값이 셋팅된것 체크
+				// List<String> invalidMarkers = new ArrayList<String>();
+				// for (Map<String, String> mi : allMarkerInfos) {
+				// 	String name = mi.get("name");
+				// 	String ref = mi.get("refValue");
+				// 	String alt = mi.get("altValue");
+				// 	// #. 마커는 있으나 값이 다른것
+				// 	String value = (String) sht.get(name);
 					
-					// #. 4가지 조합이 아닌경우
-					if (!value.equals(ref + alt) && !value.equals(alt + alt)
-							&& !value.equals(ref + ref) && !value.equals(alt + ref )) {
-						invalidMarkers.add(name);
-					}
-				}
+				// 	// #. 4가지 조합이 아닌경우
+				// 	if (!value.equals(ref + alt) && !value.equals(alt + alt)
+				// 			&& !value.equals(ref + ref) && !value.equals(alt + ref )) {
+				// 		invalidMarkers.add(name);
+				// 	}
+				// }
 				
-				if (invalidMarkers.size() > 0) {
-					// #. marker 값 유효하지 않은 경우
-					logger.info(">> Invalid Markers error sample id=[" + genotypingId + "]" + invalidMarkers.toString());
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-					rtn.put("message", "해당 마커에 값이 유효하지 않습니다.[" + genotypingId + "]" + invalidMarkers.toString());
-					return rtn;
-				}
+				// if (invalidMarkers.size() > 0) {
+				// 	// #. marker 값 유효하지 않은 경우
+				// 	logger.info(">> Invalid Markers error sample id=[" + genotypingId + "]" + invalidMarkers.toString());
+				// 	rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+				// 	rtn.put("message", "해당 마커에 값이 유효하지 않습니다.[" + genotypingId + "]" + invalidMarkers.toString());
+				// 	return rtn;
+				// }
+				// ##################### end marker validate #############################
 				
 				Map<String, Object> data = Maps.newHashMap();
 				data.putAll(sht);

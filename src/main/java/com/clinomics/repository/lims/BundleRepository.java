@@ -14,4 +14,5 @@ public interface BundleRepository extends JpaRepository<Bundle, Integer> {
 	List<Bundle> findByIsSingleAndIsActiveTrue(boolean isSingle, Pageable pageable);
 	List<Bundle> findByProductIdAndIsSingleAndIsActiveTrue(int productId, boolean isSingle);
 	Long countByIsSingleAndIsActiveTrue(boolean isSingle);
+	Bundle findByType(String type);
 }

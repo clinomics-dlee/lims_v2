@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import javax.transaction.Transactional;
 
+import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
@@ -57,6 +58,9 @@ public class ExpService {
 
 	@Autowired
 	DataTableService dataTableService;
+
+	@Autowired
+	VariousFieldsService variousDayService;
 
 	public Map<String, Object> findSampleByExpRdyStatus(Map<String, String> params) {
 		int draw = 1;
@@ -372,66 +376,86 @@ public class ExpService {
 			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
 			return rtn;
 		}
+
+		String mappingNo = datas.get(0).get("mappingNo");
+
+		// #. 입력하려는 MappingNo가 STEP2가 아닌 다른상태의 검체에 동일한 값이 존재하면 리턴
+		Specification<Sample> w = Specification
+				.where(SampleSpecification.mappingNoEqual(mappingNo))
+				.and(SampleSpecification.statusNotEqual(StatusCode.S220_EXP_STEP2));
+		List<Sample> ss = sampleRepository.findAll(w);
+		if (ss.size() > 0) {
+			rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+			rtn.put("message", "해당 Mapping No는 이미 사용중입니다.[" + mappingNo + "]");
+			return rtn;
+		}
 		
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, String> data : datas) {
-			String mappingNo = data.get("mappingNo");
+			
 			String genotypingId = data.get("genotypingId");
 			String wellPosition = data.get("wellPosition");
 
-			// #. 입력하려는 MappingNo가 STEP2가 아닌 다른상태의 검체에 동일한 값이 존재하면 리턴
-			Specification<Sample> w = Specification
-						.where(SampleSpecification.mappingNoEqual(mappingNo))
-						.and(SampleSpecification.statusNotEqual(StatusCode.S220_EXP_STEP2));
-			List<Sample> ss = sampleRepository.findAll(w);
-			if (ss.size() > 0) {
-				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-				rtn.put("message", "해당 Mapping No는 이미 사용중입니다.[" + mappingNo + "]");
-				return rtn;
+			String controlWellPosition = data.get("control_wellPosition");
+
+			if (controlWellPosition != null) {
+				// #. 임시 테스트 파일인 경우 샘플 생성
+				Sample pcSample = new Sample();
+				Bundle bundle = bundleRepository.findByType("PC");
+
+				pcSample.setBundle(bundle);
+				pcSample.setGenotypingMethodCode(GenotypingMethodCode.CHIP);
+				pcSample.setWellPosition(controlWellPosition);
+				pcSample.setVersion(0);
+				pcSample.setMappingNo(mappingNo);
+
+				variousDayService.setFields(false, pcSample, Maps.newHashMap());
+				sampleRepository.save(pcSample);
+			} else {
+				if (genotypingId.length() > 0 && wellPosition.length() > 0) {
+					String[] genotypingInfo = genotypingId.split("-V");
+					// #. genotypingId양식이 틀린경우
+					if (genotypingInfo.length != 2) {
+						rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+						rtn.put("message", "Genotyping ID 값을 확인해주세요.[" + genotypingId + "]");
+						return rtn;
+					}
+		
+					String laboratoryId = genotypingInfo[0];
+					// #. version값이 숫자가아닌경우
+					if (!NumberUtils.isCreatable(genotypingInfo[1])) {
+						rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+						rtn.put("message", "Genotyping ID Version 값을 확인해주세요.[" + genotypingId + "]");
+						return rtn;
+					}
+					int version = NumberUtils.toInt(genotypingInfo[1]);
+					
+					Specification<Sample> where = Specification
+							.where(SampleSpecification.laboratoryIdEqual(laboratoryId))
+							.and(SampleSpecification.versionEqual(version));
+					List<Sample> samples = sampleRepository.findAll(where);
+					Sample s = samples.get(0);
+					// #. 검사실ID 또는 version이 잘못 입력된 경우
+					if (s == null) {
+						rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+						rtn.put("message", "조회된 Genotyping ID 값이 없습니다.[" + genotypingId + "]");
+						return rtn;
+					}
+					// #. 조회된 검체의 상태가 STEP2가 아닌경우
+					if (!s.getStatusCode().equals(StatusCode.S220_EXP_STEP2)) {
+						rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
+						rtn.put("message", "이미 실험이 진행중인 검체입니다.[" + genotypingId + "]");
+						return rtn;
+					}
+		
+					s.setGenotypingMethodCode(GenotypingMethodCode.CHIP);
+					s.setWellPosition(wellPosition);
+					s.setMappingNo(mappingNo);
+		
+					savedSamples.add(s);
+				}
 			}
 
-			if (genotypingId.length() > 0 && wellPosition.length() > 0) {
-				String[] genotypingInfo = genotypingId.split("-V");
-				// #. genotypingId양식이 틀린경우
-				if (genotypingInfo.length != 2) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-					rtn.put("message", "Genotyping ID 값을 확인해주세요.[" + genotypingId + "]");
-					return rtn;
-				}
-	
-				String laboratoryId = genotypingInfo[0];
-				// #. version값이 숫자가아닌경우
-				if (!NumberUtils.isCreatable(genotypingInfo[1])) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-					rtn.put("message", "Genotyping ID Version 값을 확인해주세요.[" + genotypingId + "]");
-					return rtn;
-				}
-				int version = NumberUtils.toInt(genotypingInfo[1]);
-				
-				Specification<Sample> where = Specification
-						.where(SampleSpecification.laboratoryIdEqual(laboratoryId))
-						.and(SampleSpecification.versionEqual(version));
-				List<Sample> samples = sampleRepository.findAll(where);
-				Sample s = samples.get(0);
-				// #. 검사실ID 또는 version이 잘못 입력된 경우
-				if (s == null) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-					rtn.put("message", "조회된 Genotyping ID 값이 없습니다.[" + genotypingId + "]");
-					return rtn;
-				}
-				// #. 조회된 검체의 상태가 STEP2가 아닌경우
-				if (!s.getStatusCode().equals(StatusCode.S220_EXP_STEP2)) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE);
-					rtn.put("message", "이미 실험이 진행중인 검체입니다.[" + genotypingId + "]");
-					return rtn;
-				}
-	
-				s.setGenotypingMethodCode(GenotypingMethodCode.CHIP);
-				s.setWellPosition(wellPosition);
-				s.setMappingNo(mappingNo);
-	
-				savedSamples.add(s);
-			}
 		}
 		
 		sampleRepository.saveAll(savedSamples);
@@ -606,12 +630,6 @@ public class ExpService {
 			List<Sample> samples = sampleRepository.findAll(where);
 
 			for (Sample sample : samples) {
-				if (!sample.getStatusCode().equals(StatusCode.S230_EXP_STEP3)) {
-					rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
-					rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
-					return rtn;
-				}
-
 				sample.setModifiedDate(now);
 				sample.setExpStep3Date(now);
 				sample.setExpStep3Member(member);

@@ -26,7 +26,28 @@
 					<div class="form-group row m-b-12">
 						<label class="col-form-label col-md-4"></label>
 						<div class="col-xs-push-0 col-md-8">
-							<div id="_mapping_grid" style="overflow: auto; max-height: 500px;"></div>
+							<div id="_mapping_grid" style="overflow: auto; max-height: 300px;"></div>
+						</div>
+					</div>
+				</form>
+				<form id="frm_popup_control_upload" name="frm_popup_control_upload" method="POST" enctype="multipart/form-data">
+					<div class="form-group row m-b-12">
+						<label class="col-form-label col-md-4">Control File</label>
+						<div class="col-xs-push-0">
+							<input type="text" id="control_create_grid" class="form-control width-50" style = "text-align:right;"
+												onkeypress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;"/>
+						</div>
+						<div class="col-xs-push-0">
+							<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="createRowForControlFiles();">추가</button>
+						</div>
+						<div class="col-xs-push-0">
+							<button type="button" class="btn btn-warning m-r-5 m-b-5" onclick="clearRowForControlFiles();">초기화</button>
+						</div>
+					</div>
+					<div class="form-group row m-b-12">
+						<label class="col-form-label col-md-4"></label>
+						<div class="col-xs-push-0 col-md-8">
+							<div id="_control_files_grid" style="overflow: auto; max-height: 200px;"></div>
 						</div>
 					</div>
 				</form>
@@ -63,6 +84,8 @@ function mappingUploadPopupOnload(index) {
 	
 	$('#file').val("");
 	UserTable.init('_mapping_grid', false);
+
+	UserTable.init('_control_files_grid', false);
 }
 
 function createRow(excelData) {
@@ -112,20 +135,34 @@ function saveMapping() {
 		return;	
 	}
 
-	var form = $('#frm_popup_mapping_upload')[0];
-	var data = new FormData(form);
-
-	var frmData = $('#frm_popup_mapping_upload').serializeObject();
 	var data = [];
-	var rows = $("#_mapping_grid table tbody tr").length;
-	for (var r = 0; r < rows; r++) {
+	var rows = $("#_mapping_grid table tbody tr");
+	for (var r = 0; r < rows.length; r++) {
+		var inputs = $(rows[r]).find('input:text');
+			
 		var map = {};
-		for (const [key, value] of Object.entries(frmData)) {
-			if (rows > 1) {
-				map[key] = value[r];
-			} else {
-				map[key] = value;
-			}
+		for (var ii = 0; ii < inputs.length; ii++) {
+			
+			let key = $(inputs[ii]).attr('name');
+			
+			let value = $(inputs[ii]).val();
+			map[key] = value;
+		}
+		map.mappingNo = $("#mappingNo").val();
+		data.push(map);
+	}
+
+	var controlRows = $("#_control_files_grid table tbody tr");
+	for (var r = 0; r < controlRows.length; r++) {
+		var inputs = $(controlRows[r]).find('input:text');
+			
+		var map = {};
+		for (var ii = 0; ii < inputs.length; ii++) {
+			
+			let key = $(inputs[ii]).attr('name');
+			
+			let value = $(inputs[ii]).val();
+			map[key] = value;
 		}
 		map.mappingNo = $("#mappingNo").val();
 		data.push(map);
@@ -191,5 +228,46 @@ function excelForm() {
 function excelUpload() {
 	$('#file').trigger('click'); 
 }
+
+function createRowForControlFiles() {
+	var heads = [{name : "Well Position", value : "wellPosition"}];
+
+	var headHtml = "", bodyHtml = "";
+	var html = "";
+
+	for (var i = 0; i < heads.length; i++) {
+		headHtml += '<th>';
+		headHtml += heads[i].name;
+		headHtml += '</th>';
+	}
+
+	var count = $("#control_create_grid").val();
+
+	for (var i = 0; i < count; i++) {
+		bodyHtml += "<tr>";
+		for (var j = 0; j < heads.length; j++) {
+			var val = "";
+			bodyHtml += "<td>";
+			bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm" '
+					+ 'name="control_' + heads[j].value + '"'
+					+ 'style="width:200px;" ';
+			bodyHtml += '/>';
+			bodyHtml += "</td>";
+		}
+		bodyHtml += "</tr>";
+	}
+
+	html += '<thead><tr>' + headHtml;
+	html += '</tr></thead>';
+	html += '<tbody>' + bodyHtml;
+	html += '</tbody>';
+	
+	$("#_control_files_grid table").html(html);
+}
+
+function clearRowForControlFiles() {
+	UserTable.clear('_control_files_grid');
+}
+
 /* ]]> */
 </script>
