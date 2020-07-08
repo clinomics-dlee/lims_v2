@@ -405,7 +405,7 @@ public class SampleSpecification {
 				if (orderList.size() > 0) query.orderBy(orderList);
 				
 			} else {
-				//query.orderBy(criteriaBuilder.desc(root.get("laboratoryId")));
+				query.orderBy(criteriaBuilder.desc(root.get("laboratoryId")));
 			}
 			return rtn;
 		
