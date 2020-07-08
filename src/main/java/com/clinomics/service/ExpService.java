@@ -390,6 +390,8 @@ public class ExpService {
 			return rtn;
 		}
 		
+		LocalDateTime now = LocalDateTime.now();
+
 		List<Sample> savedSamples = new ArrayList<Sample>();
 		for (Map<String, String> data : datas) {
 			
@@ -408,6 +410,7 @@ public class ExpService {
 				pcSample.setWellPosition(controlWellPosition);
 				pcSample.setVersion(0);
 				pcSample.setMappingNo(mappingNo);
+				pcSample.setCreatedDate(now);
 
 				variousDayService.setFields(false, pcSample, Maps.newHashMap());
 				sampleRepository.save(pcSample);
