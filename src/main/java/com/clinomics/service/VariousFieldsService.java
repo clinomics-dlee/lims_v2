@@ -83,7 +83,7 @@ public class VariousFieldsService {
         }
 
         for (int i = 0; i < max; i++) {
-            temp = start.plusDays(i);
+            temp = start.plusDays(1);
             if (hdays.contains(temp.format(yyyymmdd)) || isWeekend(temp)) {
                 max++;
             }
