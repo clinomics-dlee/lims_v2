@@ -228,8 +228,8 @@ public class OutputService {
 				
 				StatusCode sc = sample.getStatusCode();
 				if (sc.equals(StatusCode.S710_OUTPUT_CMPL) || sc.equals(StatusCode.S810_RE_OUTPUT_CMPL)) {
-					sample.setOutputWaitDate(now);
-					sample.setOutputWaitMember(member);
+					sample.setReOutputWaitDate(now);
+					sample.setReOutputWaitMember(member);
 					sample.setModifiedDate(now);
 					
 					sample.setStatusCode(StatusCode.S800_RE_OUTPUT_WAIT);
@@ -294,6 +294,7 @@ public class OutputService {
 					
 					datas.add(data);
 					
+					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ data : " + data.toString());
 					// #. result status update
 					if (!isTest) {
 						logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ isTest : " + isTest);
