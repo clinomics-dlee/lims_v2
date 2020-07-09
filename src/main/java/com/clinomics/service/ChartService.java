@@ -49,6 +49,7 @@ public class ChartService {
 	}
 
 	public Map<String, Object> selectCountByMonthly(Map<String, String> params) {
+		System.out.println("★★★★★★★★ params=" + params.toString());
 		String paramStart = params.get("start") + "";
 		String paramEnd = params.get("end") + "";
 		
@@ -110,6 +111,8 @@ public class ChartService {
 		
 		Map<String, Object> rtn4 = Maps.newHashMap();
 		loop = start;
+
+		System.out.println("★★★★★★★★★★ mapSample.size=" + mapSample.size());
 		
 		rtn4.put("labels", bundles.stream().map(b -> b.getName()).collect(Collectors.toList()));
 		rtn4.put("datasets", getPieDatasetByBundle(bundles, end, mapSample));
@@ -161,7 +164,7 @@ public class ChartService {
 	
 	private Specification<Sample> getSampleWhere(Map<String, String> params) {
 		return Specification
-			.where(SampleSpecification.createdDateOneMonth(params))
+			.where(SampleSpecification.betweenDate(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.bundleIsActive())

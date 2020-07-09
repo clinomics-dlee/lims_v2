@@ -68,7 +68,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                     <div class="col-lg-6">
                         <!-- begin panel -->
                         <div class="panel p-20">
-                            <h5 class="m-t-0 m-b-15" th:text="#{page.chart.sampleReceipt}">Sample receipt</h5>
+							<div class="row m-b-15">
+								<div class="col-lg-6">
+									<h5 class="m-t-0" th:text="#{page.chart.sampleReceipt}">Sample receipt</h5>
+								</div>
+								<div class="col-lg-6 text-right">
+									<button onClick="downloadChart('chart1');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
+								</div>
+							</div>
                             <div>
 								<canvas id="bar-chart1" data-render="chart-js"></canvas>
 							</div>
@@ -80,7 +87,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                     <div class="col-lg-6">
                         <!-- begin panel -->
                         <div class="panel p-20">
-                            <h5 class="m-t-0 m-b-15" th:text="#{page.chart.experimentCompletion}">Experiment completion</h5>
+							<div class="row m-b-15">
+								<div class="col-lg-6">
+									<h5 class="m-t-0" th:text="#{page.chart.experimentCompletion}">Experiment completion</h5>
+								</div>
+								<div class="col-lg-6 text-right">
+									<button onClick="downloadChart('chart2');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
+								</div>
+							</div>
                             <div>
 								<canvas id="bar-chart2" data-render="chart-js"></canvas>
 							</div>
@@ -96,7 +110,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                     <div class="col-lg-6">
                         <!-- begin panel -->
                         <div class="panel p-20">
-                            <h5 class="m-t-0 m-b-15" th:text="#{page.chart.completedAnalysisFileProvided}">Completed analysis file provided</h5>
+							<div class="row m-b-15">
+								<div class="col-lg-6">
+									<h5 class="m-t-0" th:text="#{page.chart.completedAnalysisFileProvided}">Completed analysis file provided</h5>
+								</div>
+								<div class="col-lg-6 text-right">
+									<button onClick="downloadChart('chart3');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
+								</div>
+							</div>
                             <div>
 								<canvas id="bar-chart3" data-render="chart-js"></canvas>
 							</div>
@@ -108,7 +129,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                     <div class="col-lg-6">
                         <!-- begin panel -->
                         <div class="panel p-20">
-                            <h5 class="m-t-0 m-b-15" th:text="#{page.chart.sampleReceiptRate}">Sample Receipt Rate</h5>
+							<div class="row m-b-15">
+								<div class="col-lg-6">
+									<h5 class="m-t-0" th:text="#{page.chart.sampleReceiptRate}">Sample Receipt Rate</h5>
+								</div>
+								<div class="col-lg-6 text-right">
+									<button onClick="downloadChart('chart4');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
+								</div>
+							</div>
                             <div>
 								<canvas id="bar-chart4" data-render="chart-js"></canvas>
 							</div>
@@ -134,6 +162,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	/* <![CDATA[ */       
 	var token = $("meta[name='_csrf']").attr("content");
 	var header = $("meta[name='_csrf_header']").attr("content");
+
+	var g_chartData = [];
 	
 	var randomScalingFactor = function() { 
 		return Math.round(Math.random()*100)
@@ -186,6 +216,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				xhr.setRequestHeader(header, token);
 			},
 			success: function (data) {
+				g_chartData = data;
 				var ctx1 = document.getElementById('bar-chart1').getContext('2d');
 				var barChart1 = new Chart(ctx1, {
 					type: 'bar',
@@ -249,8 +280,55 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		});
 	}
 	
+	function downloadChart(key) {
+		var excelDatas = [];
+
+		if (key == "chart4") {
+			var headers = ["Service", "Count"];
+			excelDatas.push(headers);
+
+			var rows = [];
+			for (var i = 0; i < g_chartData[key].labels.length; i++) {
+				var service = g_chartData[key].labels[i];
+				var count = g_chartData[key].datasets[0].data[i];
+				var row = [service, count];
+				rows.push(row);
+			}
+
+			excelDatas = excelDatas.concat(rows);
+
+		} else {
+			var headers = ["Service"];
+			headers = headers.concat(g_chartData[key].labels);
+			excelDatas.push(headers);
 	
-		/* ]]> */
+			var rows = [];
+			for (var i = 0; i < g_chartData[key].datasets.length; i++) {
+				var dataset = g_chartData[key].datasets[i];
+	
+				var row = [dataset.label];
+				row = row.concat(dataset.data);
+	
+				rows.push(row);
+			}
+			excelDatas = excelDatas.concat(rows);
+		}
+
+		// step 1. workbook 생성
+		var wb = XLSX.utils.book_new();
+		// step 2. 시트 만들기 
+		var newWorksheet = XLSX.utils.aoa_to_sheet(excelDatas);
+		// var newWorksheet = XLSX.utils.table_to_sheet(html);
+		// step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
+		XLSX.utils.book_append_sheet(wb, newWorksheet, "sheet1");
+		// step 4. 엑셀 파일 만들기 
+		var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+		// step 5. 엑셀 파일 내보내기 
+		saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), "Sample.xlsx");
+	}
+
+
+	/* ]]> */
 	</script>
 	
 </body>
