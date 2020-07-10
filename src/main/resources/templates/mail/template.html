@@ -43,12 +43,14 @@
     <table class="normal"> 
 		<colgroup>
 			<col width="25%" />
+			<col width="10%" />
 			<col width="25%" />
-			<col width="50%" />
+			<col width="40%" />
 		</colgroup>
 		<thead>
 			<tr>
 				<th scope="cols">Chip Barcode</th>
+				<th scope="cols">Well Position</th>
 				<th scope="cols">Genotyping ID</th>
 				<th scope="cols">메세지</th>
 			</tr>
@@ -56,6 +58,7 @@
 		<tbody>
 			<tr th:each="sample : ${samples}">
 				<th scope="row" th:text="${sample.chipBarcode}"> </th>
+				<td th:text="${sample.wellPosition}"> </td>
 				<td>
 					<ul style="list-style: none; padding: 0; margin: 0;" th:each="smpl : ${#strings.arraySplit(sample.genotypingId, ',')}">
 						<li style="padding: 0;" th:text="${smpl}">

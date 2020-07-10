@@ -300,6 +300,9 @@ public class AnlsService {
 			nSample.setExpStep1Date(sample.getExpStep1Date());
 			nSample.setExpStep1Member(sample.getExpStep1Member());
 			nSample.setModifiedDate(sample.getModifiedDate());
+			nSample.setCollectedDate(sample.getCollectedDate());
+			nSample.setReceivedDate(sample.getReceivedDate());
+			nSample.setSampleType(sample.getSampleType());
 
 			savedSamples.add(nSample);
 		}
