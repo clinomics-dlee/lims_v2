@@ -194,6 +194,7 @@ public class AnalysisService {
 			ftp.connect(ftpAddress, ftpPort);
 			ftp.login(ftpUsername, ftpPassword);
 
+			ftp.setBufferSize(1024 * 1024);
 			ftp.enterLocalPassiveMode();
 
 			logger.info("★★★★★★★★★★★★ ftp.listNames()=" + ftp.listNames().length);
