@@ -6,7 +6,33 @@
 	  	max-height: 600px;
 	}
 }
-
+</style>
+<style id="style_tag">
+	#print_table {
+		color: #000;
+		border-collapse: collapse;
+		text-align: left;
+		line-height: 1.5;
+		margin: 20px 0px;
+	}
+	#print_table th {
+		width: 150px;
+		padding: 10px;
+		font-weight: bold;
+		vertical-align: top;
+		border: 1px solid #CCC;
+		background: #f3f6f7;
+		text-align: center;
+		white-space: nowrap;
+	}
+	#print_table td {
+		width: 350px;
+		padding: 10px;
+		vertical-align: top;
+		border: 1px solid #CCC;
+		text-align: center;
+		white-space: nowrap;
+	}
 </style>
 
 <div class="modal fade" id="modal-sample-print">
@@ -33,37 +59,11 @@
 					</div>
 				</div>
 				<hr/>
-				<div id="print_area" style="size: A4 landscape; height: 450px; overflow-y: auto; display: none;">
-					<style>
-						#print_table {
-							color: #000;
-							border-collapse: collapse;
-							text-align: left;
-							line-height: 1.5;
-							margin: 20px 10px;
-						}
-						#print_table th {
-							width: 150px;
-							padding: 10px;
-							font-weight: bold;
-							vertical-align: top;
-							border: 1px solid #CCC;
-							background: #f3f6f7;
-							text-align: center;
-							white-space: nowrap;
-						}
-						#print_table td {
-							width: 350px;
-							padding: 10px;
-							vertical-align: top;
-							border: 1px solid #CCC;
-							text-align: center;
-							white-space: nowrap;
-						}
-					</style>
+				<div id="print_area" style="height: 450px; overflow-y: auto; display: none;">
+					
 					<h2 style="text-align: center; margin-top: 5px; margin-bottom: 5px;">검체기록지</h2>
 					<div>
-						<table id="print_table" style="width: 25%; float: right; margin-bottom: 0px;">
+						<table id="print_table" style="width: 25%; float: right; margin-bottom: 10px;">
 							<tr>
 								<th>입고담당자</th>
 								<th>중간관리자</th>
@@ -120,6 +120,8 @@
 	function print() {
 		
 		var divToPrint = document.getElementById('print_area');
+		var styletag = document.getElementById('style_tag');
+		
 		//var newWin = window.open('','Print-Window');
 		//newWin.document.open();
 		//newWin.document.write(
@@ -128,6 +130,10 @@
 			+ '<link href="/assets/plugins/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet" />'
 			+ '<link href="/assets/plugins/font-awesome/5.0/css/fontawesome-all.min.css" rel="stylesheet" />'
 			+ '<link href="/assets/css/material/style.css" rel="stylesheet" />'
+			+ '<style>' + styletag.innerHTML
+			+ ' @page { margin : 18mm 15mm 15mm 15mm; }'
+			+ ' body { margin: 0; padding: 0; }'
+			+ '</style>'
 			+ '</head>'
 			+ '<body onload="window.print()">'
 			+ divToPrint.innerHTML
@@ -198,9 +204,9 @@
 					html += '</tr>';
 					
 					if (r == 1) {
-						$('#inputApproveMember').text((col.inputApproveMember ? col.inputApproveMember.name : ""));
-						$('#inputMngApproveMember').text((col.inputMngApproveMember ? col.inputMngApproveMember.name : ""));
-						$('#inputDrctMember').text((col.inputDrctMember ? col.inputDrctMember.name : ""));
+						$('#inputApproveMember').text((col.inputApproveMember ? col.inputApproveMember.name : "-"));
+						$('#inputMngApproveMember').text((col.inputMngApproveMember ? col.inputMngApproveMember.name : "-"));
+						$('#inputDrctMember').text((col.inputDrctMember ? col.inputDrctMember.name : "-"));
 
 						$('#bundle').text(col.bundle.name);
 						$('#inputApproveMember2').text((col.inputApproveMember ? col.inputApproveMember.name : ""));
