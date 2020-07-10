@@ -33,7 +33,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_detail"></th:block>
+		<th:block th:replace="popup/sample_print"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -91,6 +91,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								</div>
 								<div>
 									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
+								</div>
+								<div class="col-md-3 text-right">
+									<button class="btn btn-success m-r-5" onClick="printPopup();">검체기록지</button>
 								</div>
 							</div>
 							<hr/>
@@ -289,7 +292,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			data.push(checkedRows[cr].id);
 		}
 		if (data.length < 1) {
-			return
+			return;
 		}
 
 		CommonMsg.okCancel(function() {
@@ -326,6 +329,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	function search() {
 		UserTable.reload('_collect_grid');
+	}
+
+	function printPopup() {
+		
+		var bundleId = $("#sel_bundle").val();
+		var sDate = $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val();
+		var fDate = $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val();
+		printPopupOnload(bundleId, sDate, fDate);
 	}
 	
 	

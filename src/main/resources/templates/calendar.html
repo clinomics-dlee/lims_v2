@@ -53,6 +53,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<th:block th:replace="popup/cal_after"></th:block>
 		<th:block th:replace="popup/cal_registered"></th:block>
 		<th:block th:replace="popup/cal_human"></th:block>
+		<th:block th:replace="popup/sample_print"></th:block>
 		<!-- end #sidebar -->
 		<!-- begin #content -->
 		<div id="content" class="content">
@@ -86,6 +87,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							</div>
 							<div class="col-md-4 text-right">
 								<button class="btn btn-success m-r-5 m-b-5" id="btn_human">인체유래물등 다운로드</button>
+								<button class="btn btn-success m-r-5 m-b-5" onClick="printPopup();">검체기록지</button>
 							</div>
 						</div>
                     </div>
@@ -414,6 +416,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				
 			}
 		});
+	}
+
+	function printPopup() {
+		
+		
+		var bundleId = $("#sel_bundle").val();
+		printPopupOnload(bundleId, null);
 	}
 	
 	function dayToDate(day) {

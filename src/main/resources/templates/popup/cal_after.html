@@ -29,6 +29,7 @@
 				
 			</div>
 			<div class="modal-footer">
+				<a href="javascript:;" id="sample_print" class="btn btn-white fade m-r-5" data-dismiss="modal">검체 기록지</a>
 				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
 				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
 			</div>
@@ -55,6 +56,12 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 		url = "/popup/completed";
 	} else if (type == 3) {
 		url = "/popup/reported";
+	} else {
+		$('#sample_print').addClass('show');
+		$('#sample_print').click(function (e) {
+			var bundleId = $("#sel_bundle").val();
+			printPopupOnload(bundleId, startDate, true);
+		});
 	}
 	UserTable.draw('_com_after_popup', {
 		url : url,

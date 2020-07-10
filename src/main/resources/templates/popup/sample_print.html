@@ -1,0 +1,227 @@
+<!-- begin modal-dialog -->
+<style>
+@media screen and (min-width: 1024px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+
+</style>
+
+<div class="modal fade" id="modal-sample-print">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">검체 기록지 인쇄</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div class="form-group row m-b-12">
+					<input type="hidden" id="sampleId" name="id" value="">
+					<label class="col-form-label col-md-1">일자</label>
+					<div class="col-xs-push-0 row col-md-3">
+						<div class="input-group" style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
+							<input type="text" id="sel_print_date" class="form-control" value="" placeholder="" readonly="readonly"/>
+							<span class="input-group-append">
+								<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+							</span>
+						</div>
+					</div>
+					<div>
+						<a href="javascript:printPopupSearch();" class="btn btn-default">조회</a>
+					</div>
+				</div>
+				<hr/>
+				<div id="print_area" style="size: A4 landscape; height: 450px; overflow-y: auto; display: none;">
+					<style>
+						#print_table {
+							color: #000;
+							border-collapse: collapse;
+							text-align: left;
+							line-height: 1.5;
+							margin: 20px 10px;
+						}
+						#print_table th {
+							width: 150px;
+							padding: 10px;
+							font-weight: bold;
+							vertical-align: top;
+							border: 1px solid #CCC;
+							background: #f3f6f7;
+							text-align: center;
+							white-space: nowrap;
+						}
+						#print_table td {
+							width: 350px;
+							padding: 10px;
+							vertical-align: top;
+							border: 1px solid #CCC;
+							text-align: center;
+							white-space: nowrap;
+						}
+					</style>
+					<h2 style="text-align: center; margin-top: 5px; margin-bottom: 5px;">검체기록지</h2>
+					<div>
+						<table id="print_table" style="width: 25%; float: right; margin-bottom: 0px;">
+							<tr>
+								<th>입고담당자</th>
+								<th>중간관리자</th>
+								<th>검사실책임자</th>
+							</tr>
+							<tr>
+								<td id="inputApproveMember"> </td>
+								<td id="inputMngApproveMember"> </td>
+								<td id="inputDrctMember"> </td>
+							</tr>
+						</table>
+					</div>
+					<div style="clear: both; margin: 0; padding: 0;"></div>
+					<table id="print_table" style="margin-top: 10px;">
+						<tr>
+							<th>검체입고일</th>
+							<td id="createdDate"> </td>
+							<th>서비스 종류</th>
+							<td id="bundle"> </td>
+							<th>입고담당자</th>
+							<td id="inputApproveMember2"> </td>
+						</tr>
+					</table>
+					<table id="print_table">
+						<thead>
+							<tr>
+								<th>순번</th>
+								<th>검사실 ID</th>
+								<th>바코드</th>
+								<th>검체채취일</th>
+								<th>결과보고일</th>
+								<th>검체종류</th>
+								<th>Saliva</th>
+								<th>입고여부</th>
+								<th>비고</th>
+							</tr>
+						</thead>
+						<tbody id="print-table-body">
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
+				<a href="javascript:print();" class="btn btn-success">인쇄</a>
+			</div>
+			<iframe id="printf" name="printf" style="display: none;"></iframe>
+		</div>
+	</div>
+</div>
+
+<script th:inline="javascript">
+/* <![CDATA[ */    
+	function print() {
+		
+		var divToPrint = document.getElementById('print_area');
+		//var newWin = window.open('','Print-Window');
+		//newWin.document.open();
+		//newWin.document.write(
+		var html = '<html>'
+			+ '<head>'
+			+ '<link href="/assets/plugins/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet" />'
+			+ '<link href="/assets/plugins/font-awesome/5.0/css/fontawesome-all.min.css" rel="stylesheet" />'
+			+ '<link href="/assets/css/material/style.css" rel="stylesheet" />'
+			+ '</head>'
+			+ '<body onload="window.print()">'
+			+ divToPrint.innerHTML
+			+ '</body></html>';
+		
+		var newWin = window.frames["printf"];
+		newWin.document.write(html);
+		newWin.document.close();
+		//newWin.document.close();
+		//setTimeout(function(){ newWin.close(); }, 0);
+	}
+	function printPopupOnload(bundleId, fDate, doSearch) {
+		var sDate = moment().format('YYYY-MM-DD');
+		if (fDate) {
+			sDate = fDate;
+		}
+		
+		$('#sel_print_date').datepicker({
+			autoclose : true,
+			format: "yyyy-mm-dd",
+			changeMonth : true,
+			changeYear : true,
+			language: "ko"
+		}).datepicker("setDate", sDate);
+		
+		$("#modal-sample-print").modal();
+
+		if (doSearch) {
+			printPopupSearch();
+		}
+	}
+
+	function printPopupSearch() {
+		$('#print_area').hide();
+		var param = {
+			bundleId : $('#sel_bundle').val(),
+			sDate : $('#sel_print_date').val(),
+			fDate : $('#sel_print_date').val(),
+			pgrwc : 500
+		};
+			
+		$.ajax({
+			url : "/popup/registered",
+			type : "GET",
+			data : param,
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (data, xhr) {
+				var html = "";
+				var rows = data.data;
+				
+				for (var r in rows) {
+					let col = rows[r];
+					let index = Number(r) + 1;
+					html += '<tr>';
+					html += '<td>' + index + '</td>';
+					html += '<td>' + (col.laboratoryId ? col.laboratoryId : "") + '</td>';
+					html += '<td>' + (col.items.barcode ? col.items.barcode : "") + '</td>';
+					html += '<td>' + (col.collectedDate ? col.collectedDate : "") + '</td>';
+					html += '<td>' + (col.items.tat ? col.items.tat : "") + '</td>';
+					html += '<td>' + (col.sampleType ? col.sampleType : "") + '</td>';
+					html += '<td>' + (col.items.saliva ? col.items.saliva : "") + '</td>';
+					html += '<td>입고</td>';
+					html += '<td></td>';
+					html += '</tr>';
+					
+					if (r == 1) {
+						$('#inputApproveMember').text((col.inputApproveMember ? col.inputApproveMember.name : ""));
+						$('#inputMngApproveMember').text((col.inputMngApproveMember ? col.inputMngApproveMember.name : ""));
+						$('#inputDrctMember').text((col.inputDrctMember ? col.inputDrctMember.name : ""));
+
+						$('#bundle').text(col.bundle.name);
+						$('#inputApproveMember2').text((col.inputApproveMember ? col.inputApproveMember.name : ""));
+
+					}
+					$('#createdDate').text($('sel_print_date').val());
+				}
+				$('#print-table-body').html(html);
+				$('#print_area').show();
+			},
+			error : function(data, xhr) {
+				
+				if (data.status == "200") {
+					location.reload();
+				}
+				CommonMsg.error(function() { });
+			}
+		});
+		
+	}
+
+	
+/* ]]> */
+</script>
