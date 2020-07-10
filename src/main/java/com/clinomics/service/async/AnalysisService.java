@@ -194,6 +194,8 @@ public class AnalysisService {
 			ftp.connect(ftpAddress, ftpPort);
 			ftp.login(ftpUsername, ftpPassword);
 
+			ftp.enterLocalPassiveMode();
+
 			logger.info("★★★★★★★★★★★★ ftp.listNames()=" + ftp.listNames().length);
 			for (Sample sample : samples) {
 				boolean existFile = false;
