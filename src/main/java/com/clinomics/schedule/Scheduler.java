@@ -249,9 +249,20 @@ public class Scheduler {
                         sampleRepository.save(sample);
                         
                     } else if (!failRowData.isEmpty()) {
+                        String failMessage = "";
+
+                        if (failRowData.get(failHeaderDatas.get(1)) != null) {
+                            failMessage += (String)failRowData.get(failHeaderDatas.get(1));
+                        }
+
+                        if (failRowData.get(failHeaderDatas.get(2)) != null) {
+                            if (failMessage.length() > 0) failMessage += " : ";
+                            failMessage += (String)failRowData.get(failHeaderDatas.get(2));
+                        }
+
                         // #. 분석 실패 파일에 존재하는 경우
                         sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
-                        sample.setStatusMessage((String)failRowData.get(failHeaderDatas.get(1)));
+                        sample.setStatusMessage(failMessage);
                         sample.setAnlsEndDate(LocalDateTime.now());
                         sampleRepository.save(sample);
                         failSamples.add(sample);

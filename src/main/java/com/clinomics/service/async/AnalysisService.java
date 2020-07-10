@@ -185,6 +185,7 @@ public class AnalysisService {
 	 * @param samples
 	 */
 	private void downloadCelFiles(List<Sample> samples) {
+		logger.info("★★★★★★★★★★ Start downloadCelFiles");
 		FTPClient ftp = null;
 		try {
 			ftp = new FTPClient();
@@ -193,16 +194,19 @@ public class AnalysisService {
 			ftp.connect(ftpAddress, ftpPort);
 			ftp.login(ftpUsername, ftpPassword);
 
+			logger.info("★★★★★★★★★★★★ ftp.listNames()=" + ftp.listNames().length);
 			for (Sample sample : samples) {
 				boolean existFile = false;
 				for (String fileName : ftp.listNames()) {
 					if (sample.getFileName().equals(fileName)) {
+						logger.info("★★★★★★★ fileName=" + fileName);
 						File f = new File(sample.getFilePath(), fileName);
 	
 						FileOutputStream fos = null;
 						try {
 							fos = new FileOutputStream(f);
 							boolean isSuccess = ftp.retrieveFile(fileName, fos);
+							logger.info("★★★★★★★ isSuccess=" + isSuccess);
 							if (isSuccess) {
 								sample.setCheckCelFile("PASS");
 								sampleRepository.save(sample);
@@ -214,8 +218,10 @@ public class AnalysisService {
 								logger.info("★★★★★★★ failed file=" + fileName);
 							}
 						} catch (IOException ex) {
+							logger.info("★★★★★★★★★★ ex:" + ex.getMessage());
 							ex.printStackTrace();
 						} finally {
+							logger.info("★★★★★★★★★★ download finally");
 							if (fos != null) {
 								try {
 									fos.close();
@@ -237,9 +243,10 @@ public class AnalysisService {
 			}
 			ftp.logout();
 		} catch (IOException e) {
-			logger.info("IO:" + e.getMessage());
+			logger.info("★★★★★★★★★★ IO:" + e.getMessage());
 			e.printStackTrace();
 		} finally {
+			logger.info("★★★★★★★★★★ End downloadCelFiles");
 			if (ftp != null && ftp.isConnected()) {
 				try {
 					ftp.disconnect();
