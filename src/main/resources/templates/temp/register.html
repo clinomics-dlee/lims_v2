@@ -90,7 +90,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								
 								<label class="col-form-label" th:text="#{common.createdDate}">Created date</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
-								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
 								    <!-- <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span> -->
@@ -278,7 +278,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: moment().subtract(1, 'months'),
-			endDate: moment()
+			endDate: moment(),
+			locale: { cancelLabel: 'Clear' }
 		}, function (start, end) {
 			
 			$('#startDate').val(start.format('YYYY-MM-DD'));
@@ -291,6 +292,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#default-daterange input').val(startDate.format('YYYY-MM-DD') + ' ~ ' + endDate.format('YYYY-MM-DD'));
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
+
+		$('#default-daterange').on('cancel.daterangepicker', function(ev, picker) {
+			$('#default-daterange input').val('');
+			$('#startDate').val("");
+			$('#finishDate').val("");
+		});
 		
 		UserTable.draw('_collect_grid', {
 			url : "/work/register/get",
@@ -557,7 +564,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							html += '<div class="input-group" data-provide="datepicker">';
 							html += '<input type="text" class="form-control form-control-sm"'
 								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + '"' : '')
-								+ ' placeholder="click to select the date range" '
+								+ ' placeholder="클릭하여 선택" '
 								+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
 							html += '<span class="input-group-append">';
 							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';

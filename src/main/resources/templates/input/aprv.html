@@ -156,12 +156,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: startDate,
-			endDate: endDate
+			endDate: endDate,
+			locale: { cancelLabel: 'Clear' }
 		}, function (start, end) {
 			
 			setDaterangepicker(start, end);
 		});
 		setDaterangepicker(startDate, endDate);
+
+		$('#default-daterange').on('cancel.daterangepicker', function(ev, picker) {
+			$('#default-daterange input').val('');
+			$('#startDate').val("");
+			$('#finishDate').val("");
+		});
 
 		rhDiv = '<div class="progress rounded-corner" style="height:20px;">';
 		rhDivAprv = '<div class="progress-bar bg-blue " style="width: 100%">';

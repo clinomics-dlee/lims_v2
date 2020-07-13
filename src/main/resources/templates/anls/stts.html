@@ -52,7 +52,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								
 								<label class="col-form-label m-l-5">조회일자</label>
 								<div class="input-group" id="default-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
-								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
 								    <span class="input-group-append">
 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 									</span>
@@ -116,7 +116,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			format : 'YYYY/MM/DD',
 			separator: ' to ',
 			startDate: moment().subtract(1, 'months'),
-			endDate: moment()
+			endDate: moment(),
+			locale: { cancelLabel: 'Clear' }
 		}, function (start, end) {
 			
 			$('#startDate').val(start.format('YYYY-MM-DD'));
@@ -129,6 +130,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('#default-daterange input').val(startDate.format('YYYY-MM-DD') + ' ~ ' + endDate.format('YYYY-MM-DD'));
 		$('#startDate').val(startDate.format('YYYY-MM-DD'));
 		$('#finishDate').val(endDate.format('YYYY-MM-DD'));
+
+		$('#default-daterange').on('cancel.daterangepicker', function(ev, picker) {
+			$('#default-daterange input').val('');
+			$('#startDate').val("");
+			$('#finishDate').val("");
+		});
 		
 		UserTable.init('_anls_stts_grid', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500]);
 		drawSttsGrid();

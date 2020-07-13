@@ -144,11 +144,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			endDate: endDate,
 			minDate: '2018/01/01',
 			maxDate: moment(),
+			locale: { cancelLabel: 'Clear' }
 		}, function (start, end) {
 			
 			setDaterangepicker(start, end);
 		});
 		setDaterangepicker(startDate, endDate);
+
+		$('#default-daterange').on('cancel.daterangepicker', function(ev, picker) {
+			$('#default-daterange input').val('');
+			$('#startDate').val("");
+			$('#finishDate').val("");
+		});
 		
 		UserTable.draw('_collect_grid', {
 			url : "/input/rvc",

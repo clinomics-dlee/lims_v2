@@ -89,12 +89,14 @@ public class SampleSpecification {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("sDate") && params.containsKey("fDate")) {
-				List<Predicate> predicatesAnds = new ArrayList<>();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-				LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
-				LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
-				predicatesAnds.add(criteriaBuilder.between(root.get(field), start, end));
-				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				if (params.get("sDate").length() > 0 && params.get("fDate").length() > 0) {
+					List<Predicate> predicatesAnds = new ArrayList<>();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
+					LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
+					predicatesAnds.add(criteriaBuilder.between(root.get(field), start, end));
+					rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				}
 			}
 			return rtn;
 
@@ -106,12 +108,14 @@ public class SampleSpecification {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("sDate") && params.containsKey("fDate")) {
-				List<Predicate> predicatesAnds = new ArrayList<>();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-				LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
-				LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
-				predicatesAnds.add(criteriaBuilder.between(root.get("createdDate"), start, end));
-				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				if (params.get("sDate").length() > 0 && params.get("fDate").length() > 0) {
+					List<Predicate> predicatesAnds = new ArrayList<>();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
+					LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
+					predicatesAnds.add(criteriaBuilder.between(root.get("createdDate"), start, end));
+					rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				}
 			}
 			return rtn;
 
@@ -123,12 +127,14 @@ public class SampleSpecification {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("sDate") && params.containsKey("fDate")) {
-				List<Predicate> predicatesAnds = new ArrayList<>();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-				LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
-				LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
-				predicatesAnds.add(criteriaBuilder.between(root.get("modifiedDate"), start, end));
-				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				if (params.get("sDate").length() > 0 && params.get("fDate").length() > 0) {
+					List<Predicate> predicatesAnds = new ArrayList<>();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
+					LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
+					predicatesAnds.add(criteriaBuilder.between(root.get("modifiedDate"), start, end));
+					rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				}
 			}
 			return rtn;
 
@@ -347,13 +353,15 @@ public class SampleSpecification {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("sDate") && params.containsKey("fDate")) {
-				List<Predicate> predicatesAnds = new ArrayList<>();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-				LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
-				LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
-				predicatesAnds.add(criteriaBuilder.between(root.get("anlsCmplDate"), start, end));
-				query.orderBy(criteriaBuilder.asc(root.get("anlsCmplDate")));
-				rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				if (params.get("sDate").length() > 0 && params.get("fDate").length() > 0) {
+					List<Predicate> predicatesAnds = new ArrayList<>();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
+					LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
+					predicatesAnds.add(criteriaBuilder.between(root.get("anlsCmplDate"), start, end));
+					query.orderBy(criteriaBuilder.asc(root.get("anlsCmplDate")));
+					rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				}
 			}
 			return rtn;
 

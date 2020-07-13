@@ -24,7 +24,7 @@ body .daterangepicker {
 						<label class="col-form-label col-md-4">조회기간</label>
 						<div class="col-xs-push-0 row col-md-8">
 							<div class="input-group" id="human-daterange" style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
-								<input type="text" name="human-daterange" class="form-control" value="" placeholder="click to select the date range" readonly="readonly"/>
+								<input type="text" name="human-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
 								<span class="input-group-append">
 									<span class="input-group-text"><i class="fa fa-calendar"></i></span>
 								</span>
@@ -58,6 +58,7 @@ $(document).ready(function() {
 		endDate: moment(),
 		minDate: '2018/01/01',
 		maxDate: moment(),
+		locale: { cancelLabel: 'Clear' }
 	}, function (start, end) {
 		
 		$('#humanStartDate').val(start.format('YYYY-MM-DD'));
@@ -70,6 +71,12 @@ $(document).ready(function() {
 	$('#human-daterange input').val(startDate.format('YYYY-MM-DD') + ' ~ ' + endDate.format('YYYY-MM-DD'));
 	$('#humanStartDate').val(startDate.format('YYYY-MM-DD'));
 	$('#humanFinishDate').val(endDate.format('YYYY-MM-DD'));
+
+	$('#human-daterange').on('cancel.daterangepicker', function(ev, picker) {
+		$('#human-daterange input').val('');
+		$('#humanStartDate').val("");
+		$('#humanFinishDate').val("");
+	});
 });
 
 function humanPopupOnload() {
