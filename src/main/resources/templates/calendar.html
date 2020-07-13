@@ -101,7 +101,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<div class="widget widget-stats bg-blue">
 						<div class="stats-icon"><i class="fa fa-users"></i></div>
 						<div class="stats-info">
-							<h4 th:text="#{page.calendar.registered}">REGISTERED</h4>
+							<h4>출고완료 / 입고</h4>
 							<p id="total1"></p>	
 						</div>
 						<!-- <div class="stats-link">
@@ -112,10 +112,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				<!-- end col-3 -->
 				<!-- begin col-3 -->
 				<div class="col-xl-3 col-md-6">
-					<div class="widget widget-stats bg-info">
+					<div class="widget widget-stats bg-success">
 						<div class="stats-icon"><i class="fa fa-flask"></i></div>
 						<div class="stats-info">
-							<h4 th:text="#{page.calendar.analysis}">ANALYSIS</h4>
+							<h4>실험 및 분석 중</h4>
 							<p id="total2"></p>	
 						</div>
 					</div>
@@ -126,7 +126,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<div class="widget widget-stats bg-orange">
 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div>
 						<div class="stats-info">
-							<h4 th:text="#{page.calendar.completed}">COMPLETED</h4>
+							<h4>판정 및 출고대기</h4>
 							<p id="total3"></p>	
 						</div>
 					</div>
@@ -137,7 +137,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<div class="widget widget-stats bg-red">
 						<div class="stats-icon"><i class="fa fa-file-alt"></i></div>
 						<div class="stats-info">
-							<h4 th:text="#{page.calendar.reported}">REPORTED</h4>
+							<h4>출고완료</h4>
 							<p id="total4"></p>	
 						</div>
 						
@@ -341,7 +341,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				startWeek = (startWeek == 7 ? 1 : startWeek + 1);
 				endDay = rdate.endOf('month').format("DD");
 
-				var day = 1, loop = 1, w1 = 0, w2 = 0, w3 = 0, w4 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0;
+				var day = 1, loop = 1, w1 = 0, w1_1 = 0, w2 = 0, w3 = 0, w4 = 0, t1 = 0, t1_1 = 0, t2 = 0, t3 = 0, t4 = 0;
 				var val1, val2, val3, val4, html;
 				$("#cal1").find('tbody td').each (function() {
 					$(this).empty();
@@ -349,6 +349,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					if (loop >= startWeek && endDay >= day && (loop % 8 != 0 || loop == 0)) {
 						
 						val1 = parseInt(data.sample[day]);
+						val1_1 = parseInt(data.completeSample[day]);
+						if (!val1_1) val1_1 = 0;
 						val2 = parseInt(data.analysis[day]);
 						val3 = parseInt(data.complete[day]);
 						val4 = parseInt(data.completePdf[day]);
@@ -357,8 +359,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						html += '<div>';
 						if (val1) {
 							w1 += val1; t1 += val1;
+							w1_1 += val1_1; t1_1 += val1_1;
+							
 							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
-								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + val1 + '</a>';
+								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + val1_1 + ' / ' + val1 + '</a>';
 						}
 						if (val2) {
 							w2 += val2; t2 += val2;
@@ -382,7 +386,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						html = '&nbsp;<div>';
 						if (w1 > 0) {
 							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
-								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + w1 + '</a>';
+								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + w1_1 + ' / ' + w1 + '</a>';
 						}
 						if (w2 > 0) {
 							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
@@ -398,12 +402,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						}
 						html += '</div>';
 						$(this).append(html);
-						w1 = 0, w2 = 0, w3 = 0, w4 = 0;
+						w1 = 0, w1_1 = 0, w2 = 0, w3 = 0, w4 = 0;
 					}
 					loop++;
 				});
 				$("#total1").html('<a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
-								+ ' style="color: white;">' + t1 + '</a>');
+								+ ' style="color: white;">' + t1_1 + ' / ' + t1 + '</a>');
 				$("#total2").html('<a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
 								+ ' style="color: white;">' + t2 + '</a>');
 				$("#total3").html('<a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDateMonth() + ')"'
