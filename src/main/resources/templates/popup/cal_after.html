@@ -60,7 +60,7 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 		$('#sample_print').addClass('show');
 		$('#sample_print').click(function (e) {
 			var bundleId = $("#sel_bundle").val();
-			printPopupOnload(bundleId, startDate, true);
+			printPopupOnload(bundleId, startDate);
 		});
 	}
 	UserTable.draw('_com_after_popup', {
