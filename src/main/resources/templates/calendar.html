@@ -367,7 +367,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						if (val2) {
 							w2 += val2; t2 += val2;
 							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToDate(day, 2) + ')"'
-								+ ' class="btn bg-info btn-xs p-l-10 p-r-10 m-b-5">' + val2 + '</a>';
+								+ ' class="btn bg-success btn-xs p-l-10 p-r-10 m-b-5">' + val2 + '</a>';
 						}
 						if (val3) {
 							w3 += val3; t3 += val3;
@@ -390,7 +390,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						}
 						if (w2 > 0) {
 							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
-								+ ' class="btn bg-info btn-xs p-l-10 p-r-10 m-b-5">' + w2 + '</a>';
+								+ ' class="btn bg-success btn-xs p-l-10 p-r-10 m-b-5">' + w2 + '</a>';
 						}
 						if (w3 > 0) {
 							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\',' + dayToBetweenDate(day - 1, 2) + ')"'
