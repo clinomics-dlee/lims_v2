@@ -64,48 +64,74 @@ public class CalendarService {
 		
 		
 		List<Sample> sample = sampleRepository.findAll(getRegisteredWhere(params));
-		List<Sample> resultAnalysis = sampleRepository.findAll(getAnalysisWhere(params));
-		List<Sample> resultComplete = sampleRepository.findAll(getCompletedWhere(params));
-		List<Sample> resultCompletePdf = sampleRepository.findAll(getReportedWhere(params));
+		// List<Sample> resultAnalysis = sampleRepository.findAll(getAnalysisWhere(params));
+		// List<Sample> resultComplete = sampleRepository.findAll(getCompletedWhere(params));
+		// List<Sample> resultCompletePdf = sampleRepository.findAll(getReportedWhere(params));
 		
 //		TemporalField weekFields = WeekFields.of(Locale.getDefault()).weekOfMonth();
 		
+		final List<StatusCode> exp = Arrays.asList(new StatusCode[] {
+			StatusCode.S200_EXP_READY
+			, StatusCode.S210_EXP_STEP1
+			, StatusCode.S220_EXP_STEP2
+			, StatusCode.S230_EXP_STEP3
+			, StatusCode.S400_ANLS_READY
+			, StatusCode.S410_ANLS_RUNNING
+			, StatusCode.S420_ANLS_SUCC
+			, StatusCode.S440_ANLS_SUCC_CMPL
+			, StatusCode.S430_ANLS_FAIL
+			, StatusCode.S450_ANLS_FAIL_CMPL
+		});
+
+		final List<StatusCode> anls = Arrays.asList(new StatusCode[] {
+			StatusCode.S460_ANLS_CMPL
+			, StatusCode.S600_JDGM_APPROVE
+			, StatusCode.S700_OUTPUT_WAIT
+		});
+
 		List<Map<String, String>> mapSample = sample.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
-				t.put("day", s.getCreatedDate().getDayOfMonth() + "");
-//				t.put("weekOfMonth", s.getCreatedDate().get(weekFields) + "");
+				LocalDateTime cd = s.getCreatedDate();
+				LocalDateTime od = s.getOutputCmplDate();
+				t.put("day", (cd == null ? "" : cd.getDayOfMonth()) + "");
+				t.put("completeDay", (cd != null && od != null ? cd.getDayOfMonth() + "" : ""));
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapAnalysis = resultAnalysis.stream()
+		List<Map<String, String>> mapAnalysis = sample.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
-				t.put("day", (s.getModifiedDate().getDayOfMonth() + ""));
+				LocalDateTime md = s.getModifiedDate();
+				t.put("day", (md != null && exp.contains(s.getStatusCode()) ? md.getDayOfMonth() : "") + "");
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapComplete = resultComplete.stream()
+		List<Map<String, String>> mapComplete = sample.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
-				t.put("day", (s.getModifiedDate().getDayOfMonth() + ""));
+				LocalDateTime md = s.getModifiedDate();
+				t.put("day", (md != null && anls.contains(s.getStatusCode()) ? md.getDayOfMonth() : "") + "");
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapCompletePdf = resultCompletePdf.stream()
+		List<Map<String, String>> mapCompletePdf = sample.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
-				t.put("day", s.getOutputCmplDate().getDayOfMonth() + "");
+				LocalDateTime od = s.getOutputCmplDate();
+				t.put("day", (od == null ? "" : od.getDayOfMonth()) + "");
 				return t;
 			}).collect(Collectors.toList());
 		
 		Map<String, Long> groupbySample = getGroupingMap(mapSample, "day");
+		Map<String, Long> groupbyCompleteOfSample = getGroupingMap(mapSample, "completeDay");
 		Map<String, Long> groupbyAnalysis = getGroupingMap(mapAnalysis, "day");
 		Map<String, Long> groupbyComplete = getGroupingMap(mapComplete, "day");
 		Map<String, Long> groupbyCompletePdf = getGroupingMap(mapCompletePdf, "day");
 		
         Map<String, Object> rtn = Maps.newHashMap();
         rtn.put("sample", groupbySample);
+        rtn.put("completeSample", groupbyCompleteOfSample);
         rtn.put("analysis", groupbyAnalysis);
         rtn.put("complete", groupbyComplete);
         rtn.put("completePdf", groupbyCompletePdf);
