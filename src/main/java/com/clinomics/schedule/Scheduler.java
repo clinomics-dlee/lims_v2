@@ -133,7 +133,9 @@ public class Scheduler {
                             }
                         }
                     }
-                    
+                    LocalDateTime now = LocalDateTime.now();
+                    sample.setModifiedDate(now);
+
                     if (!successRowData.isEmpty()) {
                         // #. data 하나를 가져와서 marker 체크
                         String sampleKeyColumn = headerDatas.get(0);
@@ -245,7 +247,8 @@ public class Scheduler {
                         // #. result 완료 처리
                         sample.setData(data);
                         sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
-                        sample.setAnlsEndDate(LocalDateTime.now());
+                        //LocalDateTime now = LocalDateTime.now();
+                        sample.setAnlsEndDate(now);
                         sampleRepository.save(sample);
                         
                     } else if (!failRowData.isEmpty()) {
@@ -263,7 +266,7 @@ public class Scheduler {
                         // #. 분석 실패 파일에 존재하는 경우
                         sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
                         sample.setStatusMessage(failMessage);
-                        sample.setAnlsEndDate(LocalDateTime.now());
+                        sample.setAnlsEndDate(now);
                         sampleRepository.save(sample);
                         failSamples.add(sample);
                     } else {

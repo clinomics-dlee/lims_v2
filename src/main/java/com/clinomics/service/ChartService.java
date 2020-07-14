@@ -65,7 +65,7 @@ public class ChartService {
 		
 		List<Sample> sample = sampleRepository.findAll(getSampleWhere(params));
 		List<Sample> complete = sampleRepository.findAll(getCompletedWhere(params));
-		List<Sample> ifComplete = sampleRepository.findAll(getReportedWhere(params));
+		List<Sample> reporte = sampleRepository.findAll(getReportedWhere(params));
 		
 		List<Map<String, String>> mapSample = sample.stream()
 			.map(s -> {
@@ -78,15 +78,19 @@ public class ChartService {
 		List<Map<String, String>> mapSampleComplete = complete.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
-				t.put("yyyymm", (s.getModifiedDate().format(yyyymmFormat)));
+				LocalDateTime acd = s.getAnlsCmplDate();
+				String yyyymm = (acd == null ? "" : acd.format(yyyymmFormat));
+				t.put("yyyymm", yyyymm);
 				t.put("name", s.getBundle().getName());
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapResult = ifComplete.stream()
+		List<Map<String, String>> mapResult = reporte.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
-				t.put("yyyymm", (s.getModifiedDate().format(yyyymmFormat)));
+				LocalDateTime ocd = s.getOutputCmplDate();
+				String yyyymm = (ocd == null ? "" : ocd.format(yyyymmFormat));
+				t.put("yyyymm", yyyymm);
 				t.put("name", s.getBundle().getName());
 				return t;
 			}).collect(Collectors.toList());
@@ -182,6 +186,9 @@ public class ChartService {
 					StatusCode.S460_ANLS_CMPL
 					, StatusCode.S600_JDGM_APPROVE
 					, StatusCode.S700_OUTPUT_WAIT
+					, StatusCode.S710_OUTPUT_CMPL
+					, StatusCode.S810_RE_OUTPUT_CMPL
+					, StatusCode.S900_OUTPUT_CMPL
 				})
 			));
 	}

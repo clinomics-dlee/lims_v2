@@ -1,7 +1,6 @@
 package com.clinomics.service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +21,15 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import ch.qos.logback.core.status.Status;
+
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.SampleRepository;
-import com.clinomics.specification.lims.ResultSpecification;
 import com.clinomics.specification.lims.SampleSpecification;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Service
@@ -52,6 +52,31 @@ public class CalendarService {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	private final List<StatusCode> STS_EXP = Arrays.asList(new StatusCode[] {
+		StatusCode.S210_EXP_STEP1
+		, StatusCode.S220_EXP_STEP2
+		, StatusCode.S230_EXP_STEP3
+		, StatusCode.S400_ANLS_READY
+		, StatusCode.S410_ANLS_RUNNING
+		, StatusCode.S420_ANLS_SUCC
+		, StatusCode.S440_ANLS_SUCC_CMPL
+		, StatusCode.S430_ANLS_FAIL
+		, StatusCode.S450_ANLS_FAIL_CMPL
+		, StatusCode.S460_ANLS_CMPL
+	});
+
+	private final List<StatusCode> STS_JDGM = Arrays.asList(new StatusCode[] {
+		StatusCode.S600_JDGM_APPROVE
+		, StatusCode.S700_OUTPUT_WAIT
+	});
+
+	private final List<StatusCode> STS_REPORT = Arrays.asList(new StatusCode[] {
+		StatusCode.S710_OUTPUT_CMPL
+		, StatusCode.S800_RE_OUTPUT_WAIT
+		, StatusCode.S810_RE_OUTPUT_CMPL
+		, StatusCode.S900_OUTPUT_CMPL
+	});
+		
 	public Bundle selectOne(int id) {
 		return bundleRepository.findById(id).orElse(new Bundle());
 	}
@@ -63,33 +88,15 @@ public class CalendarService {
 	public Map<String, Object> selectCountByMonthly(Map<String, String> params) {
 		
 		
-		List<Sample> sample = sampleRepository.findAll(getRegisteredWhere(params));
-		// List<Sample> resultAnalysis = sampleRepository.findAll(getAnalysisWhere(params));
-		// List<Sample> resultComplete = sampleRepository.findAll(getCompletedWhere(params));
-		// List<Sample> resultCompletePdf = sampleRepository.findAll(getReportedWhere(params));
+		List<Sample> sample1 = sampleRepository.findAll(getRegisteredWhere(params));
+		List<Sample> sample2 = sampleRepository.findAll(getModifiedWhere(params));
+		// List<Sample> sample2 = sampleRepository.findAll(getAnalysisWhere(params));
+		// List<Sample> sample3 = sampleRepository.findAll(getCompletedWhere(params));
+		List<Sample> sample3 = sampleRepository.findAll(getReportedWhere(params));
 		
 //		TemporalField weekFields = WeekFields.of(Locale.getDefault()).weekOfMonth();
-		
-		final List<StatusCode> exp = Arrays.asList(new StatusCode[] {
-			StatusCode.S200_EXP_READY
-			, StatusCode.S210_EXP_STEP1
-			, StatusCode.S220_EXP_STEP2
-			, StatusCode.S230_EXP_STEP3
-			, StatusCode.S400_ANLS_READY
-			, StatusCode.S410_ANLS_RUNNING
-			, StatusCode.S420_ANLS_SUCC
-			, StatusCode.S440_ANLS_SUCC_CMPL
-			, StatusCode.S430_ANLS_FAIL
-			, StatusCode.S450_ANLS_FAIL_CMPL
-		});
 
-		final List<StatusCode> anls = Arrays.asList(new StatusCode[] {
-			StatusCode.S460_ANLS_CMPL
-			, StatusCode.S600_JDGM_APPROVE
-			, StatusCode.S700_OUTPUT_WAIT
-		});
-
-		List<Map<String, String>> mapSample = sample.stream()
+		List<Map<String, String>> mapSample = sample1.stream()
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
 				LocalDateTime cd = s.getCreatedDate();
@@ -99,23 +106,26 @@ public class CalendarService {
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapAnalysis = sample.stream()
+		List<Map<String, String>> mapAnalysis = sample2.stream()
+			.filter(s -> STS_EXP.contains(s.getStatusCode()))
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
 				LocalDateTime md = s.getModifiedDate();
-				t.put("day", (md != null && exp.contains(s.getStatusCode()) ? md.getDayOfMonth() : "") + "");
+				t.put("day", (md != null ? md.getDayOfMonth() : "") + "");
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapComplete = sample.stream()
+		List<Map<String, String>> mapComplete = sample2.stream()
+			.filter(s -> STS_JDGM.contains(s.getStatusCode()))
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
 				LocalDateTime md = s.getModifiedDate();
-				t.put("day", (md != null && anls.contains(s.getStatusCode()) ? md.getDayOfMonth() : "") + "");
+				t.put("day", (md != null ? md.getDayOfMonth() : "") + "");
 				return t;
 			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapCompletePdf = sample.stream()
+		List<Map<String, String>> mapCompletePdf = sample3.stream()
+			.filter(s -> STS_REPORT.contains(s.getStatusCode()))
 			.map(s -> {
 				Map<String, String> t = Maps.newHashMap();
 				LocalDateTime od = s.getOutputCmplDate();
@@ -248,14 +258,6 @@ public class CalendarService {
 		}
 	}
 
-	// private Specification<Sample> getAnalysisDateWhere(Map<String, String> params) {
-	// 	if (params.containsKey("yyyymm")) {
-	// 		return SampleSpecification.customDateOneMonth("expStartDate", params);
-	// 	} else {
-	// 		return SampleSpecification.customDateBetween("expStartDate", params);
-	// 	}
-	// }
-
 	private Specification<Sample> getCompleteDateWhere(Map<String, String> params) {
 		if (params.containsKey("yyyymm")) {
 			return SampleSpecification.customDateOneMonth("anlsCmplDate", params);
@@ -272,13 +274,6 @@ public class CalendarService {
 		}
 	}
 	
-	// private Specification<Sample> getSampleWhere(Map<String, String> params) {
-	// 	return Specification
-	// 		.where(getCreateDateWhere(params))
-	// 		.and(SampleSpecification.bundleId(params))
-	// 		.and(SampleSpecification.statusCodeGt(20));
-	// }
-	
 	private Specification<Sample> getRegisteredWhere(Map<String, String> params) {
 		return Specification
 			.where(getCreateDateWhere(params))
@@ -288,26 +283,25 @@ public class CalendarService {
 			.and(SampleSpecification.statusCodeGt(20));
 	}
 	
+	private Specification<Sample> getModifiedWhere(Map<String, String> params) {
+		List<StatusCode> sc = Lists.newArrayList();
+		sc.addAll(STS_EXP);
+		sc.addAll(STS_JDGM);
+		return Specification
+			.where(getModifiedDateWhere(params))
+			.and(SampleSpecification.isLastVersionTrue())
+			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.bundleIsActive())
+			.and(SampleSpecification.statusIn(sc));
+	}
+	
 	private Specification<Sample> getAnalysisWhere(Map<String, String> params) {
 		return Specification
 			.where(getModifiedDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.bundleIsActive())
-			.and(SampleSpecification.statusIn(
-				Arrays.asList(new StatusCode[] {
-					StatusCode.S200_EXP_READY
-					, StatusCode.S210_EXP_STEP1
-					, StatusCode.S220_EXP_STEP2
-					, StatusCode.S230_EXP_STEP3
-					, StatusCode.S400_ANLS_READY
-					, StatusCode.S410_ANLS_RUNNING
-					, StatusCode.S420_ANLS_SUCC
-					, StatusCode.S440_ANLS_SUCC_CMPL
-					, StatusCode.S430_ANLS_FAIL
-					, StatusCode.S450_ANLS_FAIL_CMPL
-				})
-			));
+			.and(SampleSpecification.statusIn(STS_EXP));
 	}
 	
 	private Specification<Sample> getCompletedWhere(Map<String, String> params) {
@@ -316,11 +310,7 @@ public class CalendarService {
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.bundleIsActive())
-			.and(SampleSpecification.statusIn(Arrays.asList(
-				StatusCode.S460_ANLS_CMPL
-				, StatusCode.S600_JDGM_APPROVE
-				, StatusCode.S700_OUTPUT_WAIT
-			)));
+			.and(SampleSpecification.statusIn(STS_JDGM));
 	}
 	
 	private Specification<Sample> getReportedWhere(Map<String, String> params) {
@@ -329,12 +319,7 @@ public class CalendarService {
 				.and(SampleSpecification.isLastVersionTrue())
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.bundleIsActive())
-				.and(SampleSpecification.statusIn(Arrays.asList(
-					StatusCode.S710_OUTPUT_CMPL
-					, StatusCode.S800_RE_OUTPUT_WAIT
-					, StatusCode.S810_RE_OUTPUT_CMPL
-					, StatusCode.S900_OUTPUT_CMPL
-				)));
+				.and(SampleSpecification.statusIn(STS_REPORT));
 	}
 	
 	private Map<String, Long> getGroupingMap(List<Map<String, String>> map, String key) {

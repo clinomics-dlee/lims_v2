@@ -125,6 +125,7 @@ public class ExpService {
 			}
 
 			sample.setStatusCode(StatusCode.S210_EXP_STEP1);
+			sample.setModifiedDate(now);
 			sample.setExpStartDate(now);
 			sample.setExpStartMember(member);
 
@@ -273,6 +274,7 @@ public class ExpService {
 			}
 
 			sample.setStatusCode(StatusCode.S220_EXP_STEP2);
+			sample.setModifiedDate(now);
 			sample.setExpStep1Date(now);
 			sample.setExpStep1Member(member);
 
@@ -505,6 +507,7 @@ public class ExpService {
 				sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
 			}
 			sample.setExpStep2Date(now);
+			sample.setModifiedDate(now);
 			sample.setExpStep2Member(member);
 
 			savedSamples.add(sample);

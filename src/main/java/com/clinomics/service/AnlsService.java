@@ -196,6 +196,7 @@ public class AnlsService {
 				sample.setFilePath(filePath);
 				sample.setFileName(chipBarcode + "_" + chipDesc + "_" + sample.getWellPosition() + ".CEL");
 				sample.setAnlsStartDate(now);
+				sample.setModifiedDate(now);
 				sample.setAnlsStartMember(member);
 				sample.setStatusCode(StatusCode.S410_ANLS_RUNNING);
 			}
@@ -271,6 +272,7 @@ public class AnlsService {
 			} else if (sample.getStatusCode().equals(StatusCode.S420_ANLS_SUCC)) {
 				sample.setStatusCode(StatusCode.S440_ANLS_SUCC_CMPL);
 			}
+			sample.setModifiedDate(now);
 			sample.setAnlsCmplDate(now);
 			sample.setAnlsCmplMember(member);
 			sample.setLastVersion(false);
