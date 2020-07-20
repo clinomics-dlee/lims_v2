@@ -281,12 +281,12 @@ public class Scheduler {
                     }
 				} else if (errorFile.exists()) {
 					// #. 분석 실패인 경우
+                    logger.info(">> Error occurred during analysis[" + genotypingId + "]");
                     sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
-                    sample.setStatusMessage("Error occurred during analysis[" + genotypingId + "]");
+                    sample.setStatusMessage(this.getErrorLogString(errorFile));
                     sample.setAnlsEndDate(LocalDateTime.now());
                     sampleRepository.save(sample);
                     failSamples.add(sample);
-					logger.info(">> Error occurred during analysis=[" + genotypingId + "][" + errorFile.getAbsolutePath() + "]");
 				}
             }
             
@@ -378,4 +378,31 @@ public class Scheduler {
 		return datas;
 	}
     
+    private String getErrorLogString(File errorFile) {
+		String errorString = "";
+		BufferedReader br = null;
+		try {
+            // #. read csv 데이터 파일
+            br = new BufferedReader(new FileReader(errorFile));
+            String sLine = null;
+            while((sLine = br.readLine()) != null) {
+                errorString += sLine + ",";
+                logger.info("★★★★★★★★★★ errorString=" + errorString);
+            }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return errorString;
+	}
 }

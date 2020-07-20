@@ -25,6 +25,7 @@ import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.FileUtil;
 import com.google.common.collect.Maps;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -240,6 +241,90 @@ public class AnlsService {
 		long filtered = total;
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
+	public Map<String, Object> findChipBarcodeByAllFail(Map<String, String> params) {
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.mappingInfoGroupBy())
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S430_ANLS_FAIL})))
+					.and(SampleSpecification.orderBy(params));
+		
+		List<Sample> list = sampleRepository.findAll(where);
+
+		List<String> chipBarcodes = new ArrayList<String>();
+		for (Sample s : list) {
+			String chipBarcode = s.getChipBarcode();
+			Specification<Sample> w = Specification
+					.where(SampleSpecification.chipBarcodeEqual(chipBarcode))
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.statusNotEqual(StatusCode.S430_ANLS_FAIL));
+		
+			List<Sample> l = sampleRepository.findAll(w);
+
+			if (l.size() < 1) {
+				chipBarcodes.add(chipBarcode);
+			}
+		}
+		
+		Map<String, Object> rtn = Maps.newHashMap();
+		rtn.put("chipBarcodes", chipBarcodes);
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	public Map<String, String> saveRdyStatus(Map<String, String> datas, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		LocalDateTime now = LocalDateTime.now();
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+				
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		String chipBarcode = datas.get("chipBarcode");
+		Specification<Sample> where = Specification
+				.where(SampleSpecification.chipBarcodeEqual(chipBarcode))
+				.and(SampleSpecification.bundleIsActive())
+				.and(SampleSpecification.statusEqual(StatusCode.S430_ANLS_FAIL));
+	
+		List<Sample> list = sampleRepository.findAll(where);
+		
+		// #. 파일 경로 삭제
+		Sample s = list.get(0);
+		String filePath = s.getFilePath();
+		File dir = new File(filePath);
+		try {
+			FileUtils.deleteDirectory(dir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (Sample sample : list) {
+			sample.setFilePath(null);
+			sample.setFileName(null);
+			sample.setAnlsStartDate(null);
+			sample.setModifiedDate(now);
+			sample.setAnlsStartMember(null);
+			sample.setStatusMessage(null);
+			sample.setAnlsEndDate(null);
+			sample.setStatusCode(StatusCode.S400_ANLS_READY);
+		}
+
+		sampleRepository.saveAll(list);
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
 	}
 
 	public Map<String, String> reExpReg(List<Integer> sampleIds, String userId) {

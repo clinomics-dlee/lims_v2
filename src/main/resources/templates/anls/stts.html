@@ -25,6 +25,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
+		<th:block th:replace="popup/chip_barcode"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -70,6 +71,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<hr/>
 							<div class="row">
 								<button onClick="reExpReg();" class="btn btn-warning m-l-20">재실험등록</button>
+								<button onClick="chipBarcodePopupOnload();" class="btn btn-indigo m-l-20">분석대기</button>
 							</div>
 						</div>
 						<!-- end tab-1 -->

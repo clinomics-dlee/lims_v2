@@ -1,0 +1,100 @@
+<div class="modal fade" id="modal-chip-barcode">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">분석대기로 이동</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<form id="frm_popup_chip_barcode" name="frm_popup_chip_barcode" method="POST" enctype="multipart/form-data">
+					<div class="form-group row m-b-12">
+						<label class="col-form-label col-md-4">Chip Barcode *</label>
+						<div class="col-xs-push-0">
+							<select class="form-control width-200" data-parsley-required="true" id="chip_barcode" name="chipBarcode">
+								<option value=""></option>
+							</select>
+						</div>
+					</div>
+				</form>
+				<div class="modal-footer">
+					<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
+					<a href="javascript:saveAnlsRdy();" class="btn btn-success">분석대기로 이동</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script th:inline="javascript">
+/* <![CDATA[ */       
+function chipBarcodePopupOnload(index) {
+	$("#modal-chip-barcode").modal();
+
+	// #. chip barcode 기준으로 모든 검체가 fail인 경우 목록 조회
+	$.ajax({
+		url : "/anls/fail/chipbarcode",
+		type : "GET",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+		success: function (data, xhr) {
+			// #. chip barcode 목록 셋팅
+			$('#chip_barcode').empty();
+			$('#chip_barcode').append("<option></option>");
+
+			var chipBarcodes = data.chipBarcodes;
+			if (chipBarcodes.length > 0) {
+				for (var i = 0; i < chipBarcodes.length; i++) {
+					$('#chip_barcode').append("<option value='" + chipBarcodes[i] + "'>" + chipBarcodes[i] + "</option>");
+				}
+			}
+		},
+		error : function(data, xhr) {
+			if (data.status == "200") {
+				location.reload();
+			}
+			CommonMsg.error(function() { });
+		}
+	});
+}
+
+function saveAnlsRdy() {
+	if (!$('#frm_popup_chip_barcode').parsley().validate()) {
+		return;	
+	}
+
+	var data = {chipBarcode : $("#chip_barcode").val()};
+
+	CommonMsg.okCancel(function() {
+		$.ajax({
+			url: '/anls/stts/chipbarcode/save',
+			type: 'post',
+			data : JSON.stringify(data),
+			dataType : 'json',
+			contentType : "application/json;charset=utf-8",
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function(data, xhr) {
+				if (data.result == "00") {
+					CommonMsg.save(function() {
+						$("#modal-chip-barcode").modal('hide');
+						UserTable.reload('_anls_stts_grid');
+					});
+				} else {
+					CommonMsg.error(function() { }, data.message);
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+			}
+		});
+	});
+}
+
+/* ]]> */
+</script>

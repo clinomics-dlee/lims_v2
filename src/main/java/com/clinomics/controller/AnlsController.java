@@ -65,6 +65,17 @@ public class AnlsController {
 		return anlsService.reExpReg(sampleIds, userDetails.getUsername());
 	}
 
+	@GetMapping("/fail/chipbarcode")
+	public Map<String, Object> getFailChipBarcode(@RequestParam Map<String, String> params) {
+		return anlsService.findChipBarcodeByAllFail(params);
+	}
+
+	@PostMapping("/stts/chipbarcode/save")
+	public Map<String, String> saveRdyStatus(@RequestBody Map<String, String> params) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return anlsService.saveRdyStatus(params, userDetails.getUsername());
+	}
+
 	@GetMapping("/rslt/get")
 	public Map<String, Object> getRslt(@RequestParam Map<String, String> params) {
 		return anlsService.findSampleByAnlsSuccStatus(params);

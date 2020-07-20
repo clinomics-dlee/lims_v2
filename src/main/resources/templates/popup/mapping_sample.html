@@ -74,7 +74,8 @@ function drawMappingSample(mappingNo) {
 			title : "검사실 ID",
 			data : "laboratoryId"
 		}, {
-				serverHeader : true
+			title : "바코드",
+			data : "items.barcode"
 		}, {
 			title : "Genotyping ID",
 			data : "genotypingId"
@@ -95,14 +96,15 @@ function drawMappingSample(mappingNo) {
 			title : "검체 채취일",
 			data : "collectedDate"
 		}, {
+			title : "결과 보고일",
+			data : "items.tat"
+		}, {
 			title : "상태",
 			data : "statusCode",
 			render : function(row, data, index) {
 				var value = g_statusCodeInfo[data];
 				return value;
 			}
-		}, {
-			serverHeader : true
 		}, {
 			title : "검체 입고일",
 			data : "createdDate",
