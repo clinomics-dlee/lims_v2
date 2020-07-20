@@ -312,6 +312,7 @@ public class AnlsService {
 		}
 
 		for (Sample sample : list) {
+			sample.setCheckCelFile(null);
 			sample.setFilePath(null);
 			sample.setFileName(null);
 			sample.setAnlsStartDate(null);
