@@ -39,7 +39,18 @@ public class ApiController {
 		if (ip == null)	ip = req.getRemoteAddr();
 		
 		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request IP : [" + ip + "]");
-		return outputService.getResultsForRest(params);
+		return outputService.getResultsForRest(params, ip);
+	}
+
+	@RequestMapping(value = "/status/update")
+	public Map<String, Object> updateStatus(@RequestParam Map<String, String> params) {
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ update status : /status/update ");
+		HttpServletRequest req = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String ip = req.getHeader("X-FORWARDED-FOR");
+		if (ip == null)	ip = req.getRemoteAddr();
+		
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request IP : [" + ip + "]");
+		return outputService.updateStatus(params, ip);
 	}
 	
 	@RequestMapping(value = "/mail/test")

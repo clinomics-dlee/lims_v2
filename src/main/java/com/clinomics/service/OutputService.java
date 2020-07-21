@@ -247,13 +247,11 @@ public class OutputService {
 	}
 
 	@Transactional
-	public Map<String, Object> getResultsForRest(Map<String, String> params) {
+	public Map<String, Object> getResultsForRest(Map<String, String> params, String ip) {
 		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ getResultsForRest ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ IN interface : " + params.toString());
 		Map<String, Object> rtn = Maps.newHashMap();
 		// #. productType 추가
 		String productType = params.get("productType");
-		String productTypeData = "_" + productType + "_";
-		boolean isTest = BooleanUtils.toBoolean(params.get("isTest"));
 		
 		Specification<Sample> where = Specification
 				.where(SampleSpecification.productNotLike(params))
@@ -262,7 +260,6 @@ public class OutputService {
 		List<Sample> samples = sampleRepository.findAll(where);
 
 		List<Map<String, Object>> datas = new ArrayList<Map<String, Object>>();
-		LocalDateTime now = LocalDateTime.now();
 
 		if (samples.size() > 0) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -294,50 +291,87 @@ public class OutputService {
 					
 					datas.add(data);
 					
-					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ data : " + data.toString());
-					// #. result status update
-					if (!isTest) {
-						logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ isTest : " + isTest);
-						
-						String outputProductTypes = sample.getOutputProductTypes();
-						if (outputProductTypes == null) outputProductTypes = "";
-						if (!outputProductTypes.contains(productTypeData)) {
-							outputProductTypes += productTypeData;
-							outputProductTypes.replace("__", "_");
-							sample.setOutputProductTypes(outputProductTypes);
-						} else {
-							continue;
-						}
-	
-						boolean outputAllProduct = true;
-						for (Product p : sample.getBundle().getProduct()) {
-							if (!outputProductTypes.contains(p.getType())) {
-								outputAllProduct = false;
-								break;
-							}
-						}
-						// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
-						if (outputAllProduct) {
-							if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
-								sample.setOutputCmplDate(now);
-								sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
-								sample.setOutputProductTypes("");
-								sample.setModifiedDate(now);
-							} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
-								sample.setReOutputCmplDate(now);
-								sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
-								sample.setOutputProductTypes("");
-								sample.setModifiedDate(now);
-							}
-						}
-						sampleRepository.save(sample);
-					}
+					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
 				}
 			}
 		}
 		
 		rtn.put("result", "success");
 		rtn.put("datas", datas);
+		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, Object> updateStatus(Map<String, String> params, String ip) {
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ getResultsForRest ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ IN interface : " + params.toString());
+		Map<String, Object> rtn = Maps.newHashMap();
+		// #. productType 추가
+		String laboratoryId = params.get("experimentid");
+		String productType = params.get("productType");
+		String productTypeData = "_" + productType + "_";
+		boolean isTest = BooleanUtils.toBoolean(params.get("isTest"));
+		
+		Specification<Sample> where = Specification
+				.where(SampleSpecification.laboratoryIdEqual(laboratoryId))
+				.and(SampleSpecification.productNotLike(params))
+				.and(SampleSpecification.statusIn(Arrays.asList(StatusCode.S700_OUTPUT_WAIT, StatusCode.S800_RE_OUTPUT_WAIT)));
+
+		List<Sample> samples = sampleRepository.findAll(where);
+		LocalDateTime now = LocalDateTime.now();
+
+		if (samples.size() == 1) {
+			Sample sample = samples.get(0);
+			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ laboratory Id : " + sample.getLaboratoryId());
+			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ productType : " + productType);
+			Set<String> productTypes = Sets.newHashSet();
+			sample.getBundle().getProduct().stream().forEach(p -> {
+				productTypes.add(p.getType());
+			});
+
+			if (productTypes.contains(productType)) {
+				// #. result status update
+				if (!isTest) {
+					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ isTest : " + isTest);
+					
+					String outputProductTypes = sample.getOutputProductTypes();
+					if (outputProductTypes == null) outputProductTypes = "";
+					if (!outputProductTypes.contains(productTypeData)) {
+						outputProductTypes += productTypeData;
+						outputProductTypes.replace("__", "_");
+						sample.setOutputProductTypes(outputProductTypes);
+					}
+
+					boolean outputAllProduct = true;
+					for (Product p : sample.getBundle().getProduct()) {
+						if (!outputProductTypes.contains(p.getType())) {
+							outputAllProduct = false;
+							break;
+						}
+					}
+					// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
+					if (outputAllProduct) {
+						if (StatusCode.S700_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+							sample.setOutputCmplDate(now);
+							sample.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
+							sample.setOutputProductTypes("");
+							sample.setModifiedDate(now);
+						} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sample.getStatusCode())) {
+							sample.setReOutputCmplDate(now);
+							sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
+							sample.setOutputProductTypes("");
+							sample.setModifiedDate(now);
+						}
+					}
+					sampleRepository.save(sample);
+					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆  [" + ip + "]sample[" + samples.get(0).getLaboratoryId() + "] update complete.");
+				}
+			}
+		} else if (samples.size() > 1) {
+			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆  sample[" + samples.get(0).getLaboratoryId() + "] count error : size = [" + samples.size() + "]");
+		}
+		
+		rtn.put("result", "success");
 		
 		return rtn;
 	}
