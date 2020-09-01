@@ -322,7 +322,7 @@ public class SampleSpecification {
 			List<Predicate> predicateLikes = new ArrayList<>();
 
 			if (params.containsKey("productType") && !params.get("productType").isEmpty()) {
-				String text = "%_" + params.get("productType") + "_%";
+				String text = "%\\_" + params.get("productType") + "\\_%";
 
 				predicateLikes.add(criteriaBuilder.notLike(root.get("outputProductTypes"), text));
 				predicateLikes.add(criteriaBuilder.isNull(root.get("outputProductTypes")));
@@ -417,6 +417,19 @@ public class SampleSpecification {
 			}
 			return rtn;
 		
+		};
+	}
+
+	public static Specification<Sample> barcodeEqual(String barcode) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+				root.get("items"), criteriaBuilder.literal("$.barcode")), barcode));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
 		};
 	}
 }

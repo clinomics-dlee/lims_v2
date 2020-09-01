@@ -98,9 +98,9 @@ public class AnlsService {
 					.and(SampleSpecification.mappingInfoLike(params))
 					.and(SampleSpecification.orderBy(params));
 		
+		total = sampleRepository.count(where);
 		Page<Sample> page = sampleRepository.findAll(where, pageable);
 		List<Sample> list = page.getContent();
-		total = list.size();
 		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrderingForExpAnls(list);
 		long filtered = total;
 		

@@ -321,7 +321,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						UserTable.clear('_input_grid');
 					});
 				} else if (!data.result.startsWith("0")) {
-					CommonMsg.error(function() { });
+					CommonMsg.error(function() { }, data.message);
 				}
 			},
 			error : function(data) {

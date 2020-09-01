@@ -11,6 +11,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -119,6 +120,30 @@ public class InputService {
 		Sample sample = searchExistsSample(NumberUtils.toInt(id));
 		
 		boolean existsSample = sample.getId() > 0;
+
+		// #. 바코드 중복체크
+		String barcode = StringUtils.stripToEmpty((String)items.get("barcode"));
+		if (barcode.length() > 0) {
+			long count = this.searchExistsBarcode(barcode);
+			// #. 수정시 본인에 바코드가 수정되야하면 중복체크
+			if (existsSample) {
+				String beforeBarcode = StringUtils.stripToEmpty((String)sample.getItems().get("barcode"));
+				if (!beforeBarcode.equals(barcode)) {
+					if (count > 0) {
+						rtn.put("result", ResultCode.FAIL_DUPL_VALUE.get());
+						rtn.put("message", ResultCode.FAIL_DUPL_VALUE.getMsg() + "[" + barcode + "]");
+						return rtn;
+					}
+				}
+			} else {
+				// #. 등록시 바코드 중복 체크
+				if (count > 0) {
+					rtn.put("result", ResultCode.FAIL_DUPL_VALUE.get());
+					rtn.put("message", ResultCode.FAIL_DUPL_VALUE.getMsg() + "[" + barcode + "]");
+					return rtn;
+				}
+			}
+		}
 		
 		LocalDateTime now = LocalDateTime.now();
 		Bundle bundle;
@@ -270,6 +295,14 @@ public class InputService {
 		sample.setModifiedDate(now);
 
 		return sample;
+	}
+
+	public long searchExistsBarcode(String barcode) {
+		
+		Specification<Sample> where = Specification.where(SampleSpecification.barcodeEqual(barcode));
+		long count = sampleRepository.count(where);
+		
+		return count;
 	}
 	
 	private void saveSampleHistory(Sample smpl) {

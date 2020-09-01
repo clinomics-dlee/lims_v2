@@ -13,6 +13,7 @@ public enum ResultCode {
 	FAIL_NOT_EXISTS("91", "파일이 존재하지 않습니다"),
 	FAIL_EXISTS_VALUE("92", "존재하지 않는 값입니다"),
 	FAIL_FILE_READ("93", "파일 읽기에 실패했습니다"),
+	FAIL_DUPL_VALUE("94", "중복된 값이 있습니다"),
 	FAIL_UNKNOWN("99", "알 수 없는 오류입니다")
 	;
 

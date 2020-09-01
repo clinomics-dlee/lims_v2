@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.clinomics.service.setting.BundleService;
+import com.google.common.collect.Maps;
 import com.clinomics.service.InputService;
 import com.clinomics.service.SampleDbService;
+import com.clinomics.entity.lims.Sample;
+import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
@@ -87,7 +91,19 @@ public class InputController {
 	public Map<String, String> saveall(@RequestBody List<Map<String, String>> datas) {
 		
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
+		// #. 바코드 중복체크
+		for (Map<String, String> data : datas) {
+			String barcode = StringUtils.stripToEmpty(data.get("barcode"));
+			if (barcode.length() > 0) {
+				long count = inputService.searchExistsBarcode(barcode);
+				if (count > 0) {
+					Map<String, String> rtn = Maps.newHashMap();
+					rtn.put("result", ResultCode.FAIL_DUPL_VALUE.get());
+					rtn.put("message", ResultCode.FAIL_DUPL_VALUE.getMsg() + "[" + barcode + "]");
+					return rtn;
+				}
+			}
+		}
 		return inputService.saveFromList(datas, userDetails.getUsername());
 	}
 	
