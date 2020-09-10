@@ -177,9 +177,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			var reader = new FileReader();
 			reader.onload = function(){
 				var fileData = reader.result;
-				var wb = XLSX.read(fileData, {type : 'binary'});
+				var wb = XLSX.read(fileData, {type : 'binary', cellDates: true, dateNF: 'yyyy-mm-dd'});
 				wb.SheetNames.forEach(function(sheetName){
-					var rowObj = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+					var rowObj = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {raw: false});
 					
 					createRow(rowObj);
 				})
@@ -366,7 +366,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function createRow(excelData) {
-		
+		console.log(excelData);
 		if ($("#sel_bundle").parsley().validate() != true) return;
 		var bundleId = $("#sel_bundle").val();
 		//if (bundleId == "") return;
