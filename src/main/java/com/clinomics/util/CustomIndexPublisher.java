@@ -57,7 +57,13 @@ public class CustomIndexPublisher {
 			}
 			
 		} else {
-			index = getIndex(role.split(separator), current, getYYYYMMDD("yyyyMMdd"));
+			Optional<Sample> last = sampleRepository.findTopByBundle_IdOrderByLaboratoryIdDesc(bundle.getId());
+			if (last.isPresent()) {
+				String lastLaboratoryId = last.get().getLaboratoryId();
+				index = getIndex(role.split(separator), lastLaboratoryId, getYYYYMMDD("yyyyMMdd"));
+			} else {
+				index = getIndex(role.split(separator), current, getYYYYMMDD("yyyyMMdd"));
+			}
 			bundle.setSequence(index);
 		}
 

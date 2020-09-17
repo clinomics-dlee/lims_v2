@@ -17,5 +17,6 @@ import com.clinomics.enums.StatusCode;
 public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpecificationExecutor<Sample> {
     List<Sample> findByIdIn(List<Integer> id);
     List<Sample> findByIdInAndStatusCodeIn(List<Integer> id, List<StatusCode> statusCodes);
+    Optional<Sample> findTopByBundle_IdOrderByLaboratoryIdDesc(int bundleId);
     Optional<Sample> findTopByBundle_IdAndReceivedDateOrderByLaboratoryIdDesc(int bundleId, LocalDate receivedDate);
 }
