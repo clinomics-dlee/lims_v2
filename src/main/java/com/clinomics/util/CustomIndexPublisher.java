@@ -86,10 +86,12 @@ public class CustomIndexPublisher {
 					index += separator + yyyymm;
 				} else if (t.matches("[0]+")) {
 					
+					int zero_cnt = StringUtils.countMatches(t, "0");
+
 					if (current == null || !current.startsWith(index.substring(1))) {
-						index += separator + String.format("%0" + t.length() + "d", 1);
+						index += separator + String.format("%0" + zero_cnt + "d", 1);
 					} else {
-						index += separator + String.format("%0" + t.length() + "d", NumberUtils.toInt(current.substring(current.length() - 4)) + 1);
+						index += separator + String.format("%0" + zero_cnt + "d", NumberUtils.toInt(current.substring(current.length() - zero_cnt)) + 1);
 					}
 					index = index.substring(1);
 					
