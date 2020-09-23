@@ -387,11 +387,23 @@
 	});
     
 	$(document).on("click", "#btn_save", function() {
-		//alert(JSON.stringify($('#frm_new').serialize()));
-	
 		if (!$('#frm_new').parsley().validate()) {
 			return;	
 		}
+
+		var datas = $('#frm_new').serializeObject();
+		if ($("input:checkbox[name=autoBarcode]").is(":checked") == true) {
+			datas["autoBarcode"] = "true";
+		} else {
+			datas["autoBarcode"] = "false";
+		}
+
+		if ($("input:checkbox[name=autoSequence]").is(":checked") == true) {
+			datas["autoSequence"] = "true";
+		} else {
+			datas["autoSequence"] = "false";
+		}
+
 		$.ajax({
 			url : "/set/prd/save",
 			type : 'post',

@@ -139,27 +139,27 @@
                     <span>설정</span>
                 </a>
 				<ul class="sub-menu">
-                    <li th:class="${#strings.contains(path,'/set/mbr/mng')} ? active : ''">
+                    <li th:classappend="${#strings.equals(path,'/p/set/mmbr')} ? active : ''">
                     	<a href="/p/set/mmbr">사용자</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/prd/mng')} ? active : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/prd')} ? active : ''">
                     	<a href="/p/set/prd">상품</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/bnd/mng')} ? active : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/bndl')} ? active : ''">
                     	<a href="/p/set/bndl">묶음상품</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/item/mng')} ? active : ''">
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/item')} ? active : ''">
                     	<a href="/p/set/item">검체 항목 관리</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/ritem/mng')} ? active : ''">
+                    <!-- <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.startsWith(path,'/p/set/ritem')} ? active : ''">
                     	<a href="/p/set/ritem">결과 항목 관리</a>
-                    </li>
-                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/prd/item')} ? active : ''">
+                    </li> -->
+                    <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/prd_item')} ? active : ''">
                     	<a href="/p/set/prd_item">검체 연결 설정</a>
                     </li>
-                    <li sec:authorize="hasRole('ROLE_IT_99')" th:class="${#strings.contains(path,'/set/pritem/mng')} ? active : ''">
+                    <!-- <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.startsWith(path,'/p/set/prd_ritem')} ? active : ''">
                     	<a href="/p/set/prd_ritem">결과 연결 설정</a>
-                    </li>
+                    </li> -->
                 </ul>
 			</li>
 			<!-- <li class="has-sub">

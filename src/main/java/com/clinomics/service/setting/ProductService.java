@@ -63,7 +63,7 @@ public class ProductService {
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
-		long total = bundleRepository.countByIsSingleAndIsActiveTrue(true);
+		long total = bundleRepository.countByIsSingle(true);
 		long filtered = total;
 		
 		List<Order> orders = Arrays.asList(new Order[] {
@@ -72,7 +72,7 @@ public class ProductService {
 		// #. paging 관련 객체
 		Pageable pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
 		
-		List<Bundle> list = bundleRepository.findByIsSingleAndIsActiveTrue(true, pageable);
+		List<Bundle> list = bundleRepository.findByIsSingle(true, pageable);
 		
 		Map<String, Object> rtn = dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
 		
@@ -171,14 +171,12 @@ public class ProductService {
 		}
 		if (datas.containsKey("autoBarcode")) {
 			bundle.setAutoBarcode(BooleanUtils.toBooleanObject(datas.get("autoBarcode")));
-		} else {
-			bundle.setAutoBarcode(false);
 		}
+
 		if (datas.containsKey("autoSequence")) {
 			bundle.setAutoSequence(BooleanUtils.toBooleanObject(datas.get("autoSequence")));
-		} else {
-			bundle.setAutoSequence(false);
 		}
+
 		if (datas.containsKey("barcodeRole")) {
 			bundle.setBarcodeRole(datas.get("barcodeRole"));
 		}
@@ -197,6 +195,7 @@ public class ProductService {
 		if (datas.containsKey("active")) {
 			boolean inUse = BooleanUtils.toBooleanObject(datas.get("active"));
 			product.setActive(inUse);
+			bundle.setActive(inUse);
 
 			rtn.put("result", ResultCode.SUCCESS_NOT_USE_ALERT.get());
 		}
