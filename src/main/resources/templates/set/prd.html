@@ -153,6 +153,15 @@
 										<input type="text" class="form-control" id="type" name="type">
 									</div>
 								</div>
+								<div class="form-group row m-b-15">
+									<label class="col-md-4 col-sm-4 col-form-label">Hospital Product</label>
+									<div class="col-md-8 col-sm-8">
+										<div class="switcher switcher-success">
+											<input type="checkbox" name="hospital" id="hospital" value="true">
+											<label for="hospital"></label>
+										</div>
+									</div>
+								</div>
 							</form>
 								
 							<hr>
@@ -331,6 +340,10 @@
 				data : "type",
                 visible: false,
                 render : function(data, type, row) { return data; }
+			}, {
+				data : "hospital",
+                visible: false,
+                render : function(data, type, row) { return data; }
 			}],
 			buttons : [ ],
 			lengthMenu : [ [ 10, 50, 100, 500, -1 ], [ 10, 50, 100, 500, "ALL" ] ],
@@ -356,7 +369,7 @@
 	        	
 	        	listTable.$('tr.selected').removeClass('selected');
 	            $(this).addClass('selected');
-	            
+
 	            var idx = listTable.row(this).index();
 				var name = listTable.cell(idx, 1).data();
 	            $('input[name=id]').val(listTable.cell(idx, 3).data());
@@ -366,6 +379,7 @@
 	            $('input:checkbox[name=autoSequence]').prop("checked", listTable.cell(idx, 6).data());
 	            $('input[name=sequenceRole]').val(listTable.cell(idx, 7).data());
 	            $('input[name=type]').val(listTable.cell(idx, 8).data());
+				$('input:checkbox[name=hospital]').prop("checked", listTable.cell(idx, 9).data());
 	            
 	            $("#right_title").text('Modify - ' + name);
 	        }
@@ -404,6 +418,12 @@
 			datas["autoSequence"] = "false";
 		}
 
+		if ($("input:checkbox[name=hospital]").is(":checked") == true) {
+			datas["hospital"] = "true";
+		} else {
+			datas["hospital"] = "false";
+		}
+		
 		$.ajax({
 			url : "/set/prd/save",
 			type : 'post',
@@ -411,7 +431,7 @@
 			beforeSend : function(xhr) {
 				xhr.setRequestHeader(header, token);
 			},
-			data : JSON.stringify($('#frm_new').serializeObject()),
+			data : JSON.stringify(datas),
 			contentType : "application/json;charset=utf-8",
 			success : function(data) {
 				if (data.result == "00") {

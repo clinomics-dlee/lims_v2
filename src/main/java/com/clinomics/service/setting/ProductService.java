@@ -187,6 +187,10 @@ public class ProductService {
 			bundle.setType(datas.get("type"));
 			product.setType(datas.get("type"));
 		}
+
+		if (datas.containsKey("hospital")) {
+			bundle.setHospital(BooleanUtils.toBooleanObject(datas.get("hospital")));
+		}
 		
 		bundle.setSingle(true);
 		
