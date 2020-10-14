@@ -45,27 +45,30 @@ public class CustomIndexPublisher {
 		String index = "";
 
 		if (bundle.isHospital()) {
-			Optional<Sample> last = sampleRepository.findTopByBundle_IdAndReceivedDateOrderByLaboratoryIdDesc(bundle.getId(), receivedDate);
-			if (last.isPresent()) {
-				String lastLaboratoryId = last.get().getLaboratoryId();
+			//Optional<Sample> last = sampleRepository.findTopByBundle_IdAndReceivedDateOrderByLaboratoryIdDesc(bundle.getId(), receivedDate);
+			String lastLaboratoryId = sampleRepository.findMaxHospitalLaboratoryId(bundle.getId(), receivedDate.format(DateTimeFormatter.ofPattern("yyyyMM")));
+
+			if (lastLaboratoryId == null) {
+				//String lastLaboratoryId = last.get().getLaboratoryId();
+				index = getIndex(role.split(separator), null, receivedDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+			} else {
 				int zeroCount = StringUtils.countMatches(role, "0");
 				int newIndexNumber = NumberUtils.toInt(StringUtils.right(lastLaboratoryId, zeroCount)) + 1;
 	
 				index = StringUtils.left(lastLaboratoryId, lastLaboratoryId.length() - zeroCount) + "" + String.format("%04d", newIndexNumber);
-			} else {
-				index = getIndex(role.split(separator), current, receivedDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 			}
 			
 		} else {
-			Optional<Sample> last = sampleRepository.findTopByBundle_IdOrderByLaboratoryIdDesc(bundle.getId());
-			if (last.isPresent()) {
-				String lastLaboratoryId = last.get().getLaboratoryId();
-				index = getIndex(role.split(separator), lastLaboratoryId, getYYYYMMDD("yyyyMMdd"));
+
+			String lastLaboratoryId = sampleRepository.findMaxLaboratoryId(bundle.getId());
+			if (lastLaboratoryId == null) {
+				index = getIndex(role.split(separator), null, getYYYYMMDD("yyyyMMdd"));
 			} else {
-				index = getIndex(role.split(separator), current, getYYYYMMDD("yyyyMMdd"));
+				index = getIndex(role.split(separator), lastLaboratoryId, getYYYYMMDD("yyyyMMdd"));
 			}
-			bundle.setSequence(index);
+
 		}
+		bundle.setSequence(index);
 
 		return index;
 	}
