@@ -42,6 +42,10 @@ public class OutputController {
 	@GetMapping("/all/list")
 	@ResponseBody
 	public Map<String, Object> all(@RequestParam Map<String, String> params) {
+		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
+			return sampleDbService.find(params, params.get("statusCode") + "");
+		}
+
 		return sampleDbService.find(params, 0);
 	}
 	
