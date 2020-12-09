@@ -83,7 +83,7 @@
 							<th>검체입고일</th>
 							<td id="createdDate"> </td>
 							<th>서비스 종류</th>
-							<td id="bundle"> </td>
+							<td id="bundle">개인유전자검사</td>
 							<th>입고담당자</th>
 							<td id="inputApproveMember2"> </td>
 						</tr>
@@ -207,7 +207,7 @@
 						$('#inputMngApproveMember').text((col.inputMngApproveMember ? col.inputMngApproveMember.name : "-"));
 						$('#inputDrctMember').text((col.inputDrctMember ? col.inputDrctMember.name : "-"));
 
-						$('#bundle').text(col.bundle.name);
+						// $('#bundle').text(col.bundle.name);
 						$('#inputApproveMember2').text((col.inputApproveMember ? col.inputApproveMember.name : ""));
 
 						$('#createdDate').text($('#sel_print_date').val());

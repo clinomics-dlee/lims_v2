@@ -52,6 +52,17 @@ public class ApiController {
 		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request IP : [" + ip + "]");
 		return outputService.updateStatus(params, ip);
 	}
+
+	@RequestMapping(value = "/resultby/laboratory/get")
+	public Map<String, Object> getResultByLaboratory(@RequestParam Map<String, String> params) {
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultByLaboratory ☆☆☆ IN interface : /resultby/laboratory/get ");
+		HttpServletRequest req = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String ip = req.getHeader("X-FORWARDED-FOR");
+		if (ip == null)	ip = req.getRemoteAddr();
+		
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultByLaboratory ☆☆☆ request IP : [" + ip + "]");
+		return outputService.getResultByLaboratoryForRest(params, ip);
+	}
 	
 	@RequestMapping(value = "/mail/test")
 	public String sendMailTest() {

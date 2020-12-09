@@ -374,4 +374,35 @@ public class OutputService {
 		
 		return rtn;
 	}
+
+	public Map<String, Object> getResultByLaboratoryForRest(Map<String, String> params, String ip) {
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ getResultByLaboratoryForRest ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ IN interface : " + params.toString());
+		Map<String, Object> rtn = Maps.newHashMap();
+		// #. 실험실번호
+		String laboratoryId = params.get("experimentid");
+		
+		Specification<Sample> where = Specification
+				.where(SampleSpecification.statusCodeGt(710))
+				.and(SampleSpecification.laboratoryIdEqual(laboratoryId))
+				.and(SampleSpecification.isLastVersionTrue());
+
+		List<Sample> samples = sampleRepository.findAll(where);
+
+		Map<String, Object> data = Maps.newHashMap();
+		if (samples.size() > 0) {
+			Sample sample = samples.get(0);
+			Map<String, Object> items = sample.getItems();
+			data.putAll(items);
+			data.put("experimentid", sample.getLaboratoryId());
+			data.put("genedata", sample.getData());
+			data.put("fileFullPath", sample.getFilePath() + "/" + sample.getFileName());
+				
+			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
+		}
+		
+		rtn.put("result", "success");
+		rtn.put("data", data);
+		
+		return rtn;
+	}
 }
