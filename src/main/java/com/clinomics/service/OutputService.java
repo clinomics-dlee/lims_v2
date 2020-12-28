@@ -396,6 +396,7 @@ public class OutputService {
 			data.put("experimentid", sample.getLaboratoryId());
 			data.put("genedata", sample.getData());
 			data.put("fileFullPath", sample.getFilePath() + "/" + sample.getFileName());
+			data.put("chipType", sample.getChipTypeCode());
 				
 			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
 		}
