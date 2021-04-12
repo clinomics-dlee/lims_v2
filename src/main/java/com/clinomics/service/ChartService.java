@@ -139,8 +139,9 @@ public class ChartService {
 			String name = b.getName();
 			dataset.put("label", name);
 			dataset.put("borderWidth", "2");
-			dataset.put("borderColor", colors[co]);
-			dataset.put("backgroundColor", colors[co++]);
+			dataset.put("borderColor", colors[co % colors.length]);
+			dataset.put("backgroundColor", colors[co % colors.length]);
+			co++;
 			
 			dataset.put("data", getChartDatasYyyymm(end, loop, map, name));
 			datasets.add(dataset);
@@ -149,13 +150,16 @@ public class ChartService {
 	}
 	
 	private List<Map<String, Object>> getPieDatasetByBundle(List<Bundle> bundles, LocalDateTime end, List<Map<String, String>> map) {
-		List<String> colorList = Arrays.asList(colors);
+		List<String> colorList = new ArrayList<String>();
 		List<Map<String, Object>> datasets = new ArrayList<>();
 		List<Long> datas = new ArrayList<>();
 		Map<String, Object> dataset = Maps.newHashMap();
 		
+		int co = 0;
 		for (Bundle b : bundles) {
 			datas.add(getCounting(map, "name", b.getName()));
+			colorList.add(colors[co % colors.length]);
+			co++;
 		}
 		dataset.put("borderWidth", "2");
 		dataset.put("borderColor", colorList);
