@@ -60,14 +60,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<div class="form-group row m-b-12">
 								<label class="col-form-label m-l-2">서비스</label>
 								<div class="col-xs-push-0">
-									<select class="form-control width-200" id="sel_bundle">
+									<select class="form-control width-150" id="sel_bundle">
 										<option value>전체</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
 								<label class="col-form-label m-l-2">상태</label>
 								<div class="col-xs-push-0">
-									<select class="form-control width-200" id="sel_status">
+									<select class="form-control width-150" id="sel_status">
 										<option value>전체</option>
 										<option selected value="S020_INPUT_RCV" th:text="${statusCodes.get('S020_INPUT_RCV')}"></option>
 										<option value="S200_EXP_READY" th:text="${statusCodes.get('S200_EXP_READY')}"></option>
@@ -87,13 +87,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<label class="col-form-label m-l-10">검색어</label>
 								<div class="col-xs-push-0">
 									
-								    <input type="text" id="keyword" class="form-control"/>
+								    <input type="text" id="keyword" class="form-control width-150"/>
 								</div>
 								<div>
-									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
-								</div>
-								<div class="col-md-3 text-right">
-									<button class="btn btn-success m-r-5" onClick="printPopup();">검체기록지</button>
+									<button onClick="search();" class="btn btn-default m-l-10 m-r-5">조회</button>
+									<button class="btn btn-success" onClick="printPopup();">검체기록지</button>
 								</div>
 							</div>
 							<hr/>
