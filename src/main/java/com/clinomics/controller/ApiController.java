@@ -33,23 +33,21 @@ public class ApiController {
 	
 	@RequestMapping(value = "/result/get")
 	public Map<String, Object> getResultWithWaitStatus(@RequestParam Map<String, String> params) {
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ IN interface : /result/get ");
 		HttpServletRequest req = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
 		String ip = req.getHeader("X-FORWARDED-FOR");
 		if (ip == null)	ip = req.getRemoteAddr();
 		
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request IP : [" + ip + "]");
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request (/result/get) IP : [" + ip + "]");
 		return outputService.getResultsForRest(params, ip);
 	}
 
 	@RequestMapping(value = "/status/update")
 	public Map<String, Object> updateStatus(@RequestParam Map<String, String> params) {
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ update status : /status/update ");
 		HttpServletRequest req = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
 		String ip = req.getHeader("X-FORWARDED-FOR");
 		if (ip == null)	ip = req.getRemoteAddr();
 		
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request IP : [" + ip + "]");
+		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request (/status/update) IP : [" + ip + "]");
 		return outputService.updateStatus(params, ip);
 	}
 

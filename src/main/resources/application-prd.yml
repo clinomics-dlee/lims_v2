@@ -21,7 +21,7 @@ spring:
     basename: i18n/messages
     encoding: UTF-8
   jpa:
-    show-sql: true
+    show-sql: false
     generate-ddl: true
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
   security:

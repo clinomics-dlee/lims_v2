@@ -11,6 +11,19 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Role;
@@ -24,19 +37,6 @@ import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.CustomIndexPublisher;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 @Service
 public class OutputService {
@@ -157,6 +157,7 @@ public class OutputService {
 	}
 
 	@Transactional
+	@CacheEvict(value = "apiCache", allEntries = true)
 	public Map<String, String> outputApprove(List<Integer> ids, String memberId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		
@@ -201,6 +202,7 @@ public class OutputService {
 	}
 
 	@Transactional
+	@CacheEvict(value = "apiCache", allEntries = true)
 	public Map<String, String> outputReIssue(Map<String, String> inputItems, String memberId) {
 
 
@@ -247,8 +249,9 @@ public class OutputService {
 	}
 
 	@Transactional
+	@Cacheable(value = "apiCache", key = "#params")
 	public Map<String, Object> getResultsForRest(Map<String, String> params, String ip) {
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ getResultsForRest ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ IN interface : " + params.toString());
+		logger.info("=☆☆++++++☆☆= getResultsForRest ☆☆☆ DB Conn ☆☆☆ IN interface : " + params.toString());
 		Map<String, Object> rtn = Maps.newHashMap();
 		// #. productType 추가
 		String productType = params.get("productType");
@@ -290,7 +293,7 @@ public class OutputService {
 					
 					datas.add(data);
 					
-					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
+					logger.info("=☆☆++++++☆☆= [" + ip + "] data : " + data.toString());
 				}
 			}
 		}
@@ -302,8 +305,9 @@ public class OutputService {
 	}
 
 	@Transactional
+	@CacheEvict(value = "apiCache", allEntries = true)
 	public Map<String, Object> updateStatus(Map<String, String> params, String ip) {
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ getResultsForRest ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ IN interface : " + params.toString());
+		logger.info("=☆☆++++++☆☆= getResultsForRest ☆☆☆ Cache Evict ☆☆☆ IN interface : " + params.toString());
 		Map<String, Object> rtn = Maps.newHashMap();
 		// #. productType 추가
 		String laboratoryId = params.get("experimentid");
