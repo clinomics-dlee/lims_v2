@@ -2,15 +2,22 @@
 <configuration>
     <!-- Created By yeoseong_yoon -->
     <!-- 로그 경로 변수 선언 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+	<conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+	<conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+    
     <property name="LOG_DIR" value="/BiO/Serve/lims_v2/logs" />
     <property name="LOG_PATH" value="${LOG_DIR}/lims_v2.log"/>
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+	<property name="CONSOLE_LOG_CHARSET" value="${CONSOLE_LOG_CHARSET:-default}"/>
+	<property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+	<property name="FILE_LOG_CHARSET" value="${FILE_LOG_CHARSET:-default}"/>
     
     <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>
-                %-5level %d{HH:mm:ss.SSS} [%thread %F:%L] %method - %msg%n
-            </pattern>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>${CONSOLE_LOG_CHARSET}</charset>
         </encoder>
     </appender>
     <!-- Rolling File Appender -->
@@ -19,7 +26,7 @@
         <file>${LOG_PATH}</file>
         <!-- 출력패턴 -->
         <encoder>
-            <pattern>%-5level %d{HH:mm:ss.SSS} [%thread %F:%L] %method - %msg%n</pattern>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
         <!-- Rolling 정책 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
