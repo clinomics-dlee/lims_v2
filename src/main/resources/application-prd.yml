@@ -1,4 +1,7 @@
 spring:
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com
