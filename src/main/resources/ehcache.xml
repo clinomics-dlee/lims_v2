@@ -14,7 +14,7 @@
 
     <cache alias="apiCache" uses-template="myDefaultTemplate">
         <expiry>
-            <ttl unit="seconds">1800</ttl>
+            <ttl unit="seconds">3600</ttl>
         </expiry>
     </cache>
 

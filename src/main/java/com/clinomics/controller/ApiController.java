@@ -1,7 +1,5 @@
 package com.clinomics.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,10 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.clinomics.entity.lims.Sample;
 import com.clinomics.service.OutputService;
 import com.clinomics.util.EmailSender;
-import com.google.common.collect.Maps;
 
 @RequestMapping("/rest")
 @RestController
@@ -37,7 +33,7 @@ public class ApiController {
 		String ip = req.getHeader("X-FORWARDED-FOR");
 		if (ip == null)	ip = req.getRemoteAddr();
 		
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request (/result/get) IP : [" + ip + "]");
+		logger.info("☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request (/result/get) IP : [" + ip + "]");
 		return outputService.getResultsForRest(params, ip);
 	}
 
@@ -47,31 +43,31 @@ public class ApiController {
 		String ip = req.getHeader("X-FORWARDED-FOR");
 		if (ip == null)	ip = req.getRemoteAddr();
 		
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request (/status/update) IP : [" + ip + "]");
+		logger.info("☆☆☆☆☆ getResultWithWaitStatus ☆☆☆ request (/status/update) IP : [" + ip + "]");
 		return outputService.updateStatus(params, ip);
 	}
 
 	@RequestMapping(value = "/resultby/laboratory/get")
 	public Map<String, Object> getResultByLaboratory(@RequestParam Map<String, String> params) {
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultByLaboratory ☆☆☆ IN interface : /resultby/laboratory/get ");
+		logger.info("☆☆☆☆☆ getResultByLaboratory ☆☆☆ IN interface : /resultby/laboratory/get ");
 		HttpServletRequest req = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
 		String ip = req.getHeader("X-FORWARDED-FOR");
 		if (ip == null)	ip = req.getRemoteAddr();
 		
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ getResultByLaboratory ☆☆☆ request IP : [" + ip + "]");
+		logger.info("☆☆☆☆☆ getResultByLaboratory ☆☆☆ request IP : [" + ip + "]");
 		return outputService.getResultByLaboratoryForRest(params, ip);
 	}
 	
-	@RequestMapping(value = "/mail/test")
-	public String sendMailTest() {
-		Sample sample = new Sample();
-		sample.setChipBarcode("test1");
-		sample.setLaboratoryId("TEST-0000-0001");
-		sample.setStatusMessage("Test is good.");
-		sample.setVersion(1);
-		List<Sample> samples = new ArrayList<Sample>();
-		samples.add(sample);
-		emailSender.sendMailToFail(samples);
-		return "asdf";
-	}
+//	@RequestMapping(value = "/mail/test")
+//	public String sendMailTest() {
+//		Sample sample = new Sample();
+//		sample.setChipBarcode("test1");
+//		sample.setLaboratoryId("TEST-0000-0001");
+//		sample.setStatusMessage("Test is good.");
+//		sample.setVersion(1);
+//		List<Sample> samples = new ArrayList<Sample>();
+//		samples.add(sample);
+//		emailSender.sendMailToFail(samples);
+//		return "asdf";
+//	}
 }

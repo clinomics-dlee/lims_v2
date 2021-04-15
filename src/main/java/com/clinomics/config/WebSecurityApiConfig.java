@@ -37,10 +37,11 @@ public class WebSecurityApiConfig extends WebSecurityConfigurerAdapter {
                 return authentication;
             }
         });
-        httpSecurity.
-            antMatcher("/rest/**").
-            csrf().disable().
-            sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-            and().addFilter(filter).authorizeRequests().anyRequest().authenticated();
+        httpSecurity
+            //.antMatcher("/rest/**")
+        	.requestMatchers().antMatchers("/rest/**", "/actuator/**")
+            .and().csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().addFilter(filter).authorizeRequests().anyRequest().authenticated();
     }
 }

@@ -159,6 +159,7 @@ public class OutputService {
 	@Transactional
 	@CacheEvict(value = "apiCache", allEntries = true)
 	public Map<String, String> outputApprove(List<Integer> ids, String memberId) {
+		logger.info("☆☆☆☆☆☆☆ outputApprove ☆☆☆ Cache Evict ☆☆☆");
 		Map<String, String> rtn = Maps.newHashMap();
 		
 		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, Arrays.asList(new StatusCode[] { StatusCode.S600_JDGM_APPROVE }));
@@ -204,7 +205,7 @@ public class OutputService {
 	@Transactional
 	@CacheEvict(value = "apiCache", allEntries = true)
 	public Map<String, String> outputReIssue(Map<String, String> inputItems, String memberId) {
-
+		logger.info("☆☆☆☆☆☆☆ outputReIssue ☆☆☆ Cache Evict ☆☆☆");
 
 		Map<String, String> rtn = inputService.save(inputItems, true);
 
@@ -251,7 +252,7 @@ public class OutputService {
 	@Transactional
 	@Cacheable(value = "apiCache", key = "#params")
 	public Map<String, Object> getResultsForRest(Map<String, String> params, String ip) {
-		logger.info("=☆☆++++++☆☆= getResultsForRest ☆☆☆ DB Conn ☆☆☆ IN interface : " + params.toString());
+		logger.info("☆☆☆☆☆☆☆ getResultsForRest ☆☆☆ DB Conn ☆☆☆ IN interface : " + params.toString());
 		Map<String, Object> rtn = Maps.newHashMap();
 		// #. productType 추가
 		String productType = params.get("productType");
@@ -293,7 +294,7 @@ public class OutputService {
 					
 					datas.add(data);
 					
-					logger.info("=☆☆++++++☆☆= [" + ip + "] data : " + data.toString());
+					logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "] data : " + data.toString());
 				}
 			}
 		}
@@ -307,7 +308,7 @@ public class OutputService {
 	@Transactional
 	@CacheEvict(value = "apiCache", allEntries = true)
 	public Map<String, Object> updateStatus(Map<String, String> params, String ip) {
-		logger.info("=☆☆++++++☆☆= getResultsForRest ☆☆☆ Cache Evict ☆☆☆ IN interface : " + params.toString());
+		logger.info("☆☆☆☆☆☆☆ getResultsForRest ☆☆☆ Cache Evict ☆☆☆ IN interface : " + params.toString());
 		Map<String, Object> rtn = Maps.newHashMap();
 		// #. productType 추가
 		String laboratoryId = params.get("experimentid");
@@ -380,7 +381,7 @@ public class OutputService {
 	}
 
 	public Map<String, Object> getResultByLaboratoryForRest(Map<String, String> params, String ip) {
-		logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ getResultByLaboratoryForRest ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ IN interface : " + params.toString());
+		logger.info("☆☆☆☆☆☆☆ getResultByLaboratoryForRest ☆☆☆☆☆ IN interface : " + params.toString());
 		Map<String, Object> rtn = Maps.newHashMap();
 		// #. 실험실번호
 		String laboratoryId = params.get("experimentid");
@@ -402,7 +403,7 @@ public class OutputService {
 			data.put("fileFullPath", sample.getFilePath() + "/" + sample.getFileName());
 			data.put("chipType", sample.getChipTypeCode());
 				
-			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
+			logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
 		}
 		
 		rtn.put("result", "success");
