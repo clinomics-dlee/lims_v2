@@ -14,6 +14,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -110,6 +111,7 @@ public class InputService {
 	}
 	
 	@Transactional
+	@CacheEvict(value = "hospitalCache", allEntries = true)
 	public Map<String, String> save(Map<String, String> inputItems, boolean history) {
 		Map<String, Object> items = Maps.newHashMap();
 		items.putAll(inputItems);

@@ -24,4 +24,6 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
 	String findMaxLaboratoryId(int bundleId);
 	@Query(value = "SELECT MAX(laboratory_id) FROM sample WHERE bundle_id = ?1 AND DATE_FORMAT(received_date, '%Y%m') = ?2", nativeQuery = true)
 	String findMaxHospitalLaboratoryId(int bundleId, String yyyymm);
+    @Query(value = "SELECT DISTINCT REPLACE(JSON_EXTRACT(items, '$.h_name'), '\"', '') AS name FROM sample WHERE JSON_EXTRACT(items, '$.h_name') IS NOT NULL", nativeQuery = true)
+    List<String> findDistinctHospitalName();
 }

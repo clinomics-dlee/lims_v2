@@ -18,4 +18,16 @@
         </expiry>
     </cache>
 
+    <cache alias="hospitalCache" uses-template="myDefaultTemplate">
+        <expiry>
+            <ttl unit="seconds">3600</ttl>
+        </expiry>
+    </cache>
+
+    <cache alias="bundleCache" uses-template="myDefaultTemplate">
+        <expiry>
+            <ttl unit="seconds">14400</ttl>
+        </expiry>
+    </cache>
+
 </config>

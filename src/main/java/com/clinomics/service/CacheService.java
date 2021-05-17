@@ -11,8 +11,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.StatusCode;
+import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
 
@@ -24,19 +26,34 @@ public class CacheService {
 	@Autowired
     SampleRepository sampleRepository;
 
-	@Cacheable(value = "apiCache", key = "#productType")
-	public List<Sample> getOutputResultGet(String productType) {
+	@Autowired
+	BundleRepository bundleRepository;
 
-		Specification<Sample> where = Specification
-				.where(SampleSpecification.productNotLike(null))
-				.and(SampleSpecification.statusIn(Arrays.asList(StatusCode.S700_OUTPUT_WAIT, StatusCode.S800_RE_OUTPUT_WAIT)));
+	// @Cacheable(value = "apiCache", key = "#productType")
+	// public List<Sample> getOutputResultGet(String productType) {
 
-		List<Sample> samples = sampleRepository.findAll(where);
-		return samples;
-	}
+	// 	Specification<Sample> where = Specification
+	// 			.where(SampleSpecification.productNotLike(null))
+	// 			.and(SampleSpecification.statusIn(Arrays.asList(StatusCode.S700_OUTPUT_WAIT, StatusCode.S800_RE_OUTPUT_WAIT)));
+
+	// 	List<Sample> samples = sampleRepository.findAll(where);
+	// 	return samples;
+	// }
 
 	@CacheEvict(value = "apiCache", allEntries = true)
-	public void clean() {
+	public void cleanOutputResult() {
 		
 	}
+
+	@Cacheable(value = "hospitalCache")
+	public List<String> getDistinctHospitalName() {
+		List<String> names = sampleRepository.findDistinctHospitalName();
+		return names;
+	}
+
+	@Cacheable(value = "bundleCache")
+	public List<Bundle> selectAll() {
+		return bundleRepository.findByIsActiveTrue();
+	}
+
 }

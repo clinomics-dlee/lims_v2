@@ -60,9 +60,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<div class="form-group row m-b-12">
 								<label class="col-form-label m-l-2">서비스</label>
 								<div class="col-xs-push-0">
-									<select class="form-control width-200" id="sel_bundle">
-										<option value>전체</option>
+									<select class="form-control width-200" id="sel_bundle" multiple="multiple">
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+									</select>
+								</div>
+
+								<label class="col-form-label m-l-2">의뢰기관명</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_agency" multiple="multiple">
+										<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
 									</select>
 								</div>
 								
@@ -124,7 +130,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	$(document).ready(function() {
 		App.init();
 		
-		UserTable.init('_collect_grid', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500], true);
+		UserTable.init('_collect_grid', true, [10, 50, 100, 200, 500, 1000, 2000] , [10, 50, 100, 200, 500, 1000, 2000], true);
+		
+		$("#sel_bundle").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+		$("#sel_agency").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
 		
 		var startDate = moment().subtract(7, 'days');
 		var endDate = moment();
@@ -153,7 +168,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : function() {
 				var param = {
-					bundleId : $("#sel_bundle").val(),
+					bundleId : $("#sel_bundle").val() + "",
+					agencies : $("#sel_agency").val() + "",
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
 					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val(),
 					keyword : $("#keyword").val()
@@ -224,6 +240,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function search() {
+
 		UserTable.reload('_collect_grid');
 	}
 	

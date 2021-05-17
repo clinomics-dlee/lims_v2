@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
@@ -141,17 +142,56 @@ public class SampleSpecification {
 		};
 	}
 
+	// public static Specification<Sample> bundleId(Map<String, String> params) {
+
+	// 	return (root, query, criteriaBuilder) -> {
+	// 		Predicate rtn = null;
+	// 		List<Predicate> predicatesAnds = new ArrayList<>();
+	// 		if (params.containsKey("bundleId") && !params.get("bundleId").toString().isEmpty()) {
+	// 			int bundleId = NumberUtils.toInt(params.get("bundleId") + "");
+	// 			predicatesAnds.add(criteriaBuilder.equal(root.get("bundle").get("id"), bundleId));
+	// 		}
+	// 		rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+	// 		return rtn;
+	// 	};
+	// }
+
 	public static Specification<Sample> bundleId(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
 			if (params.containsKey("bundleId") && !params.get("bundleId").toString().isEmpty()) {
-				int bundleId = NumberUtils.toInt(params.get("bundleId") + "");
-				predicatesAnds.add(criteriaBuilder.equal(root.get("bundle").get("id"), bundleId));
+				
+				List<String> bundles = Arrays.asList((params.get("bundleId") + "").split(","));
+				List<Integer> bundleIds = bundles.stream().map(b -> NumberUtils.toInt(b)).collect(Collectors.toList());
+				
+				predicatesAnds.add(criteriaBuilder.and(root.get("bundle").get("id").in(bundleIds)));
 			}
 			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
 			return rtn;
+		};
+	}
+
+	public static Specification<Sample> hNameIn(Map<String, String> params) {
+
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			if (params.containsKey("agencies") && !params.get("agencies").toString().isEmpty()) {
+				
+				List<String> hospitals = Arrays.asList((params.get("agencies") + "").split(","));
+
+				hospitals.stream().forEach(h -> {
+					predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+						root.get("items"), criteriaBuilder.literal("$.h_name")), h));
+				});
+
+				rtn = criteriaBuilder.or(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			}
+			return rtn;
+
 		};
 	}
 

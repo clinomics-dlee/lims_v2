@@ -5,6 +5,7 @@ import java.util.Map;
 import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.StatusCode;
+import com.clinomics.service.CacheService;
 import com.clinomics.service.setting.BundleService;
 import com.google.common.collect.Maps;
 
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class PageController {
 
 	@Autowired
-	BundleService bundleService;
+	CacheService cacheService;
 	
 	@GetMapping()
 	public String calendar(Model model) {
@@ -32,19 +33,21 @@ public class PageController {
 			statusCodeMap.put(statusCode.getKey(), statusCode.getValue());
 		}
 		model.addAttribute("statusCodes", statusCodeMap);
-		model.addAttribute("bundles", bundleService.selectAll());
+		model.addAttribute("bundles", cacheService.selectAll());
 		return "calendar";
 	}
 
 	@GetMapping("/chart")
 	public String chart(Model model) {
-		model.addAttribute("bundles", bundleService.selectAll());
+		model.addAttribute("bundles", cacheService.selectAll());
 		return "chart";
 	}
 	
 	@GetMapping("/p/{path1}/{path2}")
 	public String intake(@PathVariable String path1, @PathVariable String path2, Model model) {
-		model.addAttribute("bundles", bundleService.selectAll());
+		model.addAttribute("bundles", cacheService.selectAll());
+		model.addAttribute("agencies", cacheService.getDistinctHospitalName());
+		
 		Map<String, String> statusCodeMap = Maps.newHashMap();
 		for (StatusCode statusCode : StatusCode.values()) {
 			statusCodeMap.put(statusCode.getKey(), statusCode.getValue());
