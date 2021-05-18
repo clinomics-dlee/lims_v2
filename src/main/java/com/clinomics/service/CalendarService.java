@@ -279,6 +279,7 @@ public class CalendarService {
 			.where(getCreateDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusCodeGt(20));
 	}
@@ -291,6 +292,7 @@ public class CalendarService {
 			.where(getModifiedDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(sc));
 	}
@@ -300,6 +302,7 @@ public class CalendarService {
 			.where(getModifiedDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(STS_EXP));
 	}
@@ -309,6 +312,7 @@ public class CalendarService {
 			.where(getCompleteDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(STS_JDGM));
 	}
@@ -318,6 +322,7 @@ public class CalendarService {
 			.where(getOutputCmplDateWhere(params))
 				.and(SampleSpecification.isLastVersionTrue())
 				.and(SampleSpecification.bundleId(params))
+				.and(SampleSpecification.hNameIn(params))
 				.and(SampleSpecification.bundleIsActive())
 				.and(SampleSpecification.statusIn(STS_REPORT));
 	}

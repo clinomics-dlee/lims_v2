@@ -44,6 +44,21 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	                    <div class="panel p-20">
 	    					<div class="row m-b-5">
 								
+								<div class="form-group row m-b-10">
+									<label class="col-form-label m-l-2">서비스</label>
+									<div class="col-xs-push-0">
+										<select class="form-control width-200" id="sel_bundle" multiple="multiple">
+											<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+										</select>
+									</div>
+	
+									<label class="col-form-label m-l-5">의뢰기관명</label>
+									<div class="col-xs-push-0">
+										<select class="form-control width-200" id="sel_agency" multiple="multiple">
+											<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
+										</select>
+									</div>
+								</div>
 										
 								<label class="col-form-label">기간</label>
 								<div class="col-xs-push-0">
@@ -55,7 +70,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 									<input type="text" class="form-control width-80" data-parsley-required="true" id="endDate" placeholder="" autocomplete="off" />
 								</div>
 								<button onClick="chart();" class="btn btn-default m-l-10 m-b-5 width-60" id="btn_today">조회</button>
-								
 								
 								
 							</div>
@@ -176,6 +190,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		var today = moment();
 		var fdate = moment().subtract(2, 'month');
 
+		$("#sel_bundle").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+		$("#sel_agency").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+
 		$('#startDate').datepicker({
 			autoclose : true,
 			format: "yyyy-mm",
@@ -207,6 +230,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			url : "/chart/get/statistics",
 			type : "GET",
 			data : {
+				bundleId : $("#sel_bundle").val() + "",
+				agencies : $("#sel_agency").val() + "",
 				start : $("#startDate").val(),
 				end : $("#endDate").val()
 			},

@@ -90,6 +90,7 @@ public class SampleDbService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.orderBy(params));
@@ -186,6 +187,7 @@ public class SampleDbService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)))
@@ -217,6 +219,7 @@ public class SampleDbService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenModifiedDate(params))
 					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusCodeGt(statusCodeNumber))
@@ -248,6 +251,7 @@ public class SampleDbService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenModifiedDate(params))
 					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)))

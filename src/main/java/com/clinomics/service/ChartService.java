@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,16 @@ public class ChartService {
 		
 		params.put("sDate", start.format(formatter2));
 		params.put("fDate", end.format(formatter2));
-		List<Bundle> bundles = bundleRepository.findByIsActiveTrue();
+
+		String paramBundle = params.get("bundleId") + "";
+		List<Bundle> bundles = null;
+		if (paramBundle.isEmpty()) {
+			bundles = bundleRepository.findByIsActiveTrue();
+		} else {
+			List<String> strBundleIds = Arrays.asList(paramBundle.split(","));
+			List<Integer> bundleIds = strBundleIds.stream().map(b -> NumberUtils.toInt(b)).collect(Collectors.toList());
+			bundles = bundleRepository.findByIdInAndIsActiveTrue(bundleIds);
+		}
 		
 		List<Sample> sample = sampleRepository.findAll(getSampleWhere(params));
 		List<Sample> complete = sampleRepository.findAll(getCompletedWhere(params));

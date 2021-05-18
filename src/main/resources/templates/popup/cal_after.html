@@ -41,14 +41,14 @@
 /* <![CDATA[ */       
 //ajax Data List
 
-function afterPopupOnload(type, bundleId, startDate, endDate) {
+function afterPopupOnload(type, bundleId, agencies, startDate, endDate) {
 	$("#modal-after").modal();
 	
 	UserTable.init('_com_after_popup', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500], true);
-	afterAfterGetItem(type, bundleId, startDate, endDate);
+	afterAfterGetItem(type, bundleId, agencies, startDate, endDate);
 }
 
-function afterAfterGetItem(type, bundleId, startDate, endDate) {
+function afterAfterGetItem(type, bundleId, agencies, startDate, endDate) {
 	var url = "/popup/registered";
 	if (type == 1) {
 		url = "/popup/analysis";
@@ -69,6 +69,7 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 		data : function() {
 			return {
 				bundleId : bundleId,
+				agencies : agencies,
 				sDate : startDate,
 				fDate : endDate
 			};

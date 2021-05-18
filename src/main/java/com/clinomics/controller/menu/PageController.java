@@ -41,6 +41,7 @@ public class PageController {
 	@GetMapping("/chart")
 	public String chart(Model model) {
 		model.addAttribute("bundles", cacheService.selectAll());
+		model.addAttribute("agencies", cacheService.getDistinctHospitalName());
 		return "chart";
 	}
 	
