@@ -214,6 +214,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			title : "결과",
 			data : "id",
 			bodyClassName : 'text-center',
+			excelDataColumn : "data",
 			render : function(row, data, index) {
 				var value = "";
 				if (!jQuery.isEmptyObject(row.data)) {

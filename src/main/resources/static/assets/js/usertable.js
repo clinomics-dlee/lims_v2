@@ -299,6 +299,16 @@ var UserTable = function() {
 									}
 								}
 								
+								if (aColumns[r].excelDataColumn) {
+									var excelDataValue = eval('rows[s].' + aColumns[r].excelDataColumn);
+									if (excelDataValue instanceof Object) {
+										for (var dataKey in excelDataValue) {
+											excelData[dataKey] = excelDataValue[dataKey];
+										}
+									} else {
+										excelData[aColumns[r].excelDataColumn] = excelDataValue;
+									}
+								}
 							}
 							html += '</tr>';
 							rowIndex++;
