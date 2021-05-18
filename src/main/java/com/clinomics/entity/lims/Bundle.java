@@ -15,6 +15,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="bundle")
 public class Bundle implements Serializable {
@@ -60,6 +62,9 @@ public class Bundle implements Serializable {
 	
 	private boolean isActive = true;
 	
+	@JsonIgnore
+	private int sort;
+
 	@ManyToMany(cascade =  CascadeType.ALL)
 	@JoinTable(name="bundle_product",
 				joinColumns = @JoinColumn(name = "bundleId", referencedColumnName = "id"),
@@ -185,7 +190,13 @@ public class Bundle implements Serializable {
 	public void setHospital(boolean isHospital) {
 		this.isHospital = isHospital;
 	}
-
 	
+	public int getSort() {
+		return sort;
+	}
+
+	public void setSort(int sort) {
+		this.sort = sort;
+	}
 
 }
