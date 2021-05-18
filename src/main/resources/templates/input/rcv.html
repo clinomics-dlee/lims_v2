@@ -56,16 +56,27 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<!-- begin panel-body -->
 						<div id="panel-body" class="panel-body">
 							
-							<div class="form-group row m-b-12">
+							<div class="form-group row m-b-10">
+								
 								<label class="col-form-label m-l-2">서비스</label>
 								<div class="col-xs-push-0">
-									<select class="form-control width-200" id="sel_bundle">
-										<option value>전체</option>
+									<select class="form-control width-200" id="sel_bundle" multiple="multiple">
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
+
+								<label class="col-form-label m-l-2">의뢰기관명</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_agency" multiple="multiple">
+										<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group row m-b-12">
 								
-								<label class="col-form-label m-l-5">조회일자</label>
+								
+								<label class="col-form-label m-l-2">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
 									<input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
 									<span class="input-group-append">
@@ -136,6 +147,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		var startDate = moment().subtract(7, 'days');
 		var endDate = moment();
 
+		$("#sel_bundle").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+		$("#sel_agency").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+
 		$('#default-daterange').daterangepicker({
 			opens: 'right',
 			format : 'YYYY/MM/DD',
@@ -162,7 +182,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : function() {
 				var param = {
-					bundleId : $("#sel_bundle").val(),
+					bundleId : $("#sel_bundle").val() + "",
+					agencies : $("#sel_agency").val() + "",
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
 					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val(),
 					keyword : $("#keyword").val()

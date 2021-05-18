@@ -58,10 +58,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<div id="panel-body" class="panel-body">
 					
 							<div class="form-group row m-b-12">
+								
 								<label class="col-form-label m-l-2">서비스</label>
 								<div class="col-xs-push-0">
-									<select class="form-control width-200" id="sel_bundle">
-										<option value>전체</option>
+									<select class="form-control width-200" id="sel_bundle" multiple="multiple">
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
@@ -149,6 +149,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		var startDate = moment().subtract(7, 'days');
 		var endDate = moment();
 
+		$("#sel_bundle").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+
 		$('#default-daterange').daterangepicker({
 			opens: 'right',
 			format : 'YYYY/MM/DD',
@@ -179,7 +184,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : function() {
 				var param = {
-					bundleId : $("#sel_bundle").val(),
+					bundleId : $("#sel_bundle").val() + "",
 					statusCode : $("#sel_status").val(),
 					keyword : $("#keyword").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),

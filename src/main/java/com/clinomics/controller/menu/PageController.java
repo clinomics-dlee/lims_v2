@@ -34,6 +34,7 @@ public class PageController {
 		}
 		model.addAttribute("statusCodes", statusCodeMap);
 		model.addAttribute("bundles", cacheService.selectAll());
+		model.addAttribute("agencies", cacheService.getDistinctHospitalName());
 		return "calendar";
 	}
 

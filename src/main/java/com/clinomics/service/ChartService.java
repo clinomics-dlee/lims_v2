@@ -175,6 +175,7 @@ public class ChartService {
 			.where(SampleSpecification.betweenDate(params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusCodeGt(20));
 	}
@@ -184,6 +185,7 @@ public class ChartService {
 			.where(SampleSpecification.customDateBetween("anlsCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
@@ -202,6 +204,7 @@ public class ChartService {
 			.where(SampleSpecification.customDateBetween("outputCmplDate", params))
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
+			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(Arrays.asList(
 				StatusCode.S710_OUTPUT_CMPL

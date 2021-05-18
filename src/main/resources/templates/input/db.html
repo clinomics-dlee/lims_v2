@@ -57,7 +57,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						<!-- begin panel-body -->
 						<div id="panel-body" class="panel-body">
 					
-							<div class="form-group row m-b-12">
+							<div class="form-group row m-b-10">
 								<label class="col-form-label m-l-2">서비스</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200" id="sel_bundle" multiple="multiple">
@@ -71,8 +71,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
 									</select>
 								</div>
-								
-								<label class="col-form-label m-l-5">조회일자</label>
+							
+							</div>
+							<div class="form-group row m-b-12">
+
+								<label class="col-form-label m-l-2">조회일자</label>
 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
 								    <span class="input-group-append">

@@ -71,13 +71,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		    <div class="row">
                 <div class="col-lg-12">
                     <div class="panel p-20">
-    					<div class="row m-b-5">
-							<div class="row col-md-8">
-								<label class="col-form-label">서비스</label>
-								<select class="form-control width-150 m-r-5 m-b-5" data-parsley-required="true" id="sel_bundle" name="bundleId">
-									<option value="">전체</option>
+						
+    					<div class="row m-b-10">
+							
+							<div class="col-md-12 text-center">
+								<label class="col-form-label m-l-2 m-r-10">서비스</label>
+								<select class="form-control width-200" id="sel_bundle" multiple="multiple">
 									<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 								</select>
+
+								<label class="col-form-label m-l-10 m-r-10">의뢰기관명</label>
+								<select class="form-control width-200" id="sel_agency" multiple="multiple">
+									<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
+								</select>
+							</div>
+						</div>
+
+    					<div class="row m-b-5">
+							<div class="col-md-8 text-center">
+
 								<button class="btn btn-white m-r-5 m-b-5" id="btn_prev">이전</button>
 								<b id="tit_date" style="display:inline-block; width:150px; text-align: center; font-size: 24px; vertical-align: middle;">
 									2020-01-01
@@ -290,6 +302,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		
 		writeTitleDate();
 		
+		$("#sel_bundle").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+		$("#sel_agency").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+
 		$('#btn_prev').click(function() {
 			rdate.subtract(1, 'months');
 			writeTitleDate();
@@ -305,7 +326,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			writeTitleDate();
 		});
 		
-		$('#sel_bundle').on('change', function () {
+		$('#sel_bundle, #sel_agency').on('change', function () {
 
 			writeTitleDate();
 		});
@@ -319,7 +340,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	function writeTitleDate() {
 		$('.fc-title').css('font-size', '1.5em');
 		idate = rdate.format("YYYY-MM");
-		var bundleId = $("#sel_bundle").val();
+		var bundleId = $("#sel_bundle").val() + "";
 		$('#tit_date').text(idate);
 		//중복될경우 종료
 		//if (SearchedDate.has(idate)) return;
@@ -328,7 +349,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : {
 				yyyymm : idate,
-				bundleId : bundleId
+				bundleId : bundleId,
+				agencies : $("#sel_agency").val() + ""
 			},
 			dataType : "json",
 			contentType : "application/json; charset=utf-8",
