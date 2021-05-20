@@ -46,7 +46,7 @@ function historyPopupOnload(sampleId, bundleId) {
 	$("#modal-sample-history").modal();
 	$("#_history_popup").empty();
 	
-	UserTable.init('_history_popup', true, [10, 50, 100, 200, 500] , [10, 50, 100, 200, 500]);
+	UserTable.init('_history_popup', true, [10, 50, 100, 200, 500, 1000, 2000] , [10, 50, 100, 200, 500, 1000, 2000]);
 	historyAfterGetItem(sampleId);
 }
 
