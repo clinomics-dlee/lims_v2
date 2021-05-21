@@ -1,13 +1,9 @@
 package com.clinomics.service;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -21,14 +17,14 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import ch.qos.logback.core.status.Status;
-
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -46,9 +42,6 @@ public class CalendarService {
 	
 	@Autowired
 	SampleItemService sampleItemService;
-
-	@PersistenceContext
-	private EntityManager entityManager;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -86,65 +79,42 @@ public class CalendarService {
 	}
 
 	public Map<String, Object> selectCountByMonthly(Map<String, String> params) {
+		String yyyymm = (params.get("yyyymm") + "").replace("-", "");
+		String strBundles = params.get("bundleId") + "";
 		
-		
-		List<Sample> sample1 = sampleRepository.findAll(getRegisteredWhere(params));
-		List<Sample> sample2 = sampleRepository.findAll(getModifiedWhere(params));
-		// List<Sample> sample2 = sampleRepository.findAll(getAnalysisWhere(params));
-		// List<Sample> sample3 = sampleRepository.findAll(getCompletedWhere(params));
-		List<Sample> sample3 = sampleRepository.findAll(getReportedWhere(params));
-		
-//		TemporalField weekFields = WeekFields.of(Locale.getDefault()).weekOfMonth();
+		List<Integer> bundleIds = Lists.newArrayList();
+		if (strBundles.length() > 0) {
+			List<String> bundles = Arrays.asList((params.get("bundleId") + "").split(","));
+			bundleIds = bundles.stream().map(b -> NumberUtils.toInt(b)).collect(Collectors.toList());
+		} else {
+			List<Bundle> bs = bundleRepository.findByIsActiveTrue();
+			bundleIds = bs.stream().map(b -> b.getId()).collect(Collectors.toList());
+		}
 
-		List<Map<String, String>> mapSample = sample1.stream()
-			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
-				LocalDateTime cd = s.getCreatedDate();
-				LocalDateTime od = s.getOutputCmplDate();
-				t.put("day", (cd == null ? "" : cd.getDayOfMonth()) + "");
-				t.put("completeDay", (cd != null && od != null ? cd.getDayOfMonth() + "" : ""));
-				return t;
-			}).collect(Collectors.toList());
-		
-		List<Map<String, String>> mapAnalysis = sample2.stream()
-			.filter(s -> STS_EXP.contains(s.getStatusCode()))
-			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
-				LocalDateTime md = s.getModifiedDate();
-				t.put("day", (md != null ? md.getDayOfMonth() : "") + "");
-				return t;
-			}).collect(Collectors.toList());
-		
-		List<Map<String, String>> mapComplete = sample2.stream()
-			.filter(s -> STS_JDGM.contains(s.getStatusCode()))
-			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
-				LocalDateTime md = s.getModifiedDate();
-				t.put("day", (md != null ? md.getDayOfMonth() : "") + "");
-				return t;
-			}).collect(Collectors.toList());
-		
-		List<Map<String, String>> mapCompletePdf = sample3.stream()
-			.filter(s -> STS_REPORT.contains(s.getStatusCode()))
-			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
-				LocalDateTime od = s.getOutputCmplDate();
-				t.put("day", (od == null ? "" : od.getDayOfMonth()) + "");
-				return t;
-			}).collect(Collectors.toList());
-		
-		Map<String, Long> groupbySample = getGroupingMap(mapSample, "day");
-		Map<String, Long> groupbyCompleteOfSample = getGroupingMap(mapSample, "completeDay");
-		Map<String, Long> groupbyAnalysis = getGroupingMap(mapAnalysis, "day");
-		Map<String, Long> groupbyComplete = getGroupingMap(mapComplete, "day");
-		Map<String, Long> groupbyCompletePdf = getGroupingMap(mapCompletePdf, "day");
-		
+		List<String[]> cal1 = sampleRepository.findCalendarDataByCreatedDate(yyyymm, bundleIds, Arrays.asList(StatusCode.class.getEnumConstants()).stream().map(e -> e.toString()).collect(Collectors.toList()));
+		List<String[]> cal2 = sampleRepository.findCalendarDataByModifiedDate(yyyymm, bundleIds, STS_EXP.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+		List<String[]> cal3 = sampleRepository.findCalendarDataByModifiedDate(yyyymm, bundleIds, STS_JDGM.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+		List<String[]> cal4 = sampleRepository.findCalendarDataByOutputCmplDate(yyyymm, bundleIds, STS_REPORT.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+
+		ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> rtn = Maps.newHashMap();
-        rtn.put("sample", groupbySample);
-        rtn.put("completeSample", groupbyCompleteOfSample);
-        rtn.put("analysis", groupbyAnalysis);
-        rtn.put("complete", groupbyComplete);
-        rtn.put("completePdf", groupbyCompletePdf);
+
+        String json1 = cal1.stream().map(c -> "\"" + c[0] + "\":\"" + c[1] + "\"").collect(Collectors.joining(","));
+        String json2 = cal1.stream().map(c -> "\"" + c[0] + "\":\"" + c[2] + "\"").collect(Collectors.joining(","));
+        String json3 = cal2.stream().map(c -> "\"" + c[0] + "\":\"" + c[1] + "\"").collect(Collectors.joining(","));
+        String json4 = cal3.stream().map(c -> "\"" + c[0] + "\":\"" + c[1] + "\"").collect(Collectors.joining(","));
+        String json5 = cal4.stream().map(c -> "\"" + c[0] + "\":\"" + c[1] + "\"").collect(Collectors.joining(","));
+        
+        try {
+			rtn.put("sample", mapper.readValue("{" + json1 + "}", Map.class));
+			rtn.put("completeSample", mapper.readValue("{" + json2 + "}", Map.class));
+			rtn.put("analysis", mapper.readValue("{" + json3 + "}", Map.class));
+			rtn.put("complete", mapper.readValue("{" + json4 + "}", Map.class));
+			rtn.put("completePdf", mapper.readValue("{" + json5 + "}", Map.class));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
 		return rtn;
 		
@@ -275,6 +245,7 @@ public class CalendarService {
 	}
 	
 	private Specification<Sample> getRegisteredWhere(Map<String, String> params) {
+		
 		return Specification
 			.where(getCreateDateWhere(params))
 			.and(SampleSpecification.isLastVersionTrue())
@@ -282,6 +253,7 @@ public class CalendarService {
 			.and(SampleSpecification.hNameIn(params))
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusCodeGt(20));
+		
 	}
 	
 	private Specification<Sample> getModifiedWhere(Map<String, String> params) {

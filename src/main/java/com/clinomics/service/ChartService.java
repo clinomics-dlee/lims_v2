@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -22,6 +23,7 @@ import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Service
@@ -39,7 +41,7 @@ public class ChartService {
 	String[] colors = {"#FF3B30", "#FF9500", "#FFCC00", "#4CD964", "#5AC8FA", "#007AFF", "#5856D6"
 						, "#FF6C64", "#FFD940", "#F7B048", "#79E38B", "#83D6FB", "#5DA5E8", "#8280E0"};
 	
-	DateTimeFormatter yyyymmFormat = DateTimeFormatter.ofPattern("yyyy-MM");
+	DateTimeFormatter yyyymmFormat = DateTimeFormatter.ofPattern("yyyyMM");
 
 	public Bundle selectOne(int id) {
 		return bundleRepository.findById(id).orElse(new Bundle());
@@ -53,83 +55,103 @@ public class ChartService {
 		System.out.println("★★★★★★★★ params=" + params.toString());
 		String paramStart = params.get("start") + "";
 		String paramEnd = params.get("end") + "";
+		String yyyymm = (params.get("yyyymm") + "").replace("-", "");
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDateTime start = LocalDateTime.parse(paramStart + "-01 00:00:00", formatter);
 		LocalDateTime end = LocalDateTime.parse(paramEnd + "-01 00:00:00", formatter);
 		end = end.plusMonths(1).minusSeconds(1);
 		
-		params.put("sDate", start.format(formatter2));
-		params.put("fDate", end.format(formatter2));
+		String sDate = start.format(yyyymmFormat);
+		String fDate = end.format(yyyymmFormat);
 
-		String paramBundle = params.get("bundleId") + "";
-		List<Bundle> bundles = null;
-		if (paramBundle.isEmpty()) {
-			bundles = bundleRepository.findByIsActiveTrue();
+		String strBundles = params.get("bundleId") + "";
+		
+		List<Bundle> bundles = Lists.newArrayList();
+		List<Integer> bundleIds = Lists.newArrayList();
+		if (strBundles.length() > 0) {
+			List<String> lstBundles = Arrays.asList((params.get("bundleId") + "").split(","));
+			bundleIds = lstBundles.stream().map(b -> NumberUtils.toInt(b)).collect(Collectors.toList());
+			
+			bundles = bundleRepository.findByIdInAndIsActiveTrueOrderBySort(bundleIds);
 		} else {
-			List<String> strBundleIds = Arrays.asList(paramBundle.split(","));
-			List<Integer> bundleIds = strBundleIds.stream().map(b -> NumberUtils.toInt(b)).collect(Collectors.toList());
-			bundles = bundleRepository.findByIdInAndIsActiveTrue(bundleIds);
+			bundles = bundleRepository.findByIsActiveTrueOrderBySort();
+			bundleIds = bundles.stream().map(b -> b.getId()).collect(Collectors.toList());
 		}
 		
-		List<Sample> sample = sampleRepository.findAll(getSampleWhere(params));
-		List<Sample> complete = sampleRepository.findAll(getCompletedWhere(params));
-		List<Sample> reporte = sampleRepository.findAll(getReportedWhere(params));
+//		List<Sample> sample = sampleRepository.findAll(getSampleWhere(params));
+//		List<Sample> complete = sampleRepository.findAll(getCompletedWhere(params));
+//		List<Sample> reporte = sampleRepository.findAll(getReportedWhere(params));
 		
-		List<Map<String, String>> mapSample = sample.stream()
-			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
-				t.put("yyyymm", s.getCreatedDate().format(yyyymmFormat));
-				t.put("name", s.getBundle().getName());
-				return t;
-			}).collect(Collectors.toList());
+		List<Map<String, String>> chart1 = sampleRepository.findChartDataByCreatedDate(sDate, fDate, bundleIds, Arrays.asList(StatusCode.class.getEnumConstants()).stream().map(e -> e.toString()).collect(Collectors.toList()));
+		List<Map<String, String>> chart2 = sampleRepository.findChartDataByAnlsCmplDate(sDate, fDate, bundleIds, Arrays.asList(new StatusCode[] {
+				StatusCode.S460_ANLS_CMPL
+				, StatusCode.S600_JDGM_APPROVE
+				, StatusCode.S700_OUTPUT_WAIT
+				, StatusCode.S710_OUTPUT_CMPL
+				, StatusCode.S810_RE_OUTPUT_CMPL
+				, StatusCode.S900_OUTPUT_CMPL
+			}).stream().map(e -> e.getKey()).collect(Collectors.toList()));
+		List<Map<String, String>> chart3 = sampleRepository.findChartDataByOutputCmplDate(sDate, fDate, bundleIds, Arrays.asList(
+				StatusCode.S710_OUTPUT_CMPL
+				, StatusCode.S810_RE_OUTPUT_CMPL
+				, StatusCode.S900_OUTPUT_CMPL
+			).stream().map(e -> e.getKey()).collect(Collectors.toList()));
 		
-		List<Map<String, String>> mapSampleComplete = complete.stream()
-			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
-				LocalDateTime acd = s.getAnlsCmplDate();
-				String yyyymm = (acd == null ? "" : acd.format(yyyymmFormat));
-				t.put("yyyymm", yyyymm);
-				t.put("name", s.getBundle().getName());
-				return t;
-			}).collect(Collectors.toList());
 		
-		List<Map<String, String>> mapResult = reporte.stream()
-			.map(s -> {
-				Map<String, String> t = Maps.newHashMap();
-				LocalDateTime ocd = s.getOutputCmplDate();
-				String yyyymm = (ocd == null ? "" : ocd.format(yyyymmFormat));
-				t.put("yyyymm", yyyymm);
-				t.put("name", s.getBundle().getName());
-				return t;
-			}).collect(Collectors.toList());
+//		List<Map<String, String>> mapSample = chart1.stream()
+//			.map(s -> {
+//				Map<String, String> t = Maps.newHashMap();
+//				t.put("yyyymm", s.getCreatedDate().format(yyyymmFormat));
+//				t.put("name", s.getBundle().getName());
+//				return t;
+//			}).collect(Collectors.toList());
+//		
+//		List<Map<String, String>> mapSampleComplete = complete.stream()
+//			.map(s -> {
+//				Map<String, String> t = Maps.newHashMap();
+//				LocalDateTime acd = s.getAnlsCmplDate();
+//				String yyyymm = (acd == null ? "" : acd.format(yyyymmFormat));
+//				t.put("yyyymm", yyyymm);
+//				t.put("name", s.getBundle().getName());
+//				return t;
+//			}).collect(Collectors.toList());
+//		
+//		List<Map<String, String>> mapResult = reporte.stream()
+//			.map(s -> {
+//				Map<String, String> t = Maps.newHashMap();
+//				LocalDateTime ocd = s.getOutputCmplDate();
+//				String yyyymm = (ocd == null ? "" : ocd.format(yyyymmFormat));
+//				t.put("yyyymm", yyyymm);
+//				t.put("name", s.getBundle().getName());
+//				return t;
+//			}).collect(Collectors.toList());
+		
 		
 		Map<String, Object> rtn1 = Maps.newHashMap();
 		LocalDateTime loop = start;
 		
 		rtn1.put("labels", getChartLabels(end, loop));
-		rtn1.put("datasets", getDatasetByBundle(bundles, end, loop, mapSample));
+		rtn1.put("datasets", getDatasetByBundle(bundles, end, loop, chart1));
 		
 		Map<String, Object> rtn2 = Maps.newHashMap();
 		loop = start;
 		
 		rtn2.put("labels", getChartLabels(end, loop));
-		rtn2.put("datasets", getDatasetByBundle(bundles, end, loop, mapSampleComplete));
+		rtn2.put("datasets", getDatasetByBundle(bundles, end, loop, chart2));
 		
 		Map<String, Object> rtn3 = Maps.newHashMap();
 		loop = start;
 		
 		rtn3.put("labels", getChartLabels(end, loop));
-		rtn3.put("datasets", getDatasetByBundle(bundles, end, loop, mapResult));
+		rtn3.put("datasets", getDatasetByBundle(bundles, end, loop, chart3));
 		
 		Map<String, Object> rtn4 = Maps.newHashMap();
 		loop = start;
 
-		System.out.println("★★★★★★★★★★ mapSample.size=" + mapSample.size());
 		
 		rtn4.put("labels", bundles.stream().map(b -> b.getName()).collect(Collectors.toList()));
-		rtn4.put("datasets", getPieDatasetByBundle(bundles, end, mapSample));
+		rtn4.put("datasets", getPieDatasetByBundle(bundles, end, chart1));
 			
 		
 		Map<String, Object> rtn = Maps.newHashMap();
@@ -235,21 +257,31 @@ public class ChartService {
 	
 	private List<Long> getChartDatasYyyymm(LocalDateTime end, LocalDateTime loop, List<Map<String, String>> map, String name) {
 		List<Long> datas = new ArrayList<>();
+		Map<String, String> zero = Maps.newHashMap();
+		zero.put("count", "0");
 		while (end.getMonthValue() >= loop.getMonthValue()) {
 			String yyyymm = loop.format(yyyymmFormat);
-			long c = getCounting(map, "yyyymm", yyyymm, "name", name);
-			datas.add(c);
+			//long c = getCounting(map, "yyyymm", yyyymm, "name", name);
+			Optional<Map<String, String>> oma = map.stream()
+					.filter(
+							m ->
+							m.getOrDefault("yyyymm", "").equals(yyyymm) && m.getOrDefault("name", "").equals(name)
+					).findAny();
+			
+			
+			datas.add(NumberUtils.toLong(oma.orElse(zero).get("count")));
 			loop = loop.plusMonths(1);
 		}
+		
 		return datas;
 	}
 	
 	private Long getCounting(List<Map<String, String>> map, String key1, String value1) {
-		return map.stream().filter(m -> value1.equals(m.get(key1))).collect(Collectors.counting());
-	}
-	
-	private Long getCounting(List<Map<String, String>> map, String key1, String value1, String key2, String value2) {
-		return map.stream().filter(m -> value1.equals(m.get(key1)) && value2.equals(m.get(key2))).collect(Collectors.counting());
+		
+		List<Long> tmp = map.stream().filter(m -> value1.equals(m.get(key1))).map(m -> NumberUtils.toLong(m.get("count"))).collect(Collectors.toList());
+		
+		
+		return tmp.stream().collect(Collectors.summingLong(Long::longValue));
 	}
 	
 }

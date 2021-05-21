@@ -53,7 +53,7 @@ public class CacheService {
 
 	@Cacheable(value = "bundleCache")
 	public List<Bundle> selectAll() {
-		return bundleRepository.findByIsActiveTrue();
+		return bundleRepository.findByIsActiveTrueOrderBySort();
 	}
 
 }

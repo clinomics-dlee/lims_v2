@@ -79,11 +79,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<select class="form-control width-200" id="sel_bundle" multiple="multiple">
 									<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 								</select>
-
-								<label class="col-form-label m-l-10 m-r-10">의뢰기관명</label>
-								<select class="form-control width-200" id="sel_agency" multiple="multiple">
-									<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
-								</select>
+	
+								<button class="btn btn-white m-l-10" id="btn_search">조회</button>
 							</div>
 						</div>
     					<div class="row m-b-5">
@@ -304,10 +301,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			enableFiltering: true,
 			maxHeight: 450
 		});
-		$("#sel_agency").multiselect({
-			enableFiltering: true,
-			maxHeight: 450
-		});
 
 		$('#btn_prev').click(function() {
 			rdate.subtract(1, 'months');
@@ -324,8 +317,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			writeTitleDate();
 		});
 		
-		$('#sel_bundle, #sel_agency').on('change', function () {
-
+		// $('#sel_bundle, #sel_agency').on('change', function () {
+		// 	writeTitleDate();
+		// });
+		
+		$('#btn_search').on('click', function () {
 			writeTitleDate();
 		});
 
@@ -339,7 +335,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		$('.fc-title').css('font-size', '1.5em');
 		idate = rdate.format("YYYY-MM");
 		var bundleId = $("#sel_bundle").val() + "";
-		var agencies = $("#sel_agency").val() + "";
 		
 		$('#tit_date').text(idate);
 		//중복될경우 종료
@@ -349,8 +344,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : {
 				yyyymm : idate,
-				bundleId : bundleId,
-				agencies : agencies
+				bundleId : bundleId
 			},
 			dataType : "json",
 			contentType : "application/json; charset=utf-8",
@@ -372,6 +366,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						
 						val1 = parseInt(data.sample[day]);
 						val1_1 = parseInt(data.completeSample[day]);
+						
 						if (!val1_1) val1_1 = 0;
 						val2 = parseInt(data.analysis[day]);
 						val3 = parseInt(data.complete[day]);
@@ -383,22 +378,22 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							w1 += val1; t1 += val1;
 							w1_1 += val1_1; t1_1 += val1_1;
 							
-							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\', ' + dayToDate(day, 2) + ')"'
 								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + val1_1 + ' / ' + val1 + '</a>';
 						}
 						if (val2) {
 							w2 += val2; t2 += val2;
-							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\', ' + dayToDate(day, 2) + ')"'
 								+ ' class="btn bg-success btn-xs p-l-10 p-r-10 m-b-5">' + val2 + '</a>';
 						}
 						if (val3) {
 							w3 += val3; t3 += val3;
-							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\', ' + dayToDate(day, 2) + ')"'
 								+ ' class="btn bg-orange btn-xs p-l-10 p-r-10 m-b-5">' + val3 + '</a>';
 						}
 						if (val4) {
 							w4 += val4; t4 += val4;
-							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToDate(day, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\', ' + dayToDate(day, 2) + ')"'
 								+ ' class="btn bg-red btn-xs p-l-10 p-r-10 m-b-5">' + val4 + '</a>';
 						}
 						html += '</div>';
@@ -407,19 +402,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					} else if (loop % 8 == 0 && loop != 0) {
 						html = '&nbsp;<div>';
 						if (w1 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-blue btn-xs p-l-10 p-r-10 m-b-5">' + w1_1 + ' / ' + w1 + '</a>';
 						}
 						if (w2 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-success btn-xs p-l-10 p-r-10 m-b-5">' + w2 + '</a>';
 						}
 						if (w3 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-orange btn-xs p-l-10 p-r-10 m-b-5">' + w3 + '</a>';
 						}
 						if (w4 > 0) {
-							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
+							html += ' <a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\', ' + dayToBetweenDate(day - 1, 2) + ')"'
 								+ ' class="btn bg-red btn-xs p-l-10 p-r-10 m-b-5">' + w4 + '</a>';
 						}
 						html += '</div>';
@@ -428,13 +423,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					}
 					loop++;
 				});
-				$("#total1").html('<a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDateMonth() + ')"'
+				$("#total1").html('<a href="#" onClick="afterPopupOnload(0, \''+ bundleId + '\', ' + dayToBetweenDateMonth() + ')"'
 								+ ' style="color: white;">' + t1_1 + ' / ' + t1 + '</a>');
-				$("#total2").html('<a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDateMonth() + ')"'
+				$("#total2").html('<a href="#" onClick="afterPopupOnload(1, \''+ bundleId + '\', ' + dayToBetweenDateMonth() + ')"'
 								+ ' style="color: white;">' + t2 + '</a>');
-				$("#total3").html('<a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDateMonth() + ')"'
+				$("#total3").html('<a href="#" onClick="afterPopupOnload(2, \''+ bundleId + '\', ' + dayToBetweenDateMonth() + ')"'
 								+ ' style="color: white;">' + t3 + '</a>');
-				$("#total4").html('<a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\', \''+ agencies + '\', ' + dayToBetweenDateMonth() + ')"'
+				$("#total4").html('<a href="#" onClick="afterPopupOnload(3, \''+ bundleId + '\', ' + dayToBetweenDateMonth() + ')"'
 								+ ' style="color: white;">' + t4 + '</a>');
 				$("#cal1").removeClass('hide');
 			},

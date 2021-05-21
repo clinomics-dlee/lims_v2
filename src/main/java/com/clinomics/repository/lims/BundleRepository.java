@@ -9,7 +9,9 @@ import com.clinomics.entity.lims.Bundle;
 
 public interface BundleRepository extends JpaRepository<Bundle, Integer> {
 	List<Bundle> findByIsActiveTrue();
+	List<Bundle> findByIsActiveTrueOrderBySort();
 	List<Bundle> findByIdInAndIsActiveTrue(List<Integer> id);
+	List<Bundle> findByIdInAndIsActiveTrueOrderBySort(List<Integer> id);
 	List<Bundle> findByNameAndIsActiveTrue(String name);
 	List<Bundle> findByIsSingleAndIsActiveTrue(boolean isSingle);
 	List<Bundle> findByIsSingle(boolean isSingle, Pageable pageable);

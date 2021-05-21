@@ -51,13 +51,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 											<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 										</select>
 									</div>
-	
-									<label class="col-form-label m-l-5">의뢰기관명</label>
-									<div class="col-xs-push-0">
-										<select class="form-control width-200" id="sel_agency" multiple="multiple">
-											<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
-										</select>
-									</div>
 								</div>
 										
 								<label class="col-form-label">기간</label>
@@ -194,10 +187,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			enableFiltering: true,
 			maxHeight: 450
 		});
-		$("#sel_agency").multiselect({
-			enableFiltering: true,
-			maxHeight: 450
-		});
 
 		$('#startDate').datepicker({
 			autoclose : true,
@@ -231,7 +220,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "GET",
 			data : {
 				bundleId : $("#sel_bundle").val() + "",
-				agencies : $("#sel_agency").val() + "",
 				start : $("#startDate").val(),
 				end : $("#endDate").val()
 			},

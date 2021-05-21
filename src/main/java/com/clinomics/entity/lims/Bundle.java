@@ -15,8 +15,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Table(name="bundle")
 public class Bundle implements Serializable {
@@ -62,7 +60,6 @@ public class Bundle implements Serializable {
 	
 	private boolean isActive = true;
 	
-	@JsonIgnore
 	private int sort;
 
 	@ManyToMany(cascade =  CascadeType.ALL)

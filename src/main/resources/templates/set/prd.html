@@ -391,7 +391,8 @@
 	            $('input[name=sequenceRole]').val(listTable.cell(idx, 7).data());
 	            $('input[name=type]').val(listTable.cell(idx, 8).data());
 				$('input:checkbox[name=hospital]').prop("checked", listTable.cell(idx, 9).data());
-	            $('input[name=type]').val(listTable.cell(idx, 10).data());
+				
+	            $('input[name=sort]').val(listTable.cell(idx, 10).data());
 	            
 	            $("#right_title").text('Modify - ' + name);
 	        }
