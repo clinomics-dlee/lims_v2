@@ -290,15 +290,15 @@ function doList() {
 				return '<a href="javascript:edit(\'' + row.id + '\')" class="btn btn-sm btn-primary width-60 m-r-2">Edit</a>';
 			}
 		}, {
-			data : "isFailedMailSent",
+			data : "failedMailSent",
 			className : "with-btn text-center align-middle",
 			render : function(data, type, row) {
 				var checked = "";
 				if (data) checked = "checked";
 				
 				return '<div class="custom-control custom-switch">'
-					+ '<input type="checkbox" class="custom-control-input" onclick="sendMailSave(\'' + row.id + '\')" id="chk_member_' + row.id + '" ' + checked + '>'
-					+ '<label class="custom-control-label" for="chk_member_' + row.id + '"></label>'
+					+ '<input type="checkbox" class="custom-control-input" onclick="sendMailSave(\'' + row.id + '\')" id="chk_member_mail_' + row.id + '" ' + checked + '>'
+					+ '<label class="custom-control-label" for="chk_member_mail_' + row.id + '"></label>'
 					+ '</div>';
 			}
 		}, {
@@ -510,7 +510,7 @@ function sendMailSave(id) {
 		},
 		data : JSON.stringify({
 			id : id,
-			isFailedMailSent : $("#chk_member_" + id).prop('checked')
+			isFailedMailSent : $("#chk_member_mail_" + id).prop('checked')
 		}),
 		contentType : "application/json;charset=utf-8",
 		success : function(data) {
