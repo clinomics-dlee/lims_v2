@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -99,6 +100,7 @@ public class ProductService {
 	}
 	
 	@Transactional
+	@CacheEvict(value = "bundleCache", allEntries = true)
 	public Map<String, String> insert(Map<String, String> datas) {
 		Map<String, String> rtn = Maps.newHashMap();
 		String name = datas.get("name");
@@ -148,6 +150,7 @@ public class ProductService {
 	}
 	
 	@Transactional
+	@CacheEvict(value = "bundleCache", allEntries = true)
 	public Map<String, String> save(Map<String, String> datas) {
 		int id = NumberUtils.toInt(datas.get("id"));
 		Map<String, String> rtn = Maps.newHashMap();
