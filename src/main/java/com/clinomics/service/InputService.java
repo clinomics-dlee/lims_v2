@@ -94,6 +94,7 @@ public class InputService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusIn(statusCodes))
