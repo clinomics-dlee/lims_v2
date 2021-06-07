@@ -1,5 +1,10 @@
 package com.clinomics.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum StatusCode {
 	S000_INPUT_REG("등록"),
 	S020_INPUT_RCV("입고"),
@@ -25,13 +30,7 @@ public enum StatusCode {
 
 	private final String value;
 	
-	StatusCode(String value) {
-		this.value = value;
-	}
 	public String getKey() {
 		return name();
-	}
-	public String getValue() {
-		return value;
 	}
 }
