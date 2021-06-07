@@ -218,6 +218,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				    		CommonMsg.save(function() {
 				    			UserTable.reload('_anls_rdy_grid');
 							});
+						} else if (data.result == "warning") {
+							CommonMsg.warning(function() { }, data.message);
 						} else {
 							CommonMsg.error(function() { }, data.message);
 						}

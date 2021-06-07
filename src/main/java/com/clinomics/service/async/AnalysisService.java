@@ -62,9 +62,6 @@ public class AnalysisService {
 		String chipBarcode = samples.get(0).getChipBarcode();
 		String analysisPath = samples.get(0).getFilePath();
 
-		// #. Cell File 서버로 가져오기
-		this.downloadCelFiles(samples);
-
 		// #. 명령어 실행
 		FileOutputStream textFileOs = null;
 		FileOutputStream excelFileOs = null;
