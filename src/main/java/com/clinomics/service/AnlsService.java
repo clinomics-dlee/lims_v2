@@ -1,8 +1,6 @@
 package com.clinomics.service;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,7 +25,6 @@ import com.clinomics.service.async.AnalysisService;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.FileUtil;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -160,7 +157,6 @@ public class AnlsService {
 			return rtn;
 		}
 
-		List<String> failMapplingNos = new ArrayList<String>();
 		for (String mappingNo : mappingNos) {
 			Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 			List<Sample> samples = sampleRepository.findAll(where);
@@ -170,35 +166,23 @@ public class AnlsService {
 			File path = new File(filePath);
 			if (!path.exists()) path.mkdir();
 
-			// #. Cell File 서버로 가져오기
-			boolean isCompleteCopy = this.copyCelFiles(samples);
-
-			if (isCompleteCopy) {
-				for (Sample sample : samples) {
-					// #. sample 분석관련값 셋팅
-					sample.setFilePath(filePath);
-					sample.setFileName(chipBarcode + "_" + chipDesc + "_" + sample.getWellPosition() + ".CEL");
-					sample.setAnlsStartDate(now);
-					sample.setModifiedDate(now);
-					sample.setAnlsStartMember(member);
-					sample.setStatusCode(StatusCode.S410_ANLS_RUNNING);
-				}
-				// #. sample 저장
-				sampleRepository.saveAll(samples);
-	
-				// #. 가져와서 분석 실행하기
-				analysisService.doPythonAnalysis(samples);
-			} else {
-				failMapplingNos.add(mappingNo);
+			for (Sample sample : samples) {
+				// #. sample 분석관련값 셋팅
+				sample.setFilePath(filePath);
+				sample.setFileName(chipBarcode + "_" + chipDesc + "_" + sample.getWellPosition() + ".CEL");
+				sample.setAnlsStartDate(now);
+				sample.setModifiedDate(now);
+				sample.setAnlsStartMember(member);
+				sample.setStatusCode(StatusCode.S410_ANLS_RUNNING);
 			}
+			// #. sample 저장
+			sampleRepository.saveAll(samples);
+
+			// #. 가져와서 분석 실행하기
+			analysisService.doPythonAnalysis(samples);
 		}
 		
-		if (failMapplingNos.size() > 0) {
-			rtn.put("result", "warning");
-			rtn.put("message", "파일 복사중 오류가 발생하였습니다." + failMapplingNos.toString());
-		} else {
-			rtn.put("result", ResultCode.SUCCESS.get());
-		}
+		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
 	}
 
@@ -489,60 +473,5 @@ public class AnlsService {
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
-	}
-
-	/**
-	 * mount된 경로에서 파일을 복사한다.
-	 * @param samples
-	 */
-	private boolean copyCelFiles(List<Sample> samples) {
-		boolean isCompleteCopy = false;
-		logger.info("★★★★★★★★★★ Start copyCelFiles");
-		for (Sample sample : samples) {
-			File sourceFile = null;
-
-			// #. 마운트 장비에서 해당 샘플에 cel 파일이 존재하는지 확인
-			logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "]fileName=" + sample.getFileName());
-			for (MountWorkerCode code : MountWorkerCode.values()) {
-				File dir = new File(code.getValue());
-				// #. 파일이 존재한다면 sourceFile에 셋팅
-				if (Arrays.asList(dir.list()).contains(sample.getFileName())) {
-					sourceFile = new File(code.getValue(), sample.getFileName());
-					break;
-				}
-			}
-
-			// #. 파일이 존재한다면 카피 진행
-			if (sourceFile != null) {
-				logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "] sourceFile size=[" + sourceFile.length() + " byte]");
-				File copyFile = new File(sample.getFilePath(), sample.getFileName());
-
-				try {
-					Files.copy(sourceFile, copyFile);
-					// #. file 복사 확인
-					logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "] copyFile size=[" + copyFile.length() + " byte]");
-					if (Files.asByteSource(sourceFile).contentEquals(Files.asByteSource(copyFile))) {
-						isCompleteCopy = true;
-						sample.setCheckCelFile("PASS");
-						sampleRepository.save(sample);
-						logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "] success copy");
-					} else {
-						// #. 파일 복사가 잘못된 경우 
-						logger.info("★★★★★★★ There was a problem copying the file=" + sample.getLaboratoryId());
-						sample.setCheckCelFile("FAIL");
-						sampleRepository.save(sample);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				// #. 파일이 없는경우 
-				logger.info("★★★★★★★ Not Found File=" + sample.getLaboratoryId());
-				sample.setCheckCelFile("FAIL");
-				sampleRepository.save(sample);
-			}
-		}
-		logger.info("★★★★★★★★★★ finish copyCelFiles");
-		return isCompleteCopy;
 	}
 }

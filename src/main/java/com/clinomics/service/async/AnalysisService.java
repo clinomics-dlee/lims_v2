@@ -8,15 +8,19 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.ChipTypeCode;
+import com.clinomics.enums.MountWorkerCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.util.FileUtil;
+import com.google.common.io.Files;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
@@ -58,9 +62,25 @@ public class AnalysisService {
 	
 	@Async
 	public void doPythonAnalysis(List<Sample> samples) {
+		LocalDateTime now = LocalDateTime.now();
 		ChipTypeCode chipTypeCode = samples.get(0).getChipTypeCode();
 		String chipBarcode = samples.get(0).getChipBarcode();
 		String analysisPath = samples.get(0).getFilePath();
+
+		// #. Cel File 서버로 가져오기
+		boolean isCompleteCopy = this.copyCelFiles(samples);
+
+		// #. Cel File 복사 실패시 
+		if (!isCompleteCopy) {
+			logger.info("★★★ Cel File Copy Fail.");
+			for (Sample sample : samples) {
+				sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
+				sample.setStatusMessage("Cel File Copy Fail");
+				sample.setAnlsEndDate(now);
+				sampleRepository.save(sample);
+			}
+			return;
+		}
 
 		// #. 명령어 실행
 		FileOutputStream textFileOs = null;
@@ -175,6 +195,61 @@ public class AnalysisService {
 		sheet.setColumnWidth(0, 3000);
 		
 		return workbook;
+	}
+
+	/**
+	 * mount된 경로에서 파일을 복사한다.
+	 * @param samples
+	 */
+	private boolean copyCelFiles(List<Sample> samples) {
+		boolean isCompleteCopy = false;
+		logger.info("★★★★★★★★★★ Start copyCelFiles");
+		for (Sample sample : samples) {
+			File sourceFile = null;
+
+			// #. 마운트 장비에서 해당 샘플에 cel 파일이 존재하는지 확인
+			logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "]fileName=" + sample.getFileName());
+			for (MountWorkerCode code : MountWorkerCode.values()) {
+				File dir = new File(code.getValue());
+				// #. 파일이 존재한다면 sourceFile에 셋팅
+				if (Arrays.asList(dir.list()).contains(sample.getFileName())) {
+					sourceFile = new File(code.getValue(), sample.getFileName());
+					break;
+				}
+			}
+
+			// #. 파일이 존재한다면 카피 진행
+			if (sourceFile != null) {
+				logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "] sourceFile size=[" + sourceFile.length() + " byte]");
+				File copyFile = new File(sample.getFilePath(), sample.getFileName());
+
+				try {
+					Files.copy(sourceFile, copyFile);
+					// #. file 복사 확인
+					logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "] copyFile size=[" + copyFile.length() + " byte]");
+					if (Files.asByteSource(sourceFile).contentEquals(Files.asByteSource(copyFile))) {
+						isCompleteCopy = true;
+						sample.setCheckCelFile("PASS");
+						sampleRepository.save(sample);
+						logger.info("★★★★★★★ [" + sample.getLaboratoryId() + "] success copy");
+					} else {
+						// #. 파일 복사가 잘못된 경우 
+						logger.info("★★★★★★★ There was a problem copying the file=" + sample.getLaboratoryId());
+						sample.setCheckCelFile("FAIL");
+						sampleRepository.save(sample);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				// #. 파일이 없는경우 
+				logger.info("★★★★★★★ Not Found File=" + sample.getLaboratoryId());
+				sample.setCheckCelFile("FAIL");
+				sampleRepository.save(sample);
+			}
+		}
+		logger.info("★★★★★★★★★★ finish copyCelFiles");
+		return isCompleteCopy;
 	}
 
 	/**
