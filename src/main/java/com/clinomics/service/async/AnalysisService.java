@@ -62,25 +62,12 @@ public class AnalysisService {
 	
 	@Async
 	public void doPythonAnalysis(List<Sample> samples) {
-		LocalDateTime now = LocalDateTime.now();
 		ChipTypeCode chipTypeCode = samples.get(0).getChipTypeCode();
 		String chipBarcode = samples.get(0).getChipBarcode();
 		String analysisPath = samples.get(0).getFilePath();
 
 		// #. Cel File 서버로 가져오기
-		boolean isCompleteCopy = this.copyCelFiles(samples);
-
-		// #. Cel File 복사 실패시 
-		if (!isCompleteCopy) {
-			logger.info("★★★ Cel File Copy Fail.");
-			for (Sample sample : samples) {
-				sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
-				sample.setStatusMessage("Cel File Copy Fail");
-				sample.setAnlsEndDate(now);
-				sampleRepository.save(sample);
-			}
-			return;
-		}
+		this.copyCelFiles(samples);
 
 		// #. 명령어 실행
 		FileOutputStream textFileOs = null;
@@ -236,6 +223,8 @@ public class AnalysisService {
 						// #. 파일 복사가 잘못된 경우 
 						logger.info("★★★★★★★ There was a problem copying the file=" + sample.getLaboratoryId());
 						sample.setCheckCelFile("FAIL");
+						sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
+						sample.setStatusMessage("There was a problem copying the file.");
 						sampleRepository.save(sample);
 					}
 				} catch (Exception e) {
@@ -245,6 +234,8 @@ public class AnalysisService {
 				// #. 파일이 없는경우 
 				logger.info("★★★★★★★ Not Found File=" + sample.getLaboratoryId());
 				sample.setCheckCelFile("FAIL");
+				sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
+				sample.setStatusMessage("Not Found File.");
 				sampleRepository.save(sample);
 			}
 		}
