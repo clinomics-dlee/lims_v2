@@ -115,7 +115,9 @@ public class AnlsService {
 		// #. mount 위치 경로
 		for (MountWorkerCode code : MountWorkerCode.values()) {
 			File celDir = new File(code.getValue());
-
+			logger.info("★★★ code.getValue()=[" + code.getValue() + "]");
+			logger.info("★★★ celDir=[" + celDir + "]");
+			logger.info("★★★ celDir.list()=[" + celDir.list() + "]");
 			for (String fileName : celDir.list()) {
 				if (fileName.indexOf("_") > -1) {
 					String filePrefix = fileName.substring(0, fileName.indexOf("_"));
