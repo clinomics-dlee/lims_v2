@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.clinomics.entity.lims.Agency;
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Role;
@@ -31,6 +32,7 @@ import com.clinomics.entity.lims.SampleHistory;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
+import com.clinomics.repository.lims.AgencyRepository;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.ProductRepository;
@@ -54,6 +56,9 @@ public class InputService {
 
 	@Autowired
 	ProductRepository productRepository;
+
+	@Autowired
+	AgencyRepository agencyRepository;
 
 	@Autowired
 	MemberRepository memberRepository;
@@ -172,7 +177,25 @@ public class InputService {
 			sample.setCreatedMember(member);
 			sample.setStatusCode(StatusCode.S000_INPUT_REG);
 
-			
+			if (barcode.length() > 0) {
+				String barcodeLetter = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$1");
+				String barcodeNumber = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$2");
+				sample.setBarcodeLetter(barcodeLetter);
+				sample.setBarcodeNumber(barcodeNumber);
+			}
+			if (items.containsKey("h_name")) {
+				String hName = items.get("h_name") + "";
+				
+				Agency ag = agencyRepository.findByName(hName).orElseGet(() -> {
+					Agency newag = new Agency();
+					newag.setName(hName);
+					agencyRepository.save(newag);
+					agencyRepository.flush();
+					return newag;
+				});
+				
+				sample.setAgency(ag);
+			}
 		}
 		
 		items.remove("memberId");
