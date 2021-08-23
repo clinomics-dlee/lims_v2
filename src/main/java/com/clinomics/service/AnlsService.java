@@ -159,6 +159,15 @@ public class AnlsService {
 			return rtn;
 		}
 
+		// #. 마운트 장비 파일 목록 확인용 로그 추가
+		for (MountWorkerCode code : MountWorkerCode.values()) {
+			File celDir = new File(code.getValue());
+			logger.info("★★★ code.getValue()=[" + code.getValue() + "]");
+			logger.info("★★★ celDir=[" + celDir + "]");
+			logger.info("★★★ celDir.list()=[" + celDir.list() + "]");
+			logger.info("★★★ celDir.list().length=[" + celDir.list().length + "]");
+		}
+
 		for (String mappingNo : mappingNos) {
 			Specification<Sample> where = Specification.where(SampleSpecification.mappingNoEqual(mappingNo));
 			List<Sample> samples = sampleRepository.findAll(where);

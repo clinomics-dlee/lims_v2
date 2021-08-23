@@ -411,4 +411,42 @@ public class OutputService {
 		
 		return rtn;
 	}
+
+	public Map<String, Object> getResultByParamsForRest(Map<String, String> params, String ip) {
+		logger.info("☆☆☆☆☆☆☆ getResultByParamsForRest ☆☆☆☆☆ IN interface : " + params.toString());
+		Map<String, Object> rtn = Maps.newHashMap();
+
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
+		
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount);
+		}
+		long total;
+		
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.betweenModifiedDate(params))
+					.and(SampleSpecification.bundleId(params))
+					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.statusCodeGt(600))
+					.and(SampleSpecification.orderBy(params));
+					
+		
+		total = sampleRepository.count(where);
+		Page<Sample> page = sampleRepository.findAll(where, pageable);
+		
+		List<Sample> list = page.getContent();
+		logger.info("★★★ list.size()=" + list.size());
+
+		rtn.put("result", "success");
+		rtn.put("list", list);
+		rtn.put("pageNumber", pageNumber);
+		rtn.put("totalCount", total);
+		
+		return rtn;
+	}
 }
