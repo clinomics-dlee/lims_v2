@@ -124,7 +124,7 @@
                     <span>출고</span>
                 </a>
 			</li>
-			<li
+			<li sec:authorize="hasAnyRole('ROLE_IT_99')"
 				th:classappend="${#strings.startsWith(path,'/p/test/reg')} ? active : ''">
 				<a href="/p/test/reg">
                     <i class="fa fa-list-alt"></i>
