@@ -7,13 +7,6 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-
 import com.clinomics.entity.lims.Agency;
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
@@ -24,8 +17,15 @@ import com.clinomics.repository.lims.AgencyRepository;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.SampleTestRepository;
-import com.clinomics.specification.lims.SampleSpecification;
+import com.clinomics.specification.lims.SampleTestSpecification;
 import com.google.common.collect.Maps;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TestService {
@@ -33,9 +33,6 @@ public class TestService {
 	@Autowired
 	SampleTestRepository sampleTestRepository;
 	
-//	@Autowired
-//	SampleTestHistoryRepository sampleTestHistoryRepository;
-
 	@Autowired
 	BundleRepository bundleRepository;
 	
@@ -164,18 +161,9 @@ public class TestService {
 		return rtn;
 	}
 	
-//	private void savesampleTestHistory(SampleTest smpl) {
-//		sampleTestHistory sh = new sampleTestHistory();
-//		sh.setsampleTest(smpl);
-//		sh.setItems(smpl.getItems());
-//		sh.setMember(smpl.getCreatedMember());
-//		
-//		sampleTestHistoryRepository.save(sh);
-//	}
-	
 	public long searchExistsBarcode(String barcode) {
 		
-		Specification<SampleTest> where = Specification.where(SampleSpecification.testBarcodeEqual(barcode));
+		Specification<SampleTest> where = Specification.where(SampleTestSpecification.barcodeEqual(barcode));
 		long count = sampleTestRepository.count(where);
 		
 		return count;

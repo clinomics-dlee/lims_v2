@@ -1,20 +1,15 @@
 package com.clinomics.repository.lims;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.clinomics.entity.lims.SampleTest;
+import com.clinomics.enums.StatusCode;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import com.clinomics.entity.lims.Bundle;
-import com.clinomics.entity.lims.SampleTest;
-import com.clinomics.enums.StatusCode;
 
 public interface SampleTestRepository extends JpaRepository<SampleTest, Integer>, JpaSpecificationExecutor<SampleTest> {
     List<SampleTest> findByIdIn(List<Integer> id);

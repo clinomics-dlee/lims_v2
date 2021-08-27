@@ -12,8 +12,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 
-import com.clinomics.entity.lims.Sample;
-import com.clinomics.enums.ChipTypeCode;
+import com.clinomics.entity.lims.SampleTest;
 import com.clinomics.enums.StatusCode;
 import com.google.common.collect.Lists;
 
@@ -21,9 +20,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.jpa.domain.Specification;
 
-public class SampleSpecification {
+public class SampleTestSpecification {
 
-	public static Specification<Sample> createdDateOneMonth(Map<String, String> params) {
+	public static Specification<SampleTest> createdDateOneMonth(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -43,7 +42,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> modifiedDateOneMonth(Map<String, String> params) {
+	public static Specification<SampleTest> modifiedDateOneMonth(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -63,7 +62,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> customDateOneMonth(String field, Map<String, String> params) {
+	public static Specification<SampleTest> customDateOneMonth(String field, Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -83,7 +82,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> customDateBetween(String field, Map<String, String> params) {
+	public static Specification<SampleTest> customDateBetween(String field, Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -102,7 +101,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> betweenDate(Map<String, String> params) {
+	public static Specification<SampleTest> betweenDate(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -121,7 +120,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> betweenModifiedDate(Map<String, String> params) {
+	public static Specification<SampleTest> betweenModifiedDate(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -140,7 +139,7 @@ public class SampleSpecification {
 		};
 	}
 
-	// public static Specification<Sample> bundleId(Map<String, String> params) {
+	// public static Specification<SampleTest> bundleId(Map<String, String> params) {
 
 	// 	return (root, query, criteriaBuilder) -> {
 	// 		Predicate rtn = null;
@@ -154,7 +153,7 @@ public class SampleSpecification {
 	// 	};
 	// }
 
-	public static Specification<Sample> bundleId(Map<String, String> params) {
+	public static Specification<SampleTest> bundleId(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -171,7 +170,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> hNameIn(Map<String, String> params) {
+	public static Specification<SampleTest> hNameIn(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -193,7 +192,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> keywordLike(Map<String, String> params) {
+	public static Specification<SampleTest> keywordLike(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -216,7 +215,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> statusIn(List<StatusCode> statusCodes) {
+	public static Specification<SampleTest> statusIn(List<StatusCode> statusCodes) {
 		return (root, query, criteriaBuilder) -> {
 
 			Predicate rtn = null;
@@ -229,7 +228,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> statusNotIn(List<StatusCode> statusCodes) {
+	public static Specification<SampleTest> statusNotIn(List<StatusCode> statusCodes) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
@@ -241,7 +240,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> statusEqual(StatusCode statusCode) {
+	public static Specification<SampleTest> statusEqual(StatusCode statusCode) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
@@ -253,7 +252,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> statusNotEqual(StatusCode statusCode) {
+	public static Specification<SampleTest> statusNotEqual(StatusCode statusCode) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
@@ -265,7 +264,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> bundleIsActive() {
+	public static Specification<SampleTest> bundleIsActive() {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
@@ -277,43 +276,14 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> laboratoryIdEqual(String laboratoryId) {
+	public static Specification<SampleTest> laboratoryIdEqual(String laboratoryId) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.equal(root.get("laboratoryId"), laboratoryId);
 			return rtn;
 		};
 	}
 
-	public static Specification<Sample> versionEqual(int version) {
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = criteriaBuilder.equal(root.get("version"), version);
-			return rtn;
-		};
-	}
-
-	public static Specification<Sample> isLastVersionTrue() {
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = criteriaBuilder.isTrue(root.get("isLastVersion"));
-			return rtn;
-		};
-	}
-
-	public static Specification<Sample> mappingNoEqual(String mappingNo) {
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = criteriaBuilder.equal(root.get("mappingNo"), mappingNo);
-			return rtn;
-		};
-	}
-
-	public static Specification<Sample> mappingInfoGroupBy() {
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = criteriaBuilder.isNotNull(root.get("mappingNo"));
-			query.groupBy(root.get("mappingNo"), root.get("chipBarcode"), root.get("chipTypeCode"));
-			return rtn;
-		};
-	}
-
-	public static Specification<Sample> statusCodeGt(int number) {
+	public static Specification<SampleTest> statusCodeGt(int number) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.greaterThanOrEqualTo(
 					criteriaBuilder.substring(root.get("statusCode"), 2, 3).as(Integer.class), number);
@@ -321,39 +291,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> mappingInfoLike(Map<String, String> params) {
-
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = null;
-			List<Predicate> predicateLikes = new ArrayList<>();
-
-			if (params.containsKey("keyword") && !params.get("keyword").isEmpty()) {
-				String text = "%" + params.get("keyword") + "%";
-
-				predicateLikes.add(criteriaBuilder.like(root.get("mappingNo"), text));
-				predicateLikes.add(criteriaBuilder.like(root.get("chipBarcode"), text));
-
-				List<ChipTypeCode> codes = new ArrayList<ChipTypeCode>();
-				for (ChipTypeCode code : ChipTypeCode.values()) {
-					String value = code.getValue();
-					if (value.toUpperCase().indexOf(params.get("keyword").trim().toUpperCase()) > -1) {
-						codes.add(code);
-					}
-				}
-
-				if (codes.size() > 0) {
-					predicateLikes.add(criteriaBuilder.or(root.get("chipTypeCode").in(codes)));
-				}
-
-				rtn = criteriaBuilder.or(predicateLikes.toArray(new Predicate[predicateLikes.size()]));
-			}
-
-			return rtn;
-
-		};
-	}
-
-	public static Specification<Sample> productNotLike(Map<String, String> params) {
+	public static Specification<SampleTest> productNotLike(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
@@ -373,40 +311,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> checkCelFileEqual(String checkCelFile) {
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = criteriaBuilder.equal(root.get("checkCelFile"), checkCelFile);
-			return rtn;
-		};
-	}
-
-	public static Specification<Sample> chipBarcodeEqual(String chipBarcode) {
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = criteriaBuilder.equal(root.get("chipBarcode"), chipBarcode);
-			return rtn;
-		};
-	}
-
-	public static Specification<Sample> anlsCmplDatebetween(Map<String, String> params) {
-		return (root, query, criteriaBuilder) -> {
-			Predicate rtn = null;
-			if (params.containsKey("sDate") && params.containsKey("fDate")) {
-				if (params.get("sDate").length() > 0 && params.get("fDate").length() > 0) {
-					List<Predicate> predicatesAnds = new ArrayList<>();
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-					LocalDateTime start = LocalDateTime.parse(params.get("sDate") + " 00:00:00", formatter);
-					LocalDateTime end = LocalDateTime.parse(params.get("fDate") + " 23:59:59", formatter);
-					predicatesAnds.add(criteriaBuilder.between(root.get("anlsCmplDate"), start, end));
-					query.orderBy(criteriaBuilder.asc(root.get("anlsCmplDate")));
-					rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
-				}
-			}
-			return rtn;
-
-		};
-	}
-
-	public static Specification<Sample> orderBy(Map<String, String> params) {
+	public static Specification<SampleTest> orderBy(Map<String, String> params) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			if (params.containsKey("order") && !params.get("order").isEmpty()) {
@@ -458,7 +363,7 @@ public class SampleSpecification {
 		};
 	}
 
-	public static Specification<Sample> barcodeEqual(String barcode) {
+	public static Specification<SampleTest> barcodeEqual(String barcode) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
