@@ -59,14 +59,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							</a>
 						</li>
 					</ul>
-					<div class="panel panel-inverse">
+					<div class="tab-content">
 
 						<!-- begin panel-heading -->
 						
 						<!-- end panel-heading -->
 
 						<!-- begin panel-body -->
-						<div id="panel-body" class="panel-body">
+						<div class="tab-pane fade active show" id="test-tab-1">
 							<!-- begin tab-pane -->
 							
 							<div class="form-group row m-b-15">
@@ -131,64 +131,64 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 						</div>
 						
-<!-- 						<div id="panel-body" class="panel-body" id="test-tab-2"> -->
+						<div class="tab-pane fade" id="test-tab-2">
 					
-<!-- 							<div class="form-group row m-b-10"> -->
-<!-- 								<label class="col-form-label m-l-2">서비스</label> -->
-<!-- 								<div class="col-xs-push-0"> -->
-<!-- 									<select class="form-control width-200" id="sel_bundle" multiple="multiple"> -->
-<!-- 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option> -->
-<!-- 									</select> -->
-<!-- 								</div> -->
+							<div class="form-group row m-b-10">
+								<label class="col-form-label m-l-2">서비스</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="o_sel_bundle" multiple="multiple">
+										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+									</select>
+								</div>
 
-<!-- 								<label class="col-form-label m-l-5">의뢰기관명</label> -->
-<!-- 								<div class="col-xs-push-0"> -->
-<!-- 									<select class="form-control width-200" id="sel_agency" multiple="multiple"> -->
-<!-- 										<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option> -->
-<!-- 									</select> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 							<div class="form-group row m-b-12"> -->
+								<label class="col-form-label m-l-5">의뢰기관명</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_agency" multiple="multiple">
+										<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row m-b-12">
 
-<!-- 								<label class="col-form-label m-l-2">상태</label> -->
-<!-- 								<div class="col-xs-push-0"> -->
-<!-- 									<select class="form-control width-200" id="sel_status"> -->
-<!-- 										<option value>전체</option> -->
-<!-- 										<option selected value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option> -->
-<!-- 										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option> -->
-<!-- 										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option> -->
-<!-- 										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option> -->
-<!-- 										<option value="S810_RE_OUTPUT_CMPL" th:text="${statusCodes.get('S810_RE_OUTPUT_CMPL')}"></option> -->
-<!-- 									</select> -->
-<!-- 								</div> -->
+								<label class="col-form-label m-l-2">상태</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200" id="sel_status">
+										<option value>전체</option>
+										<option selected value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
+										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option>
+										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option>
+										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option>
+										<option value="S810_RE_OUTPUT_CMPL" th:text="${statusCodes.get('S810_RE_OUTPUT_CMPL')}"></option>
+									</select>
+								</div>
 								
-<!-- 								<label class="col-form-label m-l-5">조회일자</label> -->
-<!-- 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" > -->
-<!-- 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/> -->
-<!-- 								    <span class="input-group-append"> -->
-<!-- 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span> -->
-<!-- 									</span> -->
-<!-- 								</div> -->
-<!-- 								<label class="col-form-label m-l-10">검색어</label> -->
-<!-- 								<div class="col-xs-push-0"> -->
+								<label class="col-form-label m-l-5">조회일자</label>
+								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
+								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
+								    <span class="input-group-append">
+								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+									</span>
+								</div>
+								<label class="col-form-label m-l-10">검색어</label>
+								<div class="col-xs-push-0">
 									
-<!-- 								    <input type="text" id="keyword" class="form-control"/> -->
-<!-- 								</div> -->
-<!-- 								<div> -->
-<!-- 									<button onClick="search();" class="btn btn-default m-l-10">조회</button> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 							<hr/> -->
-<!-- 							<div id="_collect_grid"> -->
-<!-- 							</div> -->
-<!-- 							<hr/> -->
-<!-- 							<div class="form-group row m-b-12"> -->
+								    <input type="text" id="keyword" class="form-control"/>
+								</div>
+								<div>
+									<button onClick="search();" class="btn btn-default m-l-10">조회</button>
+								</div>
+							</div>
+							<hr/>
+							<div id="_collect_grid">
+							</div>
+							<hr/>
+							<div class="form-group row m-b-12">
 								
-<!-- 								<div> -->
-<!-- 									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">발행</button> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
+								<div>
+									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">발행</button>
+								</div>
+							</div>
+						</div>
 						
 					</div>
 					
@@ -231,6 +231,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		TableManageDefault.init();
 		
 		UserTable.init('_input_grid', false);
+		UserTable.init('_collect_grid', true, [10, 50, 100, 200, 500, 1000, 2000] , [10, 50, 100, 200, 500, 1000, 2000], true);
+		
+		var startDate = moment().subtract(7, 'days');
+		var endDate = moment();
 		
 		
 		$('#sel_bundle3, #sel_bundle').on('change', function () {
@@ -311,6 +315,131 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			// 	}
 			// });
 		});
+		
+		
+		$("#o_sel_bundle").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+		$("#sel_agency").multiselect({
+			enableFiltering: true,
+			maxHeight: 450
+		});
+
+		$('#default-daterange').daterangepicker({
+			opens: 'right',
+			format : 'YYYY/MM/DD',
+			separator: ' to ',
+			startDate: startDate,
+			endDate: endDate,
+			locale: { cancelLabel: 'Clear' }
+		}, function (start, end) {
+			
+			setDaterangepicker(start, end);
+		});
+		setDaterangepicker(startDate, endDate);
+
+		$('#default-daterange').on('cancel.daterangepicker', function(ev, picker) {
+			$('#default-daterange input').val('');
+			$('#startDate').val("");
+			$('#finishDate').val("");
+		});
+		
+		UserTable.draw('_collect_grid', {
+			url : "/output/list",
+			type : "GET",
+			data : function() {
+				var param = {
+					o_bundleId : $("#o_sel_bundle").val() + "",
+					agencies : $("#sel_agency").val() + "",
+					statusCode : $("#sel_status").val(),
+					keyword : $("#keyword").val(),
+					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
+					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
+				};
+				return param;
+			},
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			}
+		}, [ 
+			{
+				title : ' ', 
+				data : 'id',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				hideExcel : true,
+				type : {
+					name : "checkbox",
+					disabled : function(row) {
+						return (row.statusCode != 'S600_JDGM_APPROVE');
+					}
+				}
+			},
+			{
+				title : 'No',
+				headClassName : 'width-50',
+				bodyClassName : 'text-center',
+				hideExcel : true,
+				render : function(row, data, index) {
+					return '<strong>' + (index + 1) + '</strong>';
+				}
+			},
+			{
+				title : "검사실ID",
+				data : "laboratoryId",
+				render : function(row, data, index) {
+					return '<a href="javascript:samplePopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
+				},
+				sorting : true
+			},
+			{
+				title : '서비스', 
+				data : 'bundle.name',
+				sorting : true
+			},
+			{
+				title : '상태', 
+				data : "statusCode",
+				render : function(row, data, index) {
+					var value = g_statusCodeInfo[data];
+					return value;
+				},
+				sorting : true
+			},
+			{
+				serverHeader : true
+			}, {
+				title : '검체 출고일자', 
+				data : 'outputCmplDate',
+				type : 'date'
+			},
+			{
+				title : '검체 채취일', 
+				data : 'collectedDate',
+				type : 'date'
+			},
+			{
+				title : '검체 수령일', 
+				data : 'receivedDate',
+				type : 'date'
+			},
+			{
+				title : '검체 종류', 
+				data : 'sampleType'
+			},
+			{
+				title : '검체 등록일자', 
+				data : 'createdDate',
+				type : 'date'
+			},
+			{
+				title : '등록자', 
+				data : 'createdMember.name'
+			}
+		], null);
 		
 	});
 	
@@ -634,6 +763,51 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	function setGridRowCount() {
 		var rowCount = $("#_input_grid table tbody tr").length;
 		$("#rowCountSpan").text("" + rowCount + " Count");
+	}
+	
+	function setDaterangepicker(start, end) {
+		
+		$('#default-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+		$('#startDate').val(start.format('YYYY-MM-DD'));
+		$('#finishDate').val(end.format('YYYY-MM-DD'));
+	}
+	
+	function approve() {
+		var checkedRows = UserTable.getCheckedRows('_collect_grid');
+		var data = [];
+		for (var cr in checkedRows) {
+			data.push(checkedRows[cr].id);
+		}
+		$.ajax({
+            url: '/output/approve',
+			type: 'post',
+	        data : JSON.stringify(data),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+					
+				if (data.result.startsWith("0")) {
+					CommonMsg.save(function() {
+						search();
+					});
+				} else {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function search() {
+		UserTable.reload('_collect_grid');
 	}
 	
 	/* ]]> */
