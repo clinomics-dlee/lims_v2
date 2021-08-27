@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<th:block th:replace="layout/head"></th:block>
+    <style>
+	
+	#table_form td, #table_form th {
+		padding: 2px 10px;
+		border: 0;
+	}
+	
+	</style>
+</head>
+<body class="pace-done">
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade show">
+		<div class="material-loader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+			</svg>
+			<div class="message">Loading</div>
+		</div>
+	</div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+		<!-- begin #header -->
+		<th:block th:replace="layout/top"></th:block>
+		<!-- end #header -->
+		<!-- begin #sidebar -->
+		<th:block th:replace="layout/left"></th:block>
+		<!-- end #sidebar -->
+		<th:block th:replace="popup/sample_detail"></th:block>
+		<!-- begin #content -->
+		<div id="content" class="content">
+			<!-- begin page header -->
+			<ol class="breadcrumb float-xl-right">
+				<li class="breadcrumb-item">테스트 화면</li>
+			</ol>
+			
+			<h1 id="page-header" class="page-header">테스트 화면</h1>
+			
+			<div class="row">
+				<div class="col-xl-12">
+					<ul class="nav nav-tabs">
+						<li class="nav-item">
+							<a href="#test-tab-1" data-toggle="tab" class="nav-link active" id="tab">
+								<span class="d-sm-none">Tab 1</span>
+								<span class="d-sm-block d-none">등록</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#test-tab-2" data-toggle="tab" class="nav-link" id="tab">
+								<span class="d-sm-none">Tab 2</span>
+								<span class="d-sm-block d-none">출고</span>
+							</a>
+						</li>
+					</ul>
+					<div class="panel panel-inverse">
+
+						<!-- begin panel-heading -->
+						
+						<!-- end panel-heading -->
+
+						<!-- begin panel-body -->
+						<div id="panel-body" class="panel-body">
+							<!-- begin tab-pane -->
+							
+							<div class="form-group row m-b-15">
+								<label class="col-form-label m-l-2">서비스</label>
+								<div class="col-xs-push-0">
+									<select class="form-control width-200"
+										data-parsley-required="true" data-parsley-errors-container="#error_bundle4" id="sel_bundle" name="bundle">
+										<option value>선택해 주세요</option>
+										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+									</select>
+								</div>
+								<div class="col-xs-push-0">
+									<div id="error_bundle4"></div>
+								</div>
+							</div>
+							<hr/>
+							
+							<form id="fileupload" method="POST" enctype="multipart/form-data" data-parsley-validate="true">
+								<div class="form-group row m-b-15">
+									<div class="row col-xl-8">
+										<div class="col-xs-push-0">
+											<button type="button" class="btn btn-default m-b-5" onclick="createRow();">그리드열 생성</button>
+										</div>
+										<div class="col-xs-push-0">
+											<input type="text" id="txt_create_grid" class="form-control width-50" style = "text-align:right;"
+												onkeypress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;"/>
+										</div>
+										<div class="col-xs-push-0">
+											<button type="button" class="btn btn-green m-l-20 m-b-5" onclick="excelForm();">엑셀 양식 다운로드</button>
+											<button type="button" class="btn btn-green m-l-5 m-b-5" onclick="excelUpload();">엑셀 불러오기</button>
+										</div>
+										<div class="hide">
+											<input type="file" id="file" name="file">
+										</div>
+										<div id="progress" class="hide">
+											<div class="progress rounded-corner progress-striped active width-200">
+												<div class="progress-bar bg-purple" style="width: 0%"> </div>
+											</div>
+										</div>
+									</div>
+									<div class="col-xl-4 text-right p-t-10">
+										<div class="col-xs-push-0">
+											<strong style="font-size: 1.2em;" id="rowCountSpan">0 Count</strong>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="frmBundleId" name="bundleId" value=""/>
+							</form>
+							<form id="frm_new" data-parsley-validate="true">
+								<div id="_input_grid">
+								</div>
+							</form>
+
+							<hr/>
+							<div class="form-group row m-b-12">
+								
+								<div>
+									<button type="button" class="btn btn-success m-l-10" onclick="save();">저장</button>
+									<button type="button" class="btn btn-warning m-l-10" onclick="deleteRow();">삭제</button>
+								</div>
+							</div>
+
+						</div>
+						
+<!-- 						<div id="panel-body" class="panel-body" id="test-tab-2"> -->
+					
+<!-- 							<div class="form-group row m-b-10"> -->
+<!-- 								<label class="col-form-label m-l-2">서비스</label> -->
+<!-- 								<div class="col-xs-push-0"> -->
+<!-- 									<select class="form-control width-200" id="sel_bundle" multiple="multiple"> -->
+<!-- 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option> -->
+<!-- 									</select> -->
+<!-- 								</div> -->
+
+<!-- 								<label class="col-form-label m-l-5">의뢰기관명</label> -->
+<!-- 								<div class="col-xs-push-0"> -->
+<!-- 									<select class="form-control width-200" id="sel_agency" multiple="multiple"> -->
+<!-- 										<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option> -->
+<!-- 									</select> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 							<div class="form-group row m-b-12"> -->
+
+<!-- 								<label class="col-form-label m-l-2">상태</label> -->
+<!-- 								<div class="col-xs-push-0"> -->
+<!-- 									<select class="form-control width-200" id="sel_status"> -->
+<!-- 										<option value>전체</option> -->
+<!-- 										<option selected value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option> -->
+<!-- 										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option> -->
+<!-- 										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option> -->
+<!-- 										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option> -->
+<!-- 										<option value="S810_RE_OUTPUT_CMPL" th:text="${statusCodes.get('S810_RE_OUTPUT_CMPL')}"></option> -->
+<!-- 									</select> -->
+<!-- 								</div> -->
+								
+<!-- 								<label class="col-form-label m-l-5">조회일자</label> -->
+<!-- 								<div class="input-group" id="default-daterange"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" > -->
+<!-- 								    <input type="text" name="default-daterange" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/> -->
+<!-- 								    <span class="input-group-append"> -->
+<!-- 								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span> -->
+<!-- 									</span> -->
+<!-- 								</div> -->
+<!-- 								<label class="col-form-label m-l-10">검색어</label> -->
+<!-- 								<div class="col-xs-push-0"> -->
+									
+<!-- 								    <input type="text" id="keyword" class="form-control"/> -->
+<!-- 								</div> -->
+<!-- 								<div> -->
+<!-- 									<button onClick="search();" class="btn btn-default m-l-10">조회</button> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 							<hr/> -->
+<!-- 							<div id="_collect_grid"> -->
+<!-- 							</div> -->
+<!-- 							<hr/> -->
+<!-- 							<div class="form-group row m-b-12"> -->
+								
+<!-- 								<div> -->
+<!-- 									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">발행</button> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+						
+					</div>
+					
+				</div>
+			</div>
+			
+			
+			
+			<div class="panel panel-inverse">
+				<!-- begin panel-heading -->
+				
+				<!-- end panel-body -->
+			</div>
+			<!-- end panel -->
+		</div>
+		
+		<!-- end #content -->
+		<!-- begin scroll to top btn -->
+		<!-- end scroll to top btn -->
+	</div>
+	
+	<input type="hidden" name="startDate" id="startDate" value="" />
+	<input type="hidden" name="finishDate" id="finishDate" value="" />
+	<!-- end page container -->
+	
+	
+	<script th:inline="javascript">
+	/* <![CDATA[ */       
+
+	var tables = [];
+	var count;
+	
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	
+	//  시작
+	$(document).ready(function() {
+		App.init();
+		
+		TableManageDefault.init();
+		
+		UserTable.init('_input_grid', false);
+		
+		
+		$('#sel_bundle3, #sel_bundle').on('change', function () {
+			//initForm($(this).attr('id'));
+		});
+		
+		$('#file').on('change', function (event) {
+			
+			if ($("#file").val() == '') return;
+			$("#frmBundleId").val($("#sel_bundle").val());
+			
+			// var form = $('#fileupload')[0];
+			// var data = new FormData(form);
+			
+			var input = event.target;
+			var reader = new FileReader();
+			reader.onload = function(){
+				var fileData = reader.result;
+				var wb = XLSX.read(fileData, {type : 'binary', cellDates: true, dateNF: 'yyyy-mm-dd'});
+				wb.SheetNames.forEach(function(sheetName){
+					var rowObj = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {raw: false});
+					
+					createRow(rowObj);
+				})
+			};
+			reader.readAsBinaryString(input.files[0]);
+
+			// $.ajax({
+			// 	enctype: 'multipart/form-data',
+	        //     url: '/input/excel/import',
+			// 	type: 'post',
+		    //     data : data,
+		    //     processData: false,
+		    //     contentType: false,
+		    //     beforeSend: function(xhr) {
+			// 		xhr.setRequestHeader(header, token);
+			//         var percentVal = '0%';
+			// 		$("#progress").show();
+			// 		$("#progress div div").width(percentVal);
+			// 		$("#progress div div").text(percentVal);
+			// 	},
+			// 	/* xhr: function() {
+			// 		var xhr = $.ajaxSettings.xhr();
+			// 		xhr.upload.onprogress = function(e) {
+			// 			var percent = e.loaded * 100 / e.total;
+			// 			var percentVal = percent + '%';
+			// 			$("#progress div div").width(percentVal);
+			// 			$("#progress div div").text(percentVal);
+			// 		};
+			// 		return xhr;
+			// 	}, */
+			//     success: function(data,xhr) {
+			//         if (data.result == "00") {
+			// 	        var percentVal = '100%';
+			// 			$("#progress div div").width(percentVal);
+			// 			$("#progress div div").text(percentVal);
+						
+			// 			excelImport();
+						
+			// 			CommonMsg.save(function() { });
+			// 		} else if (!data.result.startsWith("0")) {
+			// 			CommonMsg.error(function() { });
+			// 		}
+			//     },
+			//     error : function(xhr, status, error) {
+			//     	CommonMsg.error(function() {
+						
+			// 		});
+			// 	},
+			// 	complete : function() {
+			// 		$("#file").val('');
+			// 		$("#progress").hide();
+			// 		//$(".progress-bar").width('0%');
+			// 		//$(".progress-bar").text('0%');
+					
+			// 		//excelImport();
+					
+			// 	}
+			// });
+		});
+		
+	});
+	
+	function excelForm() {
+		if ($("#sel_bundle").parsley().validate() != true) return;
+		
+		var bundleId = $("#sel_bundle").val();
+		//if (bundleId == "") return;
+		
+		location.href = '/input/excel/form?bundleId=' + bundleId;
+	}
+	
+	function excelUpload() {
+		if ($("#sel_bundle").parsley().validate() != true) return;
+		
+		$('#file').trigger('click'); 
+		
+	}
+	
+	function setDatepicker(aDateInputs) {
+		
+		for (var e in aDateInputs) {
+			
+			$('input[name="' + aDateInputs[e] + '"]').datepicker({
+				autoclose : true,
+				format: "yyyy-mm-dd",
+				changeMonth : true,
+				changeYear : true,
+				language: "ko"
+			});
+		}
+	}
+	
+	function deleteRow() {
+		var rows = $('#_input_grid').find('tbody tr');
+		for (var i = 0; i < rows.length; i++) {
+			if ($(rows[i]).find("input[name=checkbox]").is(":checked")) {
+				rows[i].remove();
+			}
+		}
+		setGridRowCount();
+	}
+	
+	function save() {
+		if (!$('#frm_new').parsley().validate()) {
+			return;	
+		}
+		if ($("#sel_bundle").parsley().validate() != true) return;
+		var frmData = $('#frm_new').serializeObject();
+		
+		var data = [];
+		var rows = $("#_input_grid table tbody tr");
+		for (var r = 0; r < rows.length; r++) {
+			var inputs = $(rows[r]).find('input:text, select');
+			
+			var map = {};
+			for (var ii = 0; ii < inputs.length; ii++) {
+				
+				let key = $(inputs[ii]).attr('name');
+				
+				let value = $(inputs[ii]).val();
+				map[key] = value;
+			}
+			map.bundleId = $("#sel_bundle").val();
+			data.push(map);
+		}
+		
+		$.ajax({
+            url: '/test/saveall',
+			type: 'post',
+	        data : JSON.stringify(data),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result == "00") {
+					CommonMsg.save(function() {
+						UserTable.clear('_input_grid');
+					});
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { }, data.message);
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function importExcelToTable() {
+		var rows = $('#_import_grid table tbody tr');
+		if (rows.length < 1) {
+			return;
+		}
+		
+		$.ajax({
+            url: '/input/import',
+			type: 'get',
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result == "00") {
+					CommonMsg.save(function() {
+						UserTable.clear('_input_grid');
+					}, data.message);
+				} else if (!data.result.startsWith("0")) {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function createRow(excelData) {
+		console.log(excelData);
+		if ($("#sel_bundle").parsley().validate() != true) return;
+		var bundleId = $("#sel_bundle").val();
+		//if (bundleId == "") return;
+		var id = "sel_bundle";
+		
+		UserTable.clear('_input_grid');
+		//var bundleId = $("#" + id).val();
+		$.ajax({
+			url : "/input/itemby/bundle/" + bundleId,
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (rtn) {
+				var headHtml = "", bodyHtml = "";
+				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
+				var notnull = false, readonly = '';
+				
+				var data = rtn.sampleItem;
+				var bundle = rtn.bundle;
+								
+				if (data) {
+					
+					html = '';
+					//html += '<table id="table_form" class="table table-striped table-bordered">';
+					autoComplete = 'autocomplete="off" ';
+					var max = Number($("#txt_create_grid").val());
+					if (excelData) {
+						max = excelData.length;
+					}
+					headHtml += '<th>'
+						+ '<div class="form-check checkbox checkbox-css p-5">'
+						+ '<input type="checkbox" value="" id="checkbox_all" name="checkbox_all" data="">'
+						+ '<label for="checkbox_all"></label>'
+						+ '</div>'
+						+ '</th>';
+					for (var ii = 0; ii < max; ii++) {
+						bodyHtml += "<tr>";
+						bodyHtml += '<td><div class="form-check checkbox checkbox-css p-5">'
+							+ '<input type="checkbox" value="" id="checkbox_' + ii + '" name="checkbox" data="' + ii + '">'
+							+ '<label for="checkbox_' + ii + '"></label>'
+							+ '</div></td>';
+						
+						for (var r in data) {
+							readonly = '';
+							notnull = data[r].notNull;
+							if (bundle.autoBarcode && data[r].nameCode == "barcode") {
+								
+								readonly = ' readonly';
+								notnull = false;
+							}
+							
+							var val = "";
+							if (excelData) {
+								val = excelData[ii][data[r].name];
+								if (!val) val = "";
+							}
+							
+							if (ii == 0) {
+								
+								headHtml += '<th>';
+								headHtml += data[r].name;
+								headHtml += '</th>';
+
+							}
+
+							bodyHtml += '<td>';
+							if (data[r].type == "select" && data[r].selectValue) {
+								bodyHtml += '<select class="form-control form-control-sm"' + (notnull ? parsley : '') + ' name="' + data[r].nameCode + '">';
+								aSplit = data[r].selectValue.split(",");
+								for (var a in aSplit) {
+									if (val == aSplit[a]) bodyHtml += '<option value="' + aSplit[a] + '" selected>' + aSplit[a] + '</option>';
+									else bodyHtml += '<option value="' + aSplit[a] + '">' + aSplit[a] + '</option>';
+								}
+								bodyHtml += '</select>';
+							} else if (data[r].type == "date") {
+								aDateInputs.push(data[r].nameCode);
+								//bodyHtml += '<div class="input-group" data-provide="datepicker" style="width:150px;">';
+								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm width-100"'
+									+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + "_" + ii + '"' : '')
+									+ ' placeholder="" '
+									+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
+								//bodyHtml += '<span class="input-group-append">';
+								//bodyHtml += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
+								//bodyHtml += '</span>';
+								bodyHtml += '</div><div id="error_' + data[r].nameCode + "_" + ii + '"></div>';
+							} else {
+								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+									+ 'name="' + data[r].nameCode + '" ' + autoComplete
+									+ 'style="width:' + ((Number(data[r].width) / 10) - 50) + 'px;" ';
+								bodyHtml += readonly
+								bodyHtml += '/>';
+							}
+							
+							html += '</td>';
+							//if (r % 2 == 1) html += '</tr>'
+						}
+						bodyHtml += "</tr>";
+					}
+					html += '<thead><tr>' + headHtml;
+					html += '</tr></thead>';
+					html += '<tbody>' + bodyHtml;
+					html += '</tbody>';
+					//html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
+					//html += '</table>';
+					html += '';
+					//html += '<hr/>';
+					
+					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
+					
+					$("#_input_grid table").html(html);
+				}
+				
+				setDatepicker(aDateInputs);
+
+				$("#checkbox_all").change(function() {
+					var rowCount = max;
+					if (rowCount > 0) {
+						var checkedValue = false;
+						if ($(this).is(":checked")) {
+							checkedValue = true;
+						}
+						
+						for (var i = 0; i < rowCount; i++) {
+							$("#checkbox_" + i).prop("checked", checkedValue);
+						}
+					}
+				});
+
+				$("input[name=checkbox]").change(function(e) {
+					var rowCount = max;
+					if (rowCount > 0) {
+						var allCheckedValue = true;
+						for (var i = 0; i < rowCount; i++) {
+							if (!$("#checkbox_" + i).is(":checked")) {
+								allCheckedValue = false;
+								break;
+							}
+						}
+						$("#checkbox_all").prop("checked", allCheckedValue);
+					}
+				});
+				
+				setGridRowCount();
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			}
+		});
+	}
+	
+	function excelImport() {
+		if ($("#sel_bundle").parsley().validate() != true) {
+			return;
+		}
+		var bundleId = $("#sel_bundle").val();
+		
+		
+		// UserTable.init('_import_grid', true, [50, 100] , [50, 100]);
+		
+		// UserTable.draw('_import_grid', {
+		// 	url : "/input/get/temp",
+		// 	type : "GET",
+		// 	dataType : "json",
+		// 	contentType : "application/json; charset=utf-8",
+		// 	beforeSend : function(xhr) {
+		// 		xhr.setRequestHeader(header, token);
+		// 	}
+		// }, [ ], function(data) {
+		// 	var html = '', headHtml = '<tr>';
+		// 	for (var s in data) {
+		// 		html += '<tr>';
+		// 		var items = data[s].items;
+		// 		var fields = Object.keys(items);
+		// 		for (var r in fields) {
+		// 			var val = items[fields[r]];
+		// 			html += '<td>' + (val ? val : '') + '</td>';
+		// 			if (s == 0) headHtml += '<th>' + (fields[r] ? fields[r] : '') + '</th>';
+		// 		}
+		// 		html += '</tr>';
+		// 	}
+		// 	headHtml += '</tr>';
+		// 	var rtn = {
+		// 		html : html,
+		// 		headHtml : headHtml
+		// 	};
+		// 	return rtn;
+		// });
+	}
+	
+	function setGridRowCount() {
+		var rowCount = $("#_input_grid table tbody tr").length;
+		$("#rowCountSpan").text("" + rowCount + " Count");
+	}
+	
+	/* ]]> */
+	</script>
+	
+</body>
+</html>

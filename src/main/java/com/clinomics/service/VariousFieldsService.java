@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Holiday;
 import com.clinomics.entity.lims.Sample;
+import com.clinomics.entity.lims.SampleTest;
 import com.clinomics.repository.lims.HolidayRepository;
 import com.clinomics.util.CustomIndexPublisher;
 import com.google.common.collect.Lists;
@@ -107,5 +108,40 @@ public class VariousFieldsService {
             rtn++;
         }
         return rtn;
+    }
+    
+    
+    
+    public void setFieldsTest(boolean existsSample, SampleTest sampleTest, Map<String, Object> items) {
+        Bundle bundle = sampleTest.getBundle();
+        String strCollectedDate = items.getOrDefault("collecteddate", "").toString();
+        if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+
+            sampleTest.setCollectedDate(LocalDate.parse(strCollectedDate));
+            items.remove("collecteddate");
+        }
+
+        String strReceivedDate = items.getOrDefault("receiveddate", "").toString();
+        LocalDate receivedDate = null;
+        if (strReceivedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
+            receivedDate = LocalDate.parse(strReceivedDate);
+        }
+        if (!strReceivedDate.isEmpty() && receivedDate != null) {
+
+            items.put("tat", getTat(bundle, strReceivedDate));
+            sampleTest.setReceivedDate(LocalDate.parse(strReceivedDate));
+            items.remove("receiveddate");
+        }
+
+        sampleTest.setSampleType(items.getOrDefault("sampletype", "").toString());
+        items.remove("sampletype");
+        
+        if (!existsSample && bundle.isAutoSequence()) {
+            
+            String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
+            if (!seq.isEmpty()) sampleTest.setLaboratoryId(seq);
+        } else if (items.containsKey("laboratory")) {
+            sampleTest.setLaboratoryId(items.get("laboratory").toString());
+        }
     }
 }

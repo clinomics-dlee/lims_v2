@@ -19,6 +19,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.clinomics.entity.lims.Sample;
+import com.clinomics.entity.lims.SampleTest;
 import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.StatusCode;
 import com.google.common.collect.Lists;
@@ -461,6 +462,19 @@ public class SampleSpecification {
 	}
 
 	public static Specification<Sample> barcodeEqual(String barcode) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+				root.get("items"), criteriaBuilder.literal("$.barcode")), barcode));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+	
+	public static Specification<SampleTest> testBarcodeEqual(String barcode) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;
 			List<Predicate> predicatesAnds = new ArrayList<>();
