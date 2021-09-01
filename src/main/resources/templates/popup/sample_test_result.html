@@ -1,0 +1,64 @@
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+</style>
+<div class="modal fade" id="modal-sample-test-result-detail">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">분석결과 <small id="popup_sample_test_result_title"></small></h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div style="height: 550px; overflow-y: auto;">
+					<table id="_sample_test_result_popup_table" class="table table-bordered" style="width: 100%">
+					</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javascript">
+/* <![CDATA[ */       
+var _sample_test_result_popup_table;
+
+function sampleTestResultPopupOnload(sampleId) {
+	$("#modal-sample-test-result-detail").modal();
+	
+	$.ajax({
+		url : "/test/databy/sample/" + sampleId,
+		type : "GET",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+		success: function (data) {
+			var html = "";
+			$('#popup_sample_test_result_title').text(data.sampleTest.laboratoryId);
+			for (var i = 0; i < data.datas.length; i++) {
+				var rd = data.datas[i];
+				if (i % 5 == 0) html += "<tr>";
+				html += "<th>" + rd.marker + "</th>";
+				html += "<td>" + rd.value + "</td>";
+				if (i % 5 == 4) html += "</tr>";
+			}
+			$("#_sample_test_result_popup_table").html(html);
+		},
+		error : function(data) {
+			CommonMsg.error(function() { });
+		}
+	});
+}
+
+/* ]]> */
+</script>

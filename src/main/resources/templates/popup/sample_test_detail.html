@@ -1,0 +1,236 @@
+<!-- begin modal-dialog -->
+<style>
+@media screen and (min-width: 768px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+#table_form td {
+	padding: 2px 10px;
+	border: 0;
+}
+
+</style>
+<div class="modal fade" id="modal-sample-test-detail">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">TEST 검체 정보 수정</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="div_popup_sample_test_detail">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
+				<a href="javascript:sampleTestPopupSave();" class="btn btn-success">저장</a>
+				<a id="popup_btn_reissue" href="javascript:samplePopupRecreate();" class="btn btn-success hide">저장하고 재발행</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script th:inline="javascript">
+/* <![CDATA[ */    
+	function sampleTestPopupOnload(sampleId) {
+		$("#modal-sample-test-detail").modal();
+		$.ajax({
+			url : "/test/itemby/sample/" + sampleId,
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (data, xhr) {
+				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
+				var notnull = false, readonly = '', code, value = "";
+				if (data.sampleTestItem) {
+					
+					html = '<form id="frm_popup_sample_test_detail" data-parsley-validate="true">';
+					autoComplete = 'autocomplete="off"';
+					html += '<input type="hidden" name="id" value="' + data.sampleTest.id + '">';
+					html += '<div class="form-group row m-b-15">';
+					html += '<table id="table_form" class="table">';
+					var sitm = data.sampleTestItem;
+					
+					for (var r in sitm) {
+						code = sitm[r].nameCode;
+						
+						readonly = '';
+						notnull = sitm[r].notNull;
+						
+						
+						value = data.sampleTest.items[code];
+						//if (!value) data.sampleTest.items
+						if (code == "collecteddate") value = data.sampleTest.collectedDate;
+						else if (code == "sampletype") value = data.sampleTest.sampleType;
+						else if (code == "receiveddate") value = data.sampleTest.receivedDate;
+						if (!value) value = ""; 
+						
+						if (r % 2 == 0) html += '<tr>'
+						
+						//html += '<label class="width-150 col-form-label m-l-10 m-r-5">';
+						html += '<td>';
+						html += sitm[r].name;
+						html += '</td>';
+						//html += ' </label>';
+						html += '<td>';
+						if (sitm[r].type == "select" && sitm[r].selectValue) {
+							html += '<select class="form-control form-control-sm"' + (notnull ? parsley : '') + ' name="' + code + '">';
+							aSplit = sitm[r].selectValue.split(",");
+							for (var a in aSplit) {
+								html += '<option value="' + aSplit[a] + '"' + (aSplit[a] == value ? " selected" : "") + '>' + aSplit[a] + '</option>';
+							}
+							html += '</select>';
+						} else if (sitm[r].type == "date") {
+							aDateInputs.push(code);
+							html += '<div class="input-group" id="date_' + code + '" >';
+							html += '<input type="text" class="form-control form-control-sm"'
+								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + code + '"' : '')
+								+ ' placeholder="클릭하여 선택"'
+								+ ' placeholder="' + sitm[r].exampleValue + '"'
+								+ ' value="' + value + '"'
+								+ ' name="' + code + '" " ' + autoComplete + '/>';
+							html += '<span class="input-group-append">';
+							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
+							html += '</span>';
+							html += '</div><div id="error_' + code + '"></div>';
+						} else {
+							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+								+ 'placeholder="' + sitm[r].exampleValue + '" name="' + code + '" ' + autoComplete;
+							html += readonly
+							if (typeof value === "number") html += ' value=' + value + ''
+							if (typeof value === "string") html += ' value="' + value + '"'
+							html += '/>';
+						}
+						
+						html += '</td>';
+						
+						if (r % 2 == 1) html += '</tr>';
+					}
+					html += '</table>';
+					html += '</div>';
+					
+					//html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
+					html += '</form>';
+
+					if ("S710_OUTPUT_CMPL,S810_RE_OUTPUT_CMPL".includes(data.sampleTest.statusCode)) {
+						$('#popup_btn_reissue').removeClass('hide');
+					}
+					
+					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
+					$("#div_popup_sample_test_detail").html(html);
+					
+					popupDatepicker(aDateInputs);
+				}
+				
+				
+				
+			},
+			error : function(data, xhr) {
+				
+				if (data.status == "200") {
+					location.reload();
+				}
+				CommonMsg.error(function() { });
+			}
+		});
+		
+	}
+
+	function popupDatepicker(aDateInputs) {
+		for (var e in aDateInputs) {
+			
+			$('input[name="' + aDateInputs[e] + '"]').datepicker({
+				autoclose : true,
+				format: "yyyy-mm-dd",
+				changeMonth : true,
+            	changeYear : true,
+				language: "ko"
+			});
+		}
+	}
+	
+	function sampleTestPopupSave() {
+		if (!$('#frm_popup_sample_test_detail').parsley().validate()) {
+			return;	
+		}
+		
+		$.ajax({
+            url: '/test/save',
+			type: 'post',
+	        data : JSON.stringify($('#frm_popup_sample_test_detail').serializeObject()),
+	        dataType : 'json',
+	        contentType : "application/json;charset=utf-8",
+	        beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+		    success: function(data, xhr) {
+		    	if (data.result.startsWith("0")) {
+					CommonMsg.save(function() {
+						$("#modal-sample-test-detail").modal('hide');
+						search();
+					});
+				} else if (data.message) {
+					CommonMsg.info(function() { }, data.message);
+				} else {
+					CommonMsg.error(function() { });
+				}
+			},
+			error : function(data) {
+				CommonMsg.error(function() { });
+			},
+			complete : function() {
+				
+			}
+		});
+	}
+	
+	function samplePopupRecreate() {
+		if (!$('#frm_popup_sample_test_detail').parsley().validate()) {
+			return;	
+		}
+		
+		// var data = [];
+		// var id = $('input[name=id]').val();
+		// if (typeof id === 'string') data.push(Number(id));
+		// if (typeof id === 'number') data.push(id);
+		CommonMsg.okCancel(function() {
+			$.ajax({
+	            url: '/test/reissue',
+				type: 'post',
+	        	data : JSON.stringify($('#frm_popup_sample_test_detail').serializeObject()),
+		        dataType : 'json',
+		        contentType : "application/json;charset=utf-8",
+		        beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+			    success: function(data, xhr) {
+			    	if (data.result.startsWith("0")) {
+						CommonMsg.save(function() {
+			    			$("#modal-sample-test-detail").modal('hide');
+			    			search();
+						});
+					} else if (data.message) {
+						CommonMsg.info(function() { }, data.message);
+					} else {
+						CommonMsg.error(function() { });
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() { });
+				},
+				complete : function() {
+					
+				}
+			});
+		});
+	}
+	
+	
+	
+/* ]]> */
+</script>

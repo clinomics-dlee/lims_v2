@@ -3,19 +3,22 @@ package com.clinomics.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.clinomics.enums.ResultCode;
+import com.clinomics.service.TestService;
+import com.google.common.collect.Maps;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.clinomics.enums.ResultCode;
-import com.clinomics.service.TestService;
-import com.google.common.collect.Maps;
 
 @RequestMapping("/test")
 @Controller
@@ -45,4 +48,33 @@ public class TestController {
 		return testService.saveFromList(datas, userDetails.getUsername());
 	}
 
+	@GetMapping("/list")
+	@ResponseBody
+	public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
+		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
+			return testService.findByModifiedDate(params, params.get("statusCode") + "");
+		}
+
+		return testService.findByModifiedDate(params, 600);
+	}
+
+	@GetMapping("/itemby/sample/{id}")
+	@ResponseBody
+	public Map<String, Object> getItemBySample(@PathVariable String id) {
+		return testService.findSampleItemBySample(id);
+	}
+
+	@GetMapping("/databy/sample/{id}")
+	@ResponseBody
+	public Map<String, Object> getDataBySample(@PathVariable String id) {
+		return testService.findSampleDataBySampleId(id);
+	}
+
+	@PostMapping("/approve")
+	@ResponseBody
+	public Map<String, String> outputApprove(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return testService.outputApprove(ids, userDetails.getUsername());
+	}
 }

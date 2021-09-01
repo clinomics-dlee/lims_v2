@@ -33,7 +33,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<!-- begin #sidebar -->
 		<th:block th:replace="layout/left"></th:block>
 		<!-- end #sidebar -->
-		<th:block th:replace="popup/sample_detail"></th:block>
+		<th:block th:replace="popup/sample_test_detail"></th:block>
+		<th:block th:replace="popup/sample_test_result"></th:block>
 		<!-- begin #content -->
 		<div id="content" class="content">
 			<!-- begin page header -->
@@ -153,8 +154,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<label class="col-form-label m-l-2">상태</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200" id="sel_status">
-										<option value>전체</option>
-										<option selected value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
+										<option selected value>전체</option>
+										<option value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
 										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option>
 										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option>
 										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option>
@@ -179,7 +180,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								</div>
 							</div>
 							<hr/>
-							<div id="_collect_grid">
+							<div id="_test_grid">
 							</div>
 							<hr/>
 							<div class="form-group row m-b-12">
@@ -217,7 +218,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	<script th:inline="javascript">
 	/* <![CDATA[ */       
-
+	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
+	
 	var tables = [];
 	var count;
 	
@@ -231,7 +233,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		TableManageDefault.init();
 		
 		UserTable.init('_input_grid', false);
-		UserTable.init('_collect_grid', true, [10, 50, 100, 200, 500, 1000, 2000] , [10, 50, 100, 200, 500, 1000, 2000], true);
+		UserTable.init('_test_grid', true, [10, 50, 100, 200, 500, 1000, 2000] , [10, 50, 100, 200, 500, 1000, 2000], true);
 		
 		var startDate = moment().subtract(7, 'days');
 		var endDate = moment();
@@ -345,8 +347,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			$('#finishDate').val("");
 		});
 		
-		UserTable.draw('_collect_grid', {
-			url : "/output/list",
+		UserTable.draw('_test_grid', {
+			url : "/test/list",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -374,7 +376,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : {
 					name : "checkbox",
 					disabled : function(row) {
-						return (row.statusCode != 'S600_JDGM_APPROVE');
+						return (row.statusCode != 'S600_JDGM_APPROVE' && row.statusCode != 'S710_OUTPUT_CMPL' && row.statusCode != 'S810_RE_OUTPUT_CMPL');
 					}
 				}
 			},
@@ -391,7 +393,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				title : "검사실ID",
 				data : "laboratoryId",
 				render : function(row, data, index) {
-					return '<a href="javascript:samplePopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
+					return '<a href="javascript:sampleTestPopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
 				},
 				sorting : true
 			},
@@ -438,7 +440,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			{
 				title : '등록자', 
 				data : 'createdMember.name'
+			},
+			{
+			title : "결과파일",
+			data : "id",
+			bodyClassName : 'text-center',
+			render : function(row, data, index) {
+				var value = "";
+				if (!jQuery.isEmptyObject(row.data)) {
+					value = '<a href="javascript:sampleTestResultPopupOnload(\'' + data + '\')" class="btn btn-sm btn-success width-60">VIEW</a>';
+				}
+				return value;
 			}
+		}
 		], null);
 		
 	});
@@ -773,13 +787,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function approve() {
-		var checkedRows = UserTable.getCheckedRows('_collect_grid');
+		var checkedRows = UserTable.getCheckedRows('_test_grid');
 		var data = [];
 		for (var cr in checkedRows) {
 			data.push(checkedRows[cr].id);
 		}
 		$.ajax({
-            url: '/output/approve',
+            url: '/test/approve',
 			type: 'post',
 	        data : JSON.stringify(data),
 	        dataType : 'json',
@@ -807,7 +821,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function search() {
-		UserTable.reload('_collect_grid');
+		UserTable.reload('_test_grid');
 	}
 	
 	/* ]]> */
