@@ -27,6 +27,16 @@ public class TestController {
 	@Autowired
 	TestService testService;
 	
+	@PostMapping("/save")
+	@ResponseBody
+	public Map<String, String> save(@RequestBody Map<String, String> datas) {
+		
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		datas.put("memberId", userDetails.getUsername());
+		
+		return testService.save(datas, false);
+	}
+	
 	@PostMapping("/saveall")
 	@ResponseBody
 	public Map<String, String> saveall(@RequestBody List<Map<String, String>> datas) {
