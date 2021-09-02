@@ -124,10 +124,10 @@
                     <span>출고</span>
                 </a>
 			</li>
-			<li sec:authorize="hasAnyRole('ROLE_IT_99')"
+			<li sec:authorize="hasAnyRole('ROLE_TEST_90', 'ROLE_IT_99')"
 				th:classappend="${#strings.startsWith(path,'/p/test/reg')} ? active : ''">
 				<a href="/p/test/reg">
-                    <i class="fa fa-list-alt"></i>
+                    <i class="fa fa-code-branch"></i>
                     <span>테스트 화면</span>
                 </a>
 			</li>
