@@ -3,7 +3,6 @@ package com.clinomics.service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,14 +12,12 @@ import com.clinomics.entity.lims.Holiday;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.entity.lims.SampleTest;
 import com.clinomics.repository.lims.HolidayRepository;
+import com.clinomics.repository.lims.SampleTestRepository;
 import com.clinomics.util.CustomIndexPublisher;
-import com.google.common.collect.Lists;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +28,9 @@ public class VariousFieldsService {
 
 	@Autowired
     CustomIndexPublisher customIndexPublisher;
+	
+	@Autowired
+	SampleTestRepository sampleTestRepository;
 
     public void setFields(boolean existsSample, Sample sample, Map<String, Object> items) {
         Bundle bundle = sample.getBundle();
@@ -137,8 +137,19 @@ public class VariousFieldsService {
         items.remove("sampletype");
         
         if (!existsSample && bundle.isAutoSequence()) {
-            
-            String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
+        	
+        	String lastLaboratoryId = sampleTestRepository.findMaxTestLaboratoryId();
+        	String seq = "";
+        	
+        	if(lastLaboratoryId == null) {
+        		
+        		seq = "TEST-"+StringUtils.right(receivedDate.format(DateTimeFormatter.ofPattern("yyyyMM")), 4)+"-0001";
+        		
+        	}else {
+        		int newIndexNumber = NumberUtils.toInt(lastLaboratoryId) + 1;
+				seq = "TEST-"+StringUtils.right(receivedDate.format(DateTimeFormatter.ofPattern("yyyyMM")), 4) + String.format("-%04d", newIndexNumber);
+        	}
+           // String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
             if (!seq.isEmpty()) sampleTest.setLaboratoryId(seq);
         } else if (items.containsKey("laboratory")) {
             sampleTest.setLaboratoryId(items.get("laboratory").toString());
