@@ -47,14 +47,14 @@
 			success: function (data, xhr) {
 				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
 				var notnull = false, readonly = '', code, value = "";
-				if (data.sampleTestItem) {
+				if (data.sampleItem) {
 					
 					html = '<form id="frm_popup_sample_test_detail" data-parsley-validate="true">';
 					autoComplete = 'autocomplete="off"';
-					html += '<input type="hidden" name="id" value="' + data.sampleTest.id + '">';
+					html += '<input type="hidden" name="id" value="' + data.sample.id + '">';
 					html += '<div class="form-group row m-b-15">';
 					html += '<table id="table_form" class="table">';
-					var sitm = data.sampleTestItem;
+					var sitm = data.sampleItem;
 					
 					for (var r in sitm) {
 						code = sitm[r].nameCode;
@@ -63,11 +63,11 @@
 						notnull = sitm[r].notNull;
 						
 						
-						value = data.sampleTest.items[code];
-						//if (!value) data.sampleTest.items
-						if (code == "collecteddate") value = data.sampleTest.collectedDate;
-						else if (code == "sampletype") value = data.sampleTest.sampleType;
-						else if (code == "receiveddate") value = data.sampleTest.receivedDate;
+						value = data.sample.items[code];
+						//if (!value) data.sample.items
+						if (code == "collecteddate") value = data.sample.collectedDate;
+						else if (code == "sampletype") value = data.sample.sampleType;
+						else if (code == "receiveddate") value = data.sample.receivedDate;
 						if (!value) value = ""; 
 						
 						if (r % 2 == 0) html += '<tr>'
@@ -117,7 +117,7 @@
 					//html += '<input type="hidden" name="bundleId" value="' + bundleId + '" />';
 					html += '</form>';
 
-					if ("S710_OUTPUT_CMPL,S810_RE_OUTPUT_CMPL".includes(data.sampleTest.statusCode)) {
+					if ("S710_OUTPUT_CMPL,S810_RE_OUTPUT_CMPL".includes(data.sample.statusCode)) {
 						$('#popup_btn_reissue').removeClass('hide');
 					}
 					

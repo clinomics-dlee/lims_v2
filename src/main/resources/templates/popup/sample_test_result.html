@@ -44,7 +44,7 @@ function sampleTestResultPopupOnload(sampleId) {
 		},
 		success: function (data) {
 			var html = "";
-			$('#popup_sample_test_result_title').text(data.sampleTest.laboratoryId);
+			$('#popup_sample_test_result_title').text(data.sample.laboratoryId);
 			for (var i = 0; i < data.datas.length; i++) {
 				var rd = data.datas[i];
 				if (i % 5 == 0) html += "<tr>";

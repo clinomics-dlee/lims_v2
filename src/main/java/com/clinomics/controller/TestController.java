@@ -24,67 +24,67 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class TestController {
 	
-	// @Autowired
-	// TestService testService;
+	@Autowired
+	TestService testService;
 	
-	// @PostMapping("/save")
-	// @ResponseBody
-	// public Map<String, String> save(@RequestBody Map<String, String> datas) {
+	@PostMapping("/save")
+	@ResponseBody
+	public Map<String, String> save(@RequestBody Map<String, String> datas) {
 		
-	// 	UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	// 	datas.put("memberId", userDetails.getUsername());
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		datas.put("memberId", userDetails.getUsername());
 		
-	// 	return testService.save(datas, false);
-	// }
+		return testService.save(datas, false);
+	}
 	
-	// @PostMapping("/saveall")
-	// @ResponseBody
-	// public Map<String, String> saveall(@RequestBody List<Map<String, String>> datas) {
+	@PostMapping("/saveall")
+	@ResponseBody
+	public Map<String, String> saveall(@RequestBody List<Map<String, String>> datas) {
 		
-	// 	UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	// 	// #. 바코드 중복체크
-	// 	for (Map<String, String> data : datas) {
-	// 		String barcode = StringUtils.stripToEmpty(data.get("barcode"));
-	// 		if (barcode.length() > 0) {
-	// 			long count = testService.searchExistsBarcode(barcode);
-	// 			if (count > 0) {
-	// 				Map<String, String> rtn = Maps.newHashMap();
-	// 				rtn.put("result", ResultCode.FAIL_DUPL_VALUE.get());
-	// 				rtn.put("message", ResultCode.FAIL_DUPL_VALUE.getMsg() + "[" + barcode + "]");
-	// 				return rtn;
-	// 			}
-	// 		}
-	// 	}
-	// 	return testService.saveFromList(datas, userDetails.getUsername());
-	// }
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		// #. 바코드 중복체크
+		for (Map<String, String> data : datas) {
+			String barcode = StringUtils.stripToEmpty(data.get("barcode"));
+			if (barcode.length() > 0) {
+				long count = testService.searchExistsBarcode(barcode);
+				if (count > 0) {
+					Map<String, String> rtn = Maps.newHashMap();
+					rtn.put("result", ResultCode.FAIL_DUPL_VALUE.get());
+					rtn.put("message", ResultCode.FAIL_DUPL_VALUE.getMsg() + "[" + barcode + "]");
+					return rtn;
+				}
+			}
+		}
+		return testService.saveFromList(datas, userDetails.getUsername());
+	}
 
-	// @GetMapping("/list")
-	// @ResponseBody
-	// public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
-	// 	if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
-	// 		return testService.findByModifiedDate(params, params.get("statusCode") + "");
-	// 	}
+	@GetMapping("/list")
+	@ResponseBody
+	public Map<String, Object> outputList(@RequestParam Map<String, String> params) {
+		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
+			return testService.findByModifiedDate(params, params.get("statusCode") + "");
+		}
 
-	// 	return testService.findByModifiedDate(params, 600);
-	// }
+		return testService.findByModifiedDate(params, 600);
+	}
 
-	// @GetMapping("/itemby/sample/{id}")
-	// @ResponseBody
-	// public Map<String, Object> getItemBySample(@PathVariable String id) {
-	// 	return testService.findSampleItemBySample(id);
-	// }
+	@GetMapping("/itemby/sample/{id}")
+	@ResponseBody
+	public Map<String, Object> getItemBySample(@PathVariable String id) {
+		return testService.findSampleItemBySample(id);
+	}
 
-	// @GetMapping("/databy/sample/{id}")
-	// @ResponseBody
-	// public Map<String, Object> getDataBySample(@PathVariable String id) {
-	// 	return testService.findSampleDataBySampleId(id);
-	// }
+	@GetMapping("/databy/sample/{id}")
+	@ResponseBody
+	public Map<String, Object> getDataBySample(@PathVariable String id) {
+		return testService.findSampleDataBySampleId(id);
+	}
 
-	// @PostMapping("/approve")
-	// @ResponseBody
-	// public Map<String, String> outputApprove(@RequestBody List<Integer> ids) {
-	// 	UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	@PostMapping("/approve")
+	@ResponseBody
+	public Map<String, String> outputApprove(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-	// 	return testService.outputApprove(ids, userDetails.getUsername());
-	// }
+		return testService.outputApprove(ids, userDetails.getUsername());
+	}
 }
