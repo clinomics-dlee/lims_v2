@@ -23,6 +23,30 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class SampleSpecification {
 
+	public static Specification<Sample> isTest() {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.equal(root.get("isTest"), true));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> isNotTest() {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.equal(root.get("isTest"), false));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+
 	public static Specification<Sample> createdDateOneMonth(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
