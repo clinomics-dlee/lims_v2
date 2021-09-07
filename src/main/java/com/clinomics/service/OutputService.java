@@ -15,15 +15,12 @@ import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
-import com.clinomics.entity.lims.SampleTest;
 import com.clinomics.enums.ResultCode;
 import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.SampleRepository;
-import com.clinomics.repository.lims.SampleTestRepository;
 import com.clinomics.specification.lims.SampleSpecification;
-import com.clinomics.specification.lims.SampleTestSpecification;
 import com.clinomics.util.CustomIndexPublisher;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -47,9 +44,6 @@ public class OutputService {
 	@Autowired
     SampleRepository sampleRepository;
 	
-	@Autowired
-	SampleTestRepository sampleTestRepository;
-    
 	@Autowired
 	MemberRepository memberRepository;
 	
@@ -304,46 +298,6 @@ public class OutputService {
 				}
 			}
 		}
-
-		// #. test용 sample 결과 추가
-		Specification<SampleTest> testWhere = Specification
-				.where(SampleTestSpecification.productNotLike(params))
-				.and(SampleTestSpecification.statusIn(Arrays.asList(StatusCode.S700_OUTPUT_WAIT, StatusCode.S800_RE_OUTPUT_WAIT)));
-
-		List<SampleTest> sampleTests = sampleTestRepository.findAll(testWhere);
-
-		if (sampleTests.size() > 0) {
-			for (SampleTest sampleTest : sampleTests) {
-				Set<String> productTypes = Sets.newHashSet();
-				sampleTest.getBundle().getProduct().stream().forEach(p -> {
-					productTypes.add(p.getType());
-				});
-
-				if (productTypes.contains(productType)) {
-					Map<String, Object> data = Maps.newHashMap();
-
-					Map<String, Object> items = sampleTest.getItems();
-					if (sampleTest.getBundle().isHospital()) {
-						data.put("barcode", sampleTest.getLaboratoryId());
-						data.put("name", items.get("h_name"));
-						data.put("tel", items.get("h_tel"));
-						data.put("address", items.get("h_address"));
-					}
-
-					data.putAll(items);
-					data.put("genedata", sampleTest.getData());
-					data.put("experimentid", sampleTest.getLaboratoryId());
-					data.put("collecteddate", (sampleTest.getCollectedDate() != null ? sampleTest.getCollectedDate().format(formatter) : ""));
-					data.put("receiveddate", (sampleTest.getReceivedDate() != null ? sampleTest.getReceivedDate().format(formatter) : ""));
-					data.put("sampletype", sampleTest.getSampleType());
-					data.put("p_name", sampleTest.getBundle().getName());
-					
-					datas.add(data);
-					
-					logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "] data : " + data.toString());
-				}
-			}
-		}
 		
 		rtn.put("result", "success");
 		rtn.put("datas", datas);
@@ -421,65 +375,6 @@ public class OutputService {
 			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆  sample[" + samples.get(0).getLaboratoryId() + "] count error : size = [" + samples.size() + "]");
 		}
 
-		// #. test용 sample 업데이트 추가
-		Specification<SampleTest> testWhere = Specification
-				.where(SampleTestSpecification.laboratoryIdEqual(laboratoryId))
-				.and(SampleTestSpecification.productNotLike(params))
-				.and(SampleTestSpecification.statusIn(Arrays.asList(StatusCode.S700_OUTPUT_WAIT, StatusCode.S800_RE_OUTPUT_WAIT)));
-
-		List<SampleTest> sampleTests = sampleTestRepository.findAll(testWhere);
-
-		if (sampleTests.size() == 1) {
-			SampleTest sampleTest = sampleTests.get(0);
-			logger.info("☆☆☆ sampleTest laboratory Id : " + sampleTest.getLaboratoryId());
-			logger.info("☆☆☆ sampleTest productType : " + productType);
-			Set<String> productTypes = Sets.newHashSet();
-			sampleTest.getBundle().getProduct().stream().forEach(p -> {
-				productTypes.add(p.getType());
-			});
-
-			if (productTypes.contains(productType)) {
-				// #. result status update
-				if (!isTest) {
-					logger.info("☆☆☆ isTest : " + isTest);
-					
-					String outputProductTypes = sampleTest.getOutputProductTypes();
-					if (outputProductTypes == null) outputProductTypes = "";
-					if (!outputProductTypes.contains(productTypeData)) {
-						outputProductTypes += productTypeData;
-						outputProductTypes.replace("__", "_");
-						sampleTest.setOutputProductTypes(outputProductTypes);
-					}
-
-					boolean outputAllProduct = true;
-					for (Product p : sampleTest.getBundle().getProduct()) {
-						if (!outputProductTypes.contains(p.getType())) {
-							outputAllProduct = false;
-							break;
-						}
-					}
-					// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
-					if (outputAllProduct) {
-						if (StatusCode.S700_OUTPUT_WAIT.equals(sampleTest.getStatusCode())) {
-							sampleTest.setOutputCmplDate(now);
-							sampleTest.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
-							sampleTest.setOutputProductTypes("");
-							sampleTest.setModifiedDate(now);
-						} else if (StatusCode.S800_RE_OUTPUT_WAIT.equals(sampleTest.getStatusCode())) {
-							sampleTest.setReOutputCmplDate(now);
-							sampleTest.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
-							sampleTest.setOutputProductTypes("");
-							sampleTest.setModifiedDate(now);
-						}
-					}
-					sampleTestRepository.save(sampleTest);
-					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆  [" + ip + "]sampleTest[" + sampleTest.getLaboratoryId() + "] update complete.");
-				}
-			}
-		} else if (sampleTests.size() > 1) {
-			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆  sampleTest[" + samples.get(0).getLaboratoryId() + "] count error : size = [" + sampleTests.size() + "]");
-		}
-		
 		rtn.put("result", "success");
 		
 		return rtn;
@@ -511,25 +406,6 @@ public class OutputService {
 			logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
 		}
 
-		// #. test용 sample 결과 추가
-		Specification<SampleTest> testWhere = Specification
-				.where(SampleTestSpecification.statusCodeGt(710))
-				.and(SampleTestSpecification.laboratoryIdEqual(laboratoryId));
-
-		List<SampleTest> sampleTests = sampleTestRepository.findAll(testWhere);
-		if (sampleTests.size() > 0) {
-			SampleTest sampleTest = sampleTests.get(0);
-			Map<String, Object> items = sampleTest.getItems();
-			data.putAll(items);
-			data.put("experimentid", sampleTest.getLaboratoryId());
-			data.put("genedata", sampleTest.getData());
-			// #. fileFullPath, chipType은 분석실행하지 않기 때문에 공백으로 설정
-			data.put("fileFullPath", "");
-			data.put("chipType", "");
-				
-			logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
-		}
-		
 		rtn.put("result", "success");
 		rtn.put("data", data);
 		

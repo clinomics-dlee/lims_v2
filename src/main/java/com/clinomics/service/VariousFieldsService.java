@@ -10,9 +10,8 @@ import java.util.stream.Collectors;
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Holiday;
 import com.clinomics.entity.lims.Sample;
-import com.clinomics.entity.lims.SampleTest;
 import com.clinomics.repository.lims.HolidayRepository;
-import com.clinomics.repository.lims.SampleTestRepository;
+import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.util.CustomIndexPublisher;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +29,7 @@ public class VariousFieldsService {
     CustomIndexPublisher customIndexPublisher;
 	
 	@Autowired
-	SampleTestRepository sampleTestRepository;
+	SampleRepository sampleRepository;
 
     public void setFields(boolean existsSample, Sample sample, Map<String, Object> items) {
         Bundle bundle = sample.getBundle();
@@ -112,12 +111,12 @@ public class VariousFieldsService {
     
     
     
-    public void setFieldsTest(boolean existsSample, SampleTest sampleTest, Map<String, Object> items) {
-        Bundle bundle = sampleTest.getBundle();
+    public void setFieldsTest(boolean existsSample, Sample sample, Map<String, Object> items) {
+        Bundle bundle = sample.getBundle();
         String strCollectedDate = items.getOrDefault("collecteddate", "").toString();
         if (!strCollectedDate.isEmpty() && strCollectedDate.matches("^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$")) {
 
-            sampleTest.setCollectedDate(LocalDate.parse(strCollectedDate));
+            sample.setCollectedDate(LocalDate.parse(strCollectedDate));
             items.remove("collecteddate");
         }
 
@@ -129,16 +128,16 @@ public class VariousFieldsService {
         if (!strReceivedDate.isEmpty() && receivedDate != null) {
 
             items.put("tat", getTat(bundle, strReceivedDate));
-            sampleTest.setReceivedDate(LocalDate.parse(strReceivedDate));
+            sample.setReceivedDate(LocalDate.parse(strReceivedDate));
             items.remove("receiveddate");
         }
 
-        sampleTest.setSampleType(items.getOrDefault("sampletype", "").toString());
+        sample.setSampleType(items.getOrDefault("sampletype", "").toString());
         items.remove("sampletype");
         
         if (!existsSample && bundle.isAutoSequence()) {
         	
-        	String lastLaboratoryId = sampleTestRepository.findMaxTestLaboratoryId();
+        	String lastLaboratoryId = sampleRepository.findMaxTestLaboratoryId();
         	String seq = "";
         	
         	if(lastLaboratoryId == null) {
@@ -150,9 +149,9 @@ public class VariousFieldsService {
 				seq = "TEST-"+StringUtils.right(receivedDate.format(DateTimeFormatter.ofPattern("yyyyMM")), 4) + String.format("-%04d", newIndexNumber);
         	}
            // String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
-            if (!seq.isEmpty()) sampleTest.setLaboratoryId(seq);
+            if (!seq.isEmpty()) sample.setLaboratoryId(seq);
         } else if (items.containsKey("laboratory")) {
-            sampleTest.setLaboratoryId(items.get("laboratory").toString());
+            sample.setLaboratoryId(items.get("laboratory").toString());
         }
     }
 }

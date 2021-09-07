@@ -127,6 +127,9 @@ public class Sample implements Serializable {
 
 	// #. interface api 요청된 product에 type값 목록에 "_"를 붙임 ex> _GS_GSX_
 	private String outputProductTypes;
+
+	// #. test sample 체크용, 기본 false
+	private boolean isTest = false;
 	
 	private LocalDateTime createdDate;
 
