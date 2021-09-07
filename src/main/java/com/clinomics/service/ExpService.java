@@ -78,6 +78,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.statusEqual(StatusCode.S200_EXP_READY))
@@ -159,6 +160,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.statusEqual(StatusCode.S210_EXP_STEP1))
@@ -307,6 +309,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.statusEqual(StatusCode.S220_EXP_STEP2))
@@ -534,6 +537,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.statusEqual(StatusCode.S230_EXP_STEP3))
 					.and(SampleSpecification.mappingInfoLike(params))
 					.and(SampleSpecification.orderBy(params));
@@ -665,6 +669,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.statusCodeGt(400))
 					.and(SampleSpecification.mappingInfoLike(params))
 					.and(SampleSpecification.orderBy(params));
@@ -694,6 +699,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingNoEqual(mappingNo))
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.orderBy(params));
 		
 		total = sampleRepository.count(where);
