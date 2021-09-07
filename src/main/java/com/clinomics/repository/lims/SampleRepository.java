@@ -102,6 +102,6 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
 
-    @Query(value = "SELECT MAX(SUBSTR(laboratory_id, -4, 4)) FROM sample", nativeQuery = true)
+    @Query(value = "SELECT MAX(SUBSTR(laboratory_id, -4, 4)) FROM sample WHERE is_test = 1", nativeQuery = true)
     String findMaxTestLaboratoryId();
 }
