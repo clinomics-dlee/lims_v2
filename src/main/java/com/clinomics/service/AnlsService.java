@@ -90,6 +90,7 @@ public class AnlsService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.S400_ANLS_READY))
 					.and(SampleSpecification.mappingInfoLike(params))
@@ -212,6 +213,7 @@ public class AnlsService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
@@ -230,6 +232,7 @@ public class AnlsService {
 	public Map<String, Object> findChipBarcodeByAllFail(Map<String, String> params) {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S430_ANLS_FAIL})))
 					.and(SampleSpecification.orderBy(params));
@@ -241,6 +244,7 @@ public class AnlsService {
 			String chipBarcode = s.getChipBarcode();
 			Specification<Sample> w = Specification
 					.where(SampleSpecification.chipBarcodeEqual(chipBarcode))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusNotEqual(StatusCode.S430_ANLS_FAIL));
 		
@@ -280,6 +284,7 @@ public class AnlsService {
 		String chipBarcode = datas.get("chipBarcode");
 		Specification<Sample> where = Specification
 				.where(SampleSpecification.chipBarcodeEqual(chipBarcode))
+				.and(SampleSpecification.isNotTest())
 				.and(SampleSpecification.bundleIsActive())
 				.and(SampleSpecification.statusEqual(StatusCode.S430_ANLS_FAIL));
 	
@@ -399,6 +404,7 @@ public class AnlsService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenDate(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))

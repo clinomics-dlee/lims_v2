@@ -91,6 +91,7 @@ public class SampleDbService {
 					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.orderBy(params));
@@ -159,6 +160,7 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusCodeGt(statusCodeNumber))
 					.and(SampleSpecification.orderBy(params));
@@ -189,6 +191,7 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)))
 					.and(SampleSpecification.orderBy(params));
@@ -221,6 +224,7 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusCodeGt(statusCodeNumber))
 					.and(SampleSpecification.orderBy(params));
@@ -253,6 +257,7 @@ public class SampleDbService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)))
 					.and(SampleSpecification.orderBy(params));

@@ -101,6 +101,7 @@ public class InputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusIn(statusCodes))
 					.and(SampleSpecification.orderBy(params));

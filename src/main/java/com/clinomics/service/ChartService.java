@@ -208,6 +208,7 @@ public class ChartService {
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.hNameIn(params))
+			.and(SampleSpecification.isNotTest())
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusCodeGt(20));
 	}
@@ -218,6 +219,7 @@ public class ChartService {
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.hNameIn(params))
+			.and(SampleSpecification.isNotTest())
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(
 				Arrays.asList(new StatusCode[] {
@@ -237,6 +239,7 @@ public class ChartService {
 			.and(SampleSpecification.isLastVersionTrue())
 			.and(SampleSpecification.bundleId(params))
 			.and(SampleSpecification.hNameIn(params))
+			.and(SampleSpecification.isNotTest())
 			.and(SampleSpecification.bundleIsActive())
 			.and(SampleSpecification.statusIn(Arrays.asList(
 				StatusCode.S710_OUTPUT_CMPL

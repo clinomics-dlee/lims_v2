@@ -81,6 +81,7 @@ public class OutputService {
 					.where(SampleSpecification.betweenModifiedDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusIn(statusCodes))
 					.and(SampleSpecification.orderBy(params));
