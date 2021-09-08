@@ -123,7 +123,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 							<hr/>
 							<div class="form-group row m-b-12">
-								
+								<form id="fileupload2" method="POST" enctype="multipart/form-data">
+									<div class="hide">
+										<input type="file" id="file2" name="file">
+									</div>
+								</form>
 								<div>
 									<button type="button" class="btn btn-success m-l-10" onclick="save();">저장</button>
 									<button type="button" class="btn btn-warning m-l-10" onclick="deleteRow();">삭제</button>
@@ -186,6 +190,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<div class="form-group row m-b-12">
 								
 								<div>
+									<button onClick="uploadResults();" class="btn btn-success m-l-20">결과파일 Upload</button>
 									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">발행</button>
 								</div>
 							</div>
@@ -455,6 +460,38 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		}
 		], null);
 		
+		$('#file2').on('change', function () {
+			if ($("#file2").val() == '') return;
+			
+			var form = $('#fileupload2')[0];
+			var data = new FormData(form);
+			$.ajax({
+				enctype: 'multipart/form-data',
+	            url: '/test/rslt/excel/import',
+				type: 'post',
+		        data : data,
+		        processData: false,
+		        contentType: false,
+		        beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+			    success: function(data,xhr) {
+			        if (data.result == "00") {
+						CommonMsg.save(function() { });
+					} else {
+						CommonMsg.error(function() { }, data.message);
+					}
+			    },
+			    error : function(xhr, status, error) {
+			    	CommonMsg.error(function() {});
+				},
+				complete : function() {
+					$("#file2").val('');
+					// #. 새로고침
+					UserTable.reload('_test_grid');
+				}
+			});
+		});
 	});
 	
 	function excelForm() {
@@ -822,6 +859,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	function search() {
 		UserTable.reload('_test_grid');
+	}
+
+	function uploadResults() {
+		$('#file2').trigger('click'); 
 	}
 	
 	/* ]]> */

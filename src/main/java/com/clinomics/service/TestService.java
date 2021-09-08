@@ -147,7 +147,7 @@ public class TestService {
 			sample.setCreatedDate(now);
 			sample.setModifiedDate(now);
 			sample.setCreatedMember(member);
-			sample.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+			sample.setStatusCode(StatusCode.S600_JDGM_APPROVE);
 
 			if (barcode.length() > 0) {
 				String barcodeLetter = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$1");

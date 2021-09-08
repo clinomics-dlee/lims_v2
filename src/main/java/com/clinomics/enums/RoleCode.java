@@ -8,6 +8,7 @@ public enum RoleCode {
 	ROLE_EXP_40,
 	ROLE_EXP_80,
 	ROLE_OUTPUT_20,
+	ROLE_TEST_90,
 	ROLE_IT_99,
 	;
 

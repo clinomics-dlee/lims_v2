@@ -1,10 +1,13 @@
 package com.clinomics.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import com.clinomics.enums.ResultCode;
+import com.clinomics.service.TestExcelService;
 import com.clinomics.service.TestService;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RequestMapping("/test")
 @Controller
@@ -26,6 +31,9 @@ public class TestController {
 	
 	@Autowired
 	TestService testService;
+
+	@Autowired
+	TestExcelService testExcelService;
 	
 	@PostMapping("/save")
 	@ResponseBody
@@ -86,5 +94,15 @@ public class TestController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		return testService.outputApprove(ids, userDetails.getUsername());
+	}
+
+	@PostMapping("/rslt/excel/import")
+	@ResponseBody
+	public Map<String, Object> importRsltExcel(@RequestParam("file") MultipartFile multipartFile, MultipartHttpServletRequest request)
+			throws InvalidFormatException, IOException {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String memberId = userDetails.getUsername();
+		
+		return testExcelService.importRsltExcel(multipartFile, memberId);
 	}
 }
