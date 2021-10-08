@@ -25,9 +25,9 @@ import com.clinomics.config.StringMapConverter;
 import com.clinomics.enums.ChipTypeCode;
 import com.clinomics.enums.GenotypingMethodCode;
 import com.clinomics.enums.StatusCode;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import lombok.Getter;
@@ -131,8 +131,10 @@ public class Sample implements Serializable {
 	// #. test sample 체크용, 기본 false
 	private boolean isTest = false;
 	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime modifiedDate;
 
 	@ManyToOne()
@@ -140,6 +142,7 @@ public class Sample implements Serializable {
 	private Member createdMember;
 	
 	// #. 입고 승인일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime inputApproveDate;
 	// #. 입고 승인자
 	@ManyToOne()
@@ -147,6 +150,7 @@ public class Sample implements Serializable {
 	private Member inputApproveMember;
 
 	// #. 입고 중간관리자 승인일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime inputMngApproveDate;
 	// #. 입고 중간관리자 승인자
 	@ManyToOne()
@@ -154,6 +158,7 @@ public class Sample implements Serializable {
 	private Member inputMngApproveMember;
 
 	// #. 입고 검사실책임자 승인일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime inputDrctApproveDate;
 	// #. 입고 검사실책임자 승인자
 	@ManyToOne()
@@ -161,6 +166,7 @@ public class Sample implements Serializable {
 	private Member inputDrctMember;
 
 	// #. 실험 시작일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime expStartDate;
 	// #. 실험 시작 담당자
 	@ManyToOne()
@@ -168,6 +174,7 @@ public class Sample implements Serializable {
 	private Member expStartMember;
 
 	// #. STEP1 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime expStep1Date;
 	// #. STEP1 담당자
 	@ManyToOne()
@@ -175,6 +182,7 @@ public class Sample implements Serializable {
 	private Member expStep1Member;
 
 	// #. STEP2 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime expStep2Date;
 	// #. STEP2 담당자
 	@ManyToOne()
@@ -182,6 +190,7 @@ public class Sample implements Serializable {
 	private Member expStep2Member;
 
 	// #. STEP3 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime expStep3Date;
 	// #. STEP3 담당자
 	@ManyToOne()
@@ -189,15 +198,18 @@ public class Sample implements Serializable {
 	private Member expStep3Member;
 
 	// #. 분석 시작일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime anlsStartDate;
 	// #. 분석 시작 담당자
 	@ManyToOne()
 	@JoinColumn(name = "anlsStartMemberId")
 	private Member anlsStartMember;
 	// #. 분석 종료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime anlsEndDate;
 
 	// #. 분석 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime anlsCmplDate;
 	// #. 분석 완료 담당자
 	@ManyToOne()
@@ -205,6 +217,7 @@ public class Sample implements Serializable {
 	private Member anlsCmplMember;
 
 	// #. 판정 검사 담당자 승인일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime jdgmApproveDate;
 	// #. 판정 검사 담당자
 	@ManyToOne()
@@ -212,6 +225,7 @@ public class Sample implements Serializable {
 	private Member jdgmApproveMember;
 
 	// #. 판정 중간관리자 승인일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime jdgmMngApproveDate;
 	// #. 판정 중간관리자
 	@ManyToOne()
@@ -219,6 +233,7 @@ public class Sample implements Serializable {
 	private Member jdgmMngApproveMember;
 
 	// #. 판정 검사실책임자 승인일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime jdgmDrctApproveDate;
 	// #. 판정 검사실책임자
 	@ManyToOne()
@@ -226,21 +241,25 @@ public class Sample implements Serializable {
 	private Member jdgmDrctApproveMember;
 
 	// #. PDF출고 대기일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime outputWaitDate;
 	// #. PDF출고 담당자
 	@ManyToOne()
 	@JoinColumn(name = "outputWaitMemberId")
 	private Member outputWaitMember;
 	// #. PDF출고 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime outputCmplDate;
 
 	// #. 재발행 대기일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime reOutputWaitDate;
 	// #. 재발행 담당자
 	@ManyToOne()
 	@JoinColumn(name = "reOutputWaitMemberId")
 	private Member reOutputWaitMember;
 	// #. 재발행 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime reOutputCmplDate;
 
 	// #. 실제 출고 담당자
@@ -248,6 +267,7 @@ public class Sample implements Serializable {
 	@JoinColumn(name = "deliveryMemberId")
 	private Member deliveryCmplMember;
 	// #. 실제 출고 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime deliveryCmplDate;
 	
 	public String getGenotypingId() {
