@@ -450,4 +450,24 @@ public class OutputService {
 		
 		return rtn;
 	}
+
+	public Map<String, Object> getResultByLaboratoryIdsForRest(Map<String, Object> params, String ip) {
+		logger.info("☆☆☆☆☆☆☆ getResultByLaboratoryIdsForRest ☆☆☆☆☆ IN interface : " + params.toString());
+		Map<String, Object> rtn = Maps.newHashMap();
+
+		List<String> laboratoryIds = (List<String>)params.get("laboratoryIds");
+		logger.info("★★★ params=" + params.toString());
+		Specification<Sample> where = Specification
+					.where(SampleSpecification.laboratoryIdIn(laboratoryIds));
+					
+		
+		List<Sample> list = sampleRepository.findAll(where);
+		
+		logger.info("★★★ list.size()=" + list.size());
+
+		rtn.put("result", "success");
+		rtn.put("list", list);
+		
+		return rtn;
+	}
 }

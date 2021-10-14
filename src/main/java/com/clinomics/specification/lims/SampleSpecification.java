@@ -494,4 +494,17 @@ public class SampleSpecification {
 			return rtn;
 		};
 	}
+
+	public static Specification<Sample> laboratoryIdIn(List<String> laboratoryIds) {
+		return (root, query, criteriaBuilder) -> {
+
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.and(root.get("laboratoryId").in(laboratoryIds)));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
 }
