@@ -1,9 +1,20 @@
 alert:
-  confirm: 확인
+  ok: 확인
   cancel: 취소
+  yes: 네
+  no: 아니오
   loginEmail: 아이디(이메일)를 입력해 주세요.
   loginPassword: 비밀번호를 입력해 주세요.
   loginFail: 아아디 또는 비밀번호가 올바르지 않습니다.
+  titleFail: 실패
+  titleError: 에러
+  titleSuccess: 성공
+  titleNormal: 정상
+  save: 저장이 완료되었습니다
+  error: 에러가 발생하였습니다. 관리자에게 문의바랍니다.
+  fail: 실패하였습니다. 관리자에게 문의바랍니다.
+  confirm: 진행하시겠습니까?
+  loading: 로딩
 button:
   login: 로그인
   logout: 로그아웃
@@ -13,81 +24,92 @@ button:
   changePassword: 패스워드 변경
   save: 저장
   edit: 수정
-menu:
-  dashboard: 대시보드
-  calendar: 달력
-  chart: 차트
-  work: 업무
-  register: 검체 등록
-  sampleList: 검체 목록
-  experiment: 실험 분석
-  report: PDF 발행
-  complete: 실험 종료 리스트
-  analysis: 분석
-  sampleDb: 검체 DB
-  setting: 설정
-  member: 사용자
-  product: 상품
-  productItem: 상품 속성
-  bundle: 묶음 상품
-  item: 검체 속성
-  resultItem: 결과 속성
-title:
-  sampleStatus: 검체 현황
 page:
-  calendar:
-    registered: 검체 입고
-    analysis: 분석 중
-    completed: 분석 완료
-    reported: PDF 발행
-  chart:
-    sampleReceipt: 검체 입고
-    experimentCompletion: 실험 완료
-    completedAnalysisFileProvided: 분석파일 제공완료
-    sampleReceiptRate: 검체 입고 비율
-  register:
-    new: 신규 등록
-    completed: 등록 완료
-  experiment:
-    upload: 결과 업로드
-    chipAnalysis: Chip 분석
-    analysisList: 분석 목록
-    failedList: 분석 실패 목록
-    analysis: 분석
-    deleteCelFile: Cel 파일 삭제
-    notes: 참고
-    resultFileSizeComment: 업로드할 수 있는 최대 파일용량은 1GB 입니다.
-    resultFileFormatComment: 업로드할 수 있는 파일은 엑셀(xlsx)파일만 가능합니다.
-  complete:
-    recreate: PDF 재발행
-  report:
-    create: PDF 발행
-  member:
-    title: 사용자 관리
-    name: 이름
-    id: 아이디
-    password: 비밀번호
-    changePassword: 비밀번호 변경
-    email: 이메일
-    department: 부서
-    new: 사용자 신규 등록
+  dashboard:
+    tit: 대시보드
+    calendar:
+      tit: 달력
+      registered: 입고
+      analysis: 실험 및 분석 중
+      completed: 판정 및 출고대기
+      reported: 출고 완료
+    chart:
+      tit: 차트
+      sampleReceipt: 검체 입고
+      experimentCompletion: 실험 완료
+      completedAnalysisFileProvided: 분석파일 제공완료
+      sampleReceiptRate: 검체 입고 비율
+  input:
+    tit: 입고
+    reg:
+      tit: 검체등록
+    rcv: 검체입고
+    aprv: 입고결재
+    db: 입고DB
+  exp:
+    tit: 실험
+    rdy: 실험대기
+    step1: STEP 1
+    step1: STEP 2
+    step1: STEP 3
+    db: 실험DB
+  anls:
+    tit: 분석
+    rdy: 분석대기
+    stts: 분석상황
+    rslt: 분석결과
+    db: 분석DB
+  anls:
+    tit: 분석
+    rdy: 분석대기
+    stts: 분석상황
+    rslt: 분석결과
+    db: 분석DB
+  output:
+    all: 검체목록
+    jdgm: 판정
+    output: 출고
+  test:
+    reg: 테스트화면
+  set:
+    tit: 설정
+    mmbr: 사용자
+    prd: 상품
+    bndl: 묶음상품
+    item: 검체 항목 관리
+    prd_item: 검체 연결 설정
+title:
+  regAdmin: 관리자 등록
+  sampleList: 검채 리스트
+  anlsResult: 분석결과
+label:
+  id: 아이디
+  password: 패스워드
+  email: 이메일
+  name: 이름
+  product: 서비스
 common:
-  product: 상품
+  product: 서비스
   all: 전체
   createdDate: 생성일자
   keyword: 검색어
   search: 조회
   single: 단일 등록
+  createGrid: 그리드열 생성
   excelImport: 엑셀 불러오기
   excelFormDownload: 엑셀 양식 내려받기
   excelUpload: 엑셀 업로드
   saveAll: 모두 저장
   list: 목록
   today: 오늘
+  date: 검색기간
   next: 다음
   prev: 이전
-  pleaseSelect: 선택하세요
+  downloadHumanMaterials: 인체유래물등 다운로드
+  specimenRecord : 검체기록지
+  pleaseSelect: 선택해 주세요
   save: 저장
+  delete: 삭제
   reset: 초기화
   add: 추가
   active: 활성화

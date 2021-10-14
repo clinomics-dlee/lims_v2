@@ -38,11 +38,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item">입고</li>
-				<li class="breadcrumb-item active">검체등록</li>
+				<li class="breadcrumb-item" th:text="#{page.input.tit}">입고</li>
+				<li class="breadcrumb-item active" th:text="#{page.input.reg.tit}">검체등록</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">검체등록</h1>
+			<h1 id="page-header" class="page-header" th:text="#{page.input.reg.tit}">검체등록</h1>
 			
 			<div class="row">
 				<div class="col-xl-12">
@@ -58,11 +58,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<!-- begin tab-pane -->
 							
 							<div class="form-group row m-b-15">
-								<label class="col-form-label m-l-2">서비스</label>
+								<label class="col-form-label m-l-2" th:text="#{common.product}">서비스</label>
 								<div class="col-xs-push-0">
 									<select class="form-control width-200"
 										data-parsley-required="true" data-parsley-errors-container="#error_bundle4" id="sel_bundle" name="bundle">
-										<option value>선택해 주세요</option>
+										<option value th:text="#{common.pleaseSelect}">선택해 주세요</option>
 										<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 									</select>
 								</div>
@@ -76,15 +76,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<div class="form-group row m-b-15">
 									<div class="row col-xl-8">
 										<div class="col-xs-push-0">
-											<button type="button" class="btn btn-default m-b-5" onclick="createRow();">그리드열 생성</button>
+											<button type="button" class="btn btn-default m-b-5" onclick="createRow();" th:text="#{common.createGrid}">그리드열 생성</button>
 										</div>
 										<div class="col-xs-push-0">
 											<input type="text" id="txt_create_grid" class="form-control width-50" style = "text-align:right;"
 												onkeypress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;"/>
 										</div>
 										<div class="col-xs-push-0">
-											<button type="button" class="btn btn-green m-l-20 m-b-5" onclick="excelForm();">엑셀 양식 다운로드</button>
-											<button type="button" class="btn btn-green m-l-5 m-b-5" onclick="excelUpload();">엑셀 불러오기</button>
+											<button type="button" class="btn btn-green m-l-20 m-b-5" onclick="excelForm();" th:text="#{common.excelFormDownload}">엑셀 양식 다운로드</button>
+											<button type="button" class="btn btn-green m-l-5 m-b-5" onclick="excelUpload();" th:text="#{common.excelImport}">엑셀 불러오기</button>
 										</div>
 										<div class="hide">
 											<input type="file" id="file" name="file">
@@ -112,8 +112,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<div class="form-group row m-b-12">
 								
 								<div>
-									<button type="button" class="btn btn-success m-l-10" onclick="save();">저장</button>
-									<button type="button" class="btn btn-warning m-l-10" onclick="deleteRow();">삭제</button>
+									<button type="button" class="btn btn-success m-l-10" onclick="save();" th:text="#{common.save}">저장</button>
+									<button type="button" class="btn btn-warning m-l-10" onclick="deleteRow();" th:text="#{common.delete}">삭제</button>
 								</div>
 							</div>
 

@@ -26,17 +26,17 @@
             	<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-th-large"></i>
-                    <span>대시보드</span>
+                    <span th:text="#{page.dashboard.tit}">대시보드</span>
                 </a>
                 <ul class="sub-menu">
                 	<li th:classappend="${#strings.equals(path, '/')} ? active : ''">
 						<a href="/">
-						    <span>달력</span>
+						    <span th:text="#{page.dashboard.calendar.tit}">달력</span>
 						</a>
 					</li>
 		            <li th:classappend="${#strings.startsWith(path, '/chart')} ? active : ''">
 						<a href="/chart">
-						    <span>차트</span>
+						    <span th:text="#{page.dashboard.chart.tit}">차트</span>
 						</a>
 					</li>
                 </ul>
@@ -46,20 +46,20 @@
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-truck"></i>
-                    <span>입고</span>
+                    <span th:text="#{page.input.tit}">입고</span>
                 </a>
 				<ul class="sub-menu">
                     <li th:class="${#strings.contains(path,'/p/input/reg')} ? active : ''">
-                    	<a href="/p/input/reg">검체등록</a>
+                    	<a href="/p/input/reg" th:text="#{page.input.reg.tit}">검체등록</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/input/rcv')} ? active : ''">
-                    	<a href="/p/input/rcv">검체입고</a>
+                    	<a href="/p/input/rcv" th:text="#{page.input.rcv}">검체입고</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/input/aprv')} ? active : ''">
-                    	<a href="/p/input/aprv">입고결재</a>
+                    	<a href="/p/input/aprv" th:text="#{page.input.aprv}">입고결재</a>
 					</li>
                     <li th:class="${#strings.contains(path,'/p/input/db')} ? active : ''">
-                    	<a href="/p/input/db">입고DB</a>
+                    	<a href="/p/input/db" th:text="#{page.input.db}">입고DB</a>
                     </li>
                 </ul>
 			</li>
@@ -68,23 +68,23 @@
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-flask"></i>
-                    <span>실험</span>
+                    <span th:text="#{page.exp.tit}">실험</span>
                 </a>
 				<ul class="sub-menu">
                     <li th:class="${#strings.contains(path,'/p/exp/rdy')} ? active : ''">
-                    	<a href="/p/exp/rdy">실험대기</a>
+                    	<a href="/p/exp/rdy" th:text="#{page.exp.rdy}">실험대기</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/exp/step1')} ? active : ''">
-                    	<a href="/p/exp/step1">STEP 1</a>
+                    	<a href="/p/exp/step1" th:text="#{page.exp.step1}">STEP 1</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/exp/step2')} ? active : ''">
-                    	<a href="/p/exp/step2">STEP 2</a>
+                    	<a href="/p/exp/step2" th:text="#{page.exp.step2}">STEP 2</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/exp/step3')} ? active : ''">
-                    	<a href="/p/exp/step3">STEP 3</a>
+                    	<a href="/p/exp/step3" th:text="#{page.exp.step3}">STEP 3</a>
 					</li>
 					<li th:class="${#strings.contains(path,'/p/exp/db')} ? active : ''">
-                    	<a href="/p/exp/db">실험DB</a>
+                    	<a href="/p/exp/db" th:text="#{page.exp.db}">실험DB</a>
                     </li>
                 </ul>
 			</li>
@@ -93,20 +93,20 @@
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-laptop"></i>
-                    <span>분석</span>
+                    <span th:text="#{page.anls.tit}">분석</span>
                 </a>
 				<ul class="sub-menu">
                     <li th:class="${#strings.contains(path,'/p/anls/rdy')} ? active : ''">
-                    	<a href="/p/anls/rdy">분석대기</a>
+                    	<a href="/p/anls/rdy" th:text="#{page.anls.rdy}">분석대기</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/anls/stts')} ? active : ''">
-                    	<a href="/p/anls/stts">분석상황</a>
+                    	<a href="/p/anls/stts" th:text="#{page.anls.stts}">분석상황</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/anls/rslt')} ? active : ''">
-                    	<a href="/p/anls/rslt">분석결과</a>
+                    	<a href="/p/anls/rslt" th:text="#{page.anls.rslt}">분석결과</a>
                     </li>
                     <li th:class="${#strings.contains(path,'/p/anls/db')} ? active : ''">
-                    	<a href="/p/anls/db">분석DB</a>
+                    	<a href="/p/anls/db" th:text="#{page.anls.db}">분석DB</a>
 					</li>
                 </ul>
 			</li>
@@ -114,28 +114,28 @@
 				th:classappend="${#strings.startsWith(path,'/p/output/jdgm')} ? active : ''">
 				<a href="/p/output/jdgm">
                     <i class="fa fa-balance-scale"></i>
-                    <span>판정</span>
+                    <span th:text="#{page.output.jdgm}">판정</span>
                 </a>
 			</li>
 			<li sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_INPUT_40', 'ROLE_OUTPUT_20', 'ROLE_EXP_80', 'ROLE_IT_99')"
 				th:classappend="${#strings.startsWith(path,'/p/output/output')} ? active : ''">
 				<a href="/p/output/output">
                     <i class="fa fa-print"></i>
-                    <span>출고</span>
+                    <span th:text="#{page.output.output}">출고</span>
                 </a>
 			</li>
 			<li sec:authorize="hasAnyRole('ROLE_TEST_90', 'ROLE_IT_99')"
 				th:classappend="${#strings.startsWith(path,'/p/test/reg')} ? active : ''">
 				<a href="/p/test/reg">
                     <i class="fa fa-code-branch"></i>
-                    <span>테스트 화면</span>
+                    <span th:text="#{page.test.reg}">테스트 화면</span>
                 </a>
 			</li>
 			<li sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_INPUT_40', 'ROLE_EXP_80', 'ROLE_IT_99')"
 				th:classappend="${#strings.startsWith(path,'/p/output/all')} ? active : ''">
 				<a href="/p/output/all">
                     <i class="fa fa-list-alt"></i>
-                    <span>검체 목록</span>
+                    <span th:text="#{page.output.all}">검체 목록</span>
                 </a>
 			</li>
 			<li sec:authorize="hasAnyRole('ROLE_EXP_80', 'ROLE_IT_99')"
@@ -143,26 +143,26 @@
 				<a href="javascript:;">
                     <b class="caret"></b>
                     <i class="fa fa-cog fa-fw"></i>
-                    <span>설정</span>
+                    <span th:text="#{page.set.tit}">설정</span>
                 </a>
 				<ul class="sub-menu">
                     <li th:classappend="${#strings.equals(path,'/p/set/mmbr')} ? active : ''">
-                    	<a href="/p/set/mmbr">사용자</a>
+                    	<a href="/p/set/mmbr" th:text="#{page.set.mmbr}">사용자</a>
                     </li>
                     <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/prd')} ? active : ''">
-                    	<a href="/p/set/prd">상품</a>
+                    	<a href="/p/set/prd" th:text="#{page.set.prd}">상품</a>
                     </li>
                     <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/bndl')} ? active : ''">
-                    	<a href="/p/set/bndl">묶음상품</a>
+                    	<a href="/p/set/bndl" th:text="#{page.set.bndl}">묶음상품</a>
                     </li>
                     <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/item')} ? active : ''">
-                    	<a href="/p/set/item">검체 항목 관리</a>
+                    	<a href="/p/set/item" th:text="#{page.set.item}">검체 항목 관리</a>
                     </li>
                     <!-- <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.startsWith(path,'/p/set/ritem')} ? active : ''">
                     	<a href="/p/set/ritem">결과 항목 관리</a>
                     </li> -->
                     <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.equals(path,'/p/set/prd_item')} ? active : ''">
-                    	<a href="/p/set/prd_item">검체 연결 설정</a>
+                    	<a href="/p/set/prd_item" th:text="#{page.set.prd_item}">검체 연결 설정</a>
                     </li>
                     <!-- <li sec:authorize="hasRole('ROLE_IT_99')" th:classappend="${#strings.startsWith(path,'/p/set/prd_ritem')} ? active : ''">
                     	<a href="/p/set/prd_ritem">결과 연결 설정</a>

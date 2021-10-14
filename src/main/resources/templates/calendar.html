@@ -64,7 +64,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			</ol> -->
 			<!-- end breadcrumb -->
 			<!-- begin page-header -->
-			<h1 class="page-header">검체 현황</h1>
+			<h1 class="page-header" th:text="#{page.dashboard.calendar.tit}">검체 현황</h1>
 			<!-- end page-header -->
 			
 			<!-- begin fullcalendar-container -->
@@ -75,26 +75,26 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     					<div class="row m-b-10">
 							
 							<div class="col-md-12 text-center">
-								<label class="col-form-label m-l-2 m-r-10">서비스</label>
+								<label class="col-form-label m-l-2 m-r-10" th:text="#{common.product}">서비스</label>
 								<select class="form-control width-200" id="sel_bundle" multiple="multiple">
 									<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
 								</select>
 	
-								<button class="btn btn-white m-l-10" id="btn_search">조회</button>
+								<button class="btn btn-white m-l-10" id="btn_search" th:text="#{common.search}">조회</button>
 							</div>
 						</div>
     					<div class="row m-b-5">
 							
 							<div class="col-md-12 text-center">
 
-								<button class="btn btn-white m-r-5 m-b-5" id="btn_prev">이전</button>
+								<button class="btn btn-white m-r-5 m-b-5" id="btn_prev" th:text="#{common.prev}">이전</button>
 								<b id="tit_date" style="display:inline-block; width:150px; text-align: center; font-size: 24px; vertical-align: middle;">
 									2020-01-01
 								</b>
-								<button class="btn btn-white m-r-5 m-b-5" id="btn_next">다음</button>
-								<button class="btn btn-default m-r-5 m-b-5 width-60" id="btn_today">오늘</button>
-								<button class="btn btn-success m-r-5 m-b-5" id="btn_human">인체유래물등 다운로드</button>
-								<button class="btn btn-success m-r-5 m-b-5" onClick="printPopup();">검체기록지</button>
+								<button class="btn btn-white m-r-5 m-b-5" id="btn_next" th:text="#{common.next}">다음</button>
+								<button class="btn btn-default m-r-5 m-b-5 width-60" id="btn_today" th:text="#{common.today}">오늘</button>
+								<button class="btn btn-success m-r-5 m-b-5" id="btn_human" th:text="#{common.downloadHumanMaterials}">인체유래물등 다운로드</button>
+								<button class="btn btn-success m-r-5 m-b-5" onClick="printPopup();" th:text="#{common.specimenRecord}">검체기록지</button>
 							</div>
 						</div>
                     </div>
@@ -108,7 +108,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<div class="widget widget-stats bg-blue">
 						<div class="stats-icon"><i class="fa fa-users"></i></div>
 						<div class="stats-info">
-							<h4>출고완료 / 입고</h4>
+							<h4><span th:text="#{page.dashboard.calendar.reported}"></span> /
+								<span th:text="#{page.dashboard.calendar.registered}"></span></h4>
 							<p id="total1"></p>	
 						</div>
 						<!-- <div class="stats-link">
@@ -122,7 +123,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<div class="widget widget-stats bg-success">
 						<div class="stats-icon"><i class="fa fa-flask"></i></div>
 						<div class="stats-info">
-							<h4>실험 및 분석 중</h4>
+							<h4 th:text="#{page.dashboard.calendar.analysis}"></h4>
 							<p id="total2"></p>	
 						</div>
 					</div>
@@ -133,7 +134,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<div class="widget widget-stats bg-orange">
 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div>
 						<div class="stats-info">
-							<h4>판정 및 출고대기</h4>
+							<h4 th:text="#{page.dashboard.calendar.completed}">판정 및 출고대기</h4>
 							<p id="total3"></p>	
 						</div>
 					</div>
@@ -144,7 +145,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					<div class="widget widget-stats bg-red">
 						<div class="stats-icon"><i class="fa fa-file-alt"></i></div>
 						<div class="stats-info">
-							<h4>출고완료</h4>
+							<h4 th:text="#{page.dashboard.calendar.reported}">출고완료</h4>
 							<p id="total4"></p>	
 						</div>
 						

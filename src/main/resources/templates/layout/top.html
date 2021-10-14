@@ -50,7 +50,7 @@
 				<a href="javascript:void(0)" class="dropdown-item" id="profile">사용자 정보</a>
 				<a href="javascript:;" class="dropdown-item">Setting</a> -->
 				<a href="javascript:passwordPopupOnload()" class="dropdown-item" id="changePw">
-					<i class="fas fa-lg fa-fw m-r-10 fa-key"></i><span>Password 변경</span>
+					<i class="fas fa-lg fa-fw m-r-10 fa-key"></i><span th:text="#{button.changePassword}">Password 변경</span>
 				</a>
 				<div class="dropdown-divider"></div>
 				<a href="javascript:document.getElementById('logoutForm').submit();" class="dropdown-item" id="logout">
@@ -67,16 +67,16 @@
 		</form>
 	</div> -->
 </div>
-<script>
+<script th:inline="javascript">
 var CommonMsg = function() {
 	return {
 		//save
 		save : function(sfunc, msg) {
-			if (!msg) msg = "저장이 완료되었습니다";
+			if (!msg) msg = /*[[#{alert.save}]]*/ {};
 			swal({
 				text: msg,
 				icon: 'success',
-				title: '정상',
+				title: /*[[#{alert.titleNormal}]]*/ {},
 				buttons : {
 					confirm : {
 						visible : false
@@ -90,14 +90,14 @@ var CommonMsg = function() {
 		},
 		//save
 		error : function(sfunc, msg) {
-			if (!msg) msg = "에러가 발생하였습니다. 관리자에게 문의바랍니다.";
+			if (!msg) msg = /*[[#{alert.error}]]*/ {};
 			swal({
-				title: '에러',
+				title: /*[[#{alert.titleError}]]*/ {},
 				text: msg,
 				icon: 'error',
 				buttons: {
 					confirm: {
-						text: '확인',
+						text: /*[[#{alert.ok}]]*/ {},
 						value: true,
 						visible: true,
 						className: 'btn btn-white',
@@ -109,14 +109,14 @@ var CommonMsg = function() {
 	  		});
 		},
 		warning : function(sfunc, msg) {
-			if (!msg) msg = "실패하였습니다. 관리자에게 문의바랍니다.";
+			if (!msg) msg = /*[[#{alert.fail}]]*/ {};
 			swal({
-				title: '실패',
+				title: /*[[#{alert.titleFail}]]*/ {},
 				text: msg,
 				icon: 'warning',
 				buttons: {
 					confirm: {
-						text: '확인',
+						text: /*[[#{alert.ok}]]*/ {},
 						value: true,
 						visible: true,
 						className: 'btn btn-white',
@@ -128,14 +128,14 @@ var CommonMsg = function() {
 	  		});
 		},
 		info : function(sfunc, msg) {
-			if (!msg) msg = "실패하였습니다. 관리자에게 문의바랍니다.";
+			if (!msg) msg = /*[[#{alert.fail}]]*/ {};
 			swal({
-				title: '실패',
+				title: /*[[#{alert.titleFail}]]*/ {},
 				text: msg,
 				icon: 'info',
 				buttons: {
 					confirm: {
-						text: '확인',
+						text: /*[[#{alert.ok}]]*/ {},
 						value: true,
 						visible: true,
 						className: 'btn btn-white',
@@ -148,20 +148,20 @@ var CommonMsg = function() {
 		},
 		//yes and no
 		yesNo : function(ofunc, cfunc, msg) {
-			if (!msg) msg = "진행하시겠습니까?";
+			if (!msg) msg = /*[[#{alert.confirm}]]*/ {};
 			swal({
 				title: msg,
 				icon: 'warning',
 				buttons: {
 					confirm: {
-						text: '네',
+						text: /*[[#{alert.yes}]]*/ {},
 						value: true,
 						visible: true,
 						className: 'btn btn-info',
 						closeModal: true
 					},
 					cancel: {
-						text: '아니오',
+						text: /*[[#{alert.no}]]*/ {},
 						value: null,
 						visible: true,
 						className: 'btn btn-white',
@@ -179,20 +179,20 @@ var CommonMsg = function() {
 		},
 		//save
 		okCancel : function(ofunc, cfunc, msg) {
-			if (!msg) msg = "진행하시겠습니까?";
+			if (!msg) msg = /*[[#{alert.confirm}]]*/ {};
 			swal({
 				title: msg,
 				icon: 'warning',
 				buttons: {
 					confirm: {
-						text: 'OK',
+						text: /*[[#{alert.ok}]]*/ {},
 						value: true,
 						visible: true,
 						className: 'btn btn-info',
 						closeModal: true
 					},
 					cancel: {
-						text: 'Cancel',
+						text: /*[[#{alert.cancel}]]*/ {},
 						value: null,
 						visible: true,
 						className: 'btn btn-white',

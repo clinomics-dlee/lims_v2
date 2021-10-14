@@ -1,36 +1,96 @@
 alert:
-  confirm: OK
-  cancel: Cancel
-  loginEmail: Please enter ID
-  loginPassword: Please enter password
-  loginFail: Invalid id or password
+  ok: OK
+  cancel: cancel
+  yes: yes
+  no: no
+  loginEmail: Please enter your ID (e-mail).
+  loginPassword: Please enter your password.
+  loginFail: The username or password is incorrect.
+  titleFail: Fail
+  titleError: error
+  titleSuccess: Success
+  titleNormal: normal
+  save: save is complete
+  error: An error has occurred. Please contact the administrator.
+  fail: Failed. Please contact the administrator.
+  confirm: Are you sure you want to proceed?
+  loading: loading
 button:
   login: Login
   logout: Logout
   language: Language
   english: English
   korean: Korean
-  changePassword: ChangePassword
+  changePassword: Change password
   save: Save
   edit: Edit
-menu:
-  dashboard: Dashboard
-  calendar: Calendar
-  chart: Chart
-  work: Work
-  sampleRegistration: Sample registration
-  sampleList: Sample list
-  linkToCelFile: Link to cel file
-  uploadResult: Upload Result
-  experiment: Experiment
-  analysis: Analysis
-  endOfExperiment: End Of Experiment
-  sampleDb: Sample DB
-  reissueResults: Reissue results
-  setting: Setting
-  member: Member
-  product: Product
-  productItem: Product item
-  bundle: Bundle
-  item: Item
-  resultItem: Result item
+page:
+  dashboard:
+    tit: Dashboard
+    calendar: Calendar
+    chart: Chart
+  input:
+    tit: Wearing
+    reg: Sample registration
+    rcv: Sample receipt
+    aprv: Warehousing payment
+    db: Warehouse DB
+  exp:
+    tit: Experiment
+    rdy: Waiting for experiment
+    step1: STEP 1
+    step2: STEP 2
+    step3: STEP 3
+    db: Experiment DB
+  anls:
+    tit: Analysis
+    rdy: Waiting for analysis
+    stts: Analysis status
+    rslt: Analysis result
+    db: Analysis DB
+  output:
+    all: Sample list
+    jdgm: Judgment
+    output: Send marker INFO
+  test:
+    reg: Test screen
+  set:
+    tit: Setting
+    mmbr: User
+    prd: Product
+    bndl: Bundle
+    item: Manage specimen items
+    prd_item: Sample connection
+title:
+  regAdmin: Register as an administrator
+  sampleList: sample list
+  anlsResult: analysis result
+label:
+  id: ID
+  password: password
+  email: email
+  name: name
+  product: product
+common:
+  product: product
+  all: all
+  createdDate: Creation date
+  keyword: Keyword
+  search: Find
+  single: Single registration
+  excelImport: Import Excel
+  excelFormDownload: Download excel form
+  excelUpload: Upload excel
+  saveAll: Save all
+  list: List
+  today: Today
+  date: Date
+  next: Next
+  prev: Previous
+  downloadHumanMaterials: Download human materials
+  specimenRecord : Specimen record
+  pleaseSelect: Please select
+  save: Save
+  reset: Reset
+  add: Add
+  active: Active

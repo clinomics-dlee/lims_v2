@@ -35,37 +35,37 @@
                 <!-- end login-header -->
                 <!-- begin login-content -->
                 <div class="login-content">
-					<h3>관리자 등록</h3>
+					<h3 th:text="#{page.regAdmin}">관리자 등록</h3>
 			        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 					<form th:object="${Member}" th:action="@{/registration}" th:method="post">
 						<table>
 							<tr>
-								<th>아이디</th>
+								<th th:text="#{label.id}">아이디</th>
 								<td>
 									<input type="text" th:field="*{id}">
 								</td>
 							</tr>
 							<tr>
-								<th>비밀번호</th>
+								<th th:text="#{label.id}">비밀번호</th>
 								<td>
 									<input type="password" th:field="*{password}">
 								</td>
 							</tr>
 							<tr>
-								<th>이메일</th>
+								<th th:text="#{label.id}">이메일</th>
 								<td>
 									<input type="email" th:field="*{email}">
 								</td>
 							</tr>
 							<tr>
-								<th>이름</th>
+								<th th:text="#{label.id}">이름</th>
 								<td>
 					        		<input type="text" th:field="*{name}">
 								</td>
 							</tr>
 						</table>
 				    	<hr>
-					    <button type="submit">저장</button>
+					    <button th:text="#{button.save}" type="submit">저장</button>
 					</form>
 				</div>
 			</div>

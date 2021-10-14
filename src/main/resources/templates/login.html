@@ -105,8 +105,9 @@ $(document).ready(function() {
 //Error page redirect ()
 
 function sendRedirectErrorLocation(){
+	var m_title = /*[[#{alert.titleFail}]]*/ {};
 	swal({
-		title: '로그인 실패',
+		title: m_title,
 		text: $("#loginFail").val(),
 		icon: 'warning',
 		buttons: {

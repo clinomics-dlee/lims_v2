@@ -37,7 +37,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				</ol> -->
 				<!-- end breadcrumb -->
 				<!-- begin page-header -->
-				<h1 class="page-header" th:text="#{title.sampleStatus}">Sample status</h1>
+				<h1 class="page-header" th:text="#{page.dashboard.chart.tit}">Sample status</h1>
 				<!-- end page-header -->
                 <div class="row">
 	                <div class="col-lg-12">
@@ -45,7 +45,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	    					<div class="row m-b-5">
 								
 								<div class="form-group row m-b-10">
-									<label class="col-form-label m-l-2">서비스</label>
+									<label class="col-form-label m-l-2" th:text="#{common.product}">서비스</label>
 									<div class="col-xs-push-0">
 										<select class="form-control width-200" id="sel_bundle" multiple="multiple">
 											<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
@@ -53,7 +53,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 									</div>
 								</div>
 										
-								<label class="col-form-label">기간</label>
+								<label class="col-form-label" th:text="#{common.date}">기간</label>
 								<div class="col-xs-push-0">
 									<input type="text" class="form-control width-80" data-parsley-required="true" id="startDate" placeholder="" autocomplete="off" />
 								</div>
@@ -62,7 +62,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<div class="col-xs-push-0">
 									<input type="text" class="form-control width-80" data-parsley-required="true" id="endDate" placeholder="" autocomplete="off" />
 								</div>
-								<button onClick="chart();" class="btn btn-default m-l-10 m-b-5 width-60" id="btn_today">조회</button>
+								<button onClick="chart();" class="btn btn-default m-l-10 m-b-5 width-60" id="btn_today" th:text="#{common.search}">조회</button>
 								
 								
 							</div>
@@ -77,7 +77,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                         <div class="panel p-20">
 							<div class="row m-b-15">
 								<div class="col-lg-6">
-									<h5 class="m-t-0" th:text="#{page.chart.sampleReceipt}">Sample receipt</h5>
+									<h5 class="m-t-0" th:text="#{page.dashboard.chart.sampleReceipt}">Sample receipt</h5>
 								</div>
 								<div class="col-lg-6 text-right">
 									<button onClick="downloadChart('chart1');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
@@ -96,7 +96,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                         <div class="panel p-20">
 							<div class="row m-b-15">
 								<div class="col-lg-6">
-									<h5 class="m-t-0" th:text="#{page.chart.experimentCompletion}">Experiment completion</h5>
+									<h5 class="m-t-0" th:text="#{page.dashboard.chart.experimentCompletion}">Experiment completion</h5>
 								</div>
 								<div class="col-lg-6 text-right">
 									<button onClick="downloadChart('chart2');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
@@ -119,7 +119,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                         <div class="panel p-20">
 							<div class="row m-b-15">
 								<div class="col-lg-6">
-									<h5 class="m-t-0" th:text="#{page.chart.completedAnalysisFileProvided}">Completed analysis file provided</h5>
+									<h5 class="m-t-0" th:text="#{page.dashboard.chart.completedAnalysisFileProvided}">Completed analysis file provided</h5>
 								</div>
 								<div class="col-lg-6 text-right">
 									<button onClick="downloadChart('chart3');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
@@ -138,7 +138,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                         <div class="panel p-20">
 							<div class="row m-b-15">
 								<div class="col-lg-6">
-									<h5 class="m-t-0" th:text="#{page.chart.sampleReceiptRate}">Sample Receipt Rate</h5>
+									<h5 class="m-t-0" th:text="#{page.dashboard.chart.sampleReceiptRate}">Sample Receipt Rate</h5>
 								</div>
 								<div class="col-lg-6 text-right">
 									<button onClick="downloadChart('chart4');" class="btn btn-xs btn-success m-l-20">.xlsx</button>
