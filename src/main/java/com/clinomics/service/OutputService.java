@@ -433,7 +433,7 @@ public class OutputService {
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
-					.and(SampleSpecification.statusCodeGt(600))
+					.and(SampleSpecification.statusCodeGt(700))
 					.and(SampleSpecification.orderBy(params));
 					
 		
