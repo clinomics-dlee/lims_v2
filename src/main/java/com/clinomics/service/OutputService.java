@@ -429,7 +429,7 @@ public class OutputService {
 		long total;
 		
 		Specification<Sample> where = Specification
-					.where(SampleSpecification.betweenModifiedDate(params))
+					.where(SampleSpecification.betweenDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.keywordLike(params))
 					.and(SampleSpecification.bundleIsActive())
