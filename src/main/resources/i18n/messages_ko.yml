@@ -41,8 +41,7 @@ page:
       sampleReceiptRate: 검체 입고 비율
   input:
     tit: 입고
-    reg:
-      tit: 검체등록
+    reg: 검체등록
     rcv: 검체입고
     aprv: 입고결재
     db: 입고DB
@@ -113,3 +112,11 @@ common:
   reset: 초기화
   add: 추가
   active: 활성화
+  searchDate: 조회일자
+  approve: 발행
+  resultFileUpload: 결과파일 업로드
+  status: 상태
+  clickToSelect: 클릭하여 선택
+  wearing: 등록
+  release: 출고
+  agencyName: 의뢰기관명

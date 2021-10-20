@@ -27,8 +27,18 @@ button:
 page:
   dashboard:
     tit: Dashboard
-    calendar: Calendar
-    chart: Chart
+    calendar:
+      tit: Calendar
+      registered: Registered
+      analysis: Analysis
+      completed: Completed
+      reported: Reported
+    chart:
+      tit: Chart
+      sampleReceipt: Sample receipt
+      experimentCompletion: Experiment Completion
+      completedAnalysisFileProvided: Completed Analysis File Provided
+      sampleReceiptRate: Sample Receipt Rate
   input:
     tit: Wearing
     reg: Sample registration
@@ -53,7 +63,7 @@ page:
     jdgm: Judgment
     output: Send marker INFO
   test:
-    reg: Test screen
+    reg: Reg / Result Upload
   set:
     tit: Setting
     mmbr: User
@@ -70,14 +80,15 @@ label:
   password: password
   email: email
   name: name
-  product: product
+  product: Product
 common:
-  product: product
+  product: Product
   all: all
   createdDate: Creation date
   keyword: Keyword
   search: Find
   single: Single registration
+  createGrid: Create grid rows
   excelImport: Import Excel
   excelFormDownload: Download excel form
   excelUpload: Upload excel
@@ -91,6 +102,15 @@ common:
   specimenRecord : Specimen record
   pleaseSelect: Please select
   save: Save
+  delete: Delete
   reset: Reset
   add: Add
   active: Active
+  searchDate: Search Date
+  approve: Approve
+  resultFileUpload: Result File Upload
+  status: Status
+  clickToSelect: Click to select
+  wearing: Wearing
+  release: Release
+  agencyName: Agency
