@@ -391,6 +391,7 @@ var UserTable = function() {
 						, 'word-break' : 'nowrap'
 						, 'vertical-align' : 'middle !important'});
 					
+					$('a[aria-controls="' + uid + '_ctrl"]').off('click');
 					$('a[aria-controls="' + uid + '_ctrl"]').click(function () {
 						var nextval = $(this).attr("data-dt-idx");
 						if (!$(this).parent().hasClass("disabled") && !(n == nextval)) {
@@ -399,6 +400,7 @@ var UserTable = function() {
 						}
 					});
 					
+					$('a[aria-controls="' + uid + '_ctrl"]').off('click');
 					$('a[aria-controls="' + uid + '_ctrl"]').click(function () {
 						var nextval = $(this).attr("data-dt-idx");
 						if (!$(this).parent().hasClass("disabled") && !(n == nextval)) {
@@ -411,6 +413,7 @@ var UserTable = function() {
 						UserTable.draw(uid, ajax, columns, custom_func);
 					}
 
+					$("#" + uid + "_checkbox_all").off('change');
 					$("#" + uid + "_checkbox_all").change(function() {
 						var rowCount = UserTable.getRowCount(uid);
 						if (rowCount > 0) {
@@ -425,6 +428,7 @@ var UserTable = function() {
 						}
 					});
 
+					$("#" + uid + " th").off('click');
 					$("#" + uid + " th").click(function() {
 						var sort = '', removeSort = '';
 
@@ -456,11 +460,13 @@ var UserTable = function() {
 						drawnTableFunc[uid]();
 					});
 					
+					$("#" + uid + "_page").off('change');
 					$("#" + uid + "_page").change(function() {
 						$("#" + uid + "_page_start").val(0);
 						drawnTableFunc[uid]();
 					});
 					
+					$("input[name=" + uid + "_checkbox]").off('change');
 					$("input[name=" + uid + "_checkbox]").change(function(e) {
 						var rowCount = UserTable.getRowCount(uid);
 						if (rowCount > 0) {
