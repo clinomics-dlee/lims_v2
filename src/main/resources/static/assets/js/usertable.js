@@ -456,7 +456,7 @@ var UserTable = function() {
 							pageOrder[uid] = pageOrder[uid].replace("," + headId + ":" + removeSort, "");
 						}
 						pageOrder[uid] = "," + headId + ":" + sort + pageOrder[uid];
-						console.log(pageOrder[uid]);
+						//console.log(pageOrder[uid]);
 						drawnTableFunc[uid]();
 					});
 					
