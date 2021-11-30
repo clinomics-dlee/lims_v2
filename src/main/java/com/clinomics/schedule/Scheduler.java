@@ -12,21 +12,16 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.clinomics.entity.lims.Product;
 import com.clinomics.entity.lims.Sample;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.ProductRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.service.SampleDbService;
+import com.clinomics.service.async.AnalysisService;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.EmailSender;
-import com.clinomics.util.ExcelReadComponent;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +44,9 @@ public class Scheduler {
 	@Autowired
 	SampleDbService sampleDbService;
 
+    @Autowired
+	AnalysisService analysisService;
+
 	@Autowired
 	EmailSender emailSender;
 	
@@ -70,6 +68,9 @@ public class Scheduler {
 			
 			//실패 목록
             List<Sample> failSamples = new ArrayList<Sample>();
+
+            List<String> reAnalysisChipBarcodes = new ArrayList<String>();
+            List<Sample> reAnalysisSamples = new ArrayList<Sample>();
             
             // #. 상태가 S410_ANLS_RUNNING(분석중) 인 목록 조회
             Specification<Sample> where = Specification
@@ -269,6 +270,12 @@ public class Scheduler {
                         sample.setAnlsEndDate(now);
                         sampleRepository.save(sample);
                         failSamples.add(sample);
+
+                        // #. 재분석 자동실행에 사용될 chip barcode 목록에 추가. 중복제거
+                        if (!reAnalysisChipBarcodes.contains(chipBarcode)) {
+                            reAnalysisChipBarcodes.add(chipBarcode);
+                            reAnalysisSamples.add(sample);
+                        }
                     } else {
                         // #. 둘다 존재하지 않는 경우
                         logger.info(">> Missing sample ID in file.=[" + genotypingId + "]");
@@ -287,11 +294,24 @@ public class Scheduler {
                     sample.setAnlsEndDate(LocalDateTime.now());
                     sampleRepository.save(sample);
                     failSamples.add(sample);
+
+                    // #. 재분석 자동실행에 사용될 chip barcode 목록에 추가. 중복제거
+                    if (!reAnalysisChipBarcodes.contains(chipBarcode)) {
+                        reAnalysisChipBarcodes.add(chipBarcode);
+                        reAnalysisSamples.add(sample);
+                    }
 				}
             }
             
             if (failSamples.size() > 0) {
                 emailSender.sendMailToFail(failSamples);
+            }
+
+            // #. 재분석 실행
+            if (reAnalysisSamples.size() > 0 ) {
+                for (Sample reAnalysisSample : reAnalysisSamples) {
+                    analysisService.doPythonReAnalysis(reAnalysisSample.getChipBarcode(), reAnalysisSample.getFilePath());
+                }
             }
 		} catch(Exception e) {
 			e.printStackTrace();

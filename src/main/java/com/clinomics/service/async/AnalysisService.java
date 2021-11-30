@@ -152,6 +152,68 @@ public class AnalysisService {
 			}
 		}
     }
+
+	@Async
+	public void doPythonReAnalysis(String chipBarcode, String analysisPath) {
+
+		// #. 명령어 실행
+		FileOutputStream textFileOs = null;
+		FileOutputStream excelFileOs = null;
+		try {
+			// #. 명령어 파일 경로로 명령어 파일 생성. 직접 실행시 pipe 명령어(|) 수행 불가
+			String shellExt = ".sh";
+			if (OS.indexOf("win") >= 0) {
+				shellExt = ".bat";
+			}
+			StringBuilder commandsSb = new StringBuilder();
+			commandsSb.append("python3.7 ");
+			commandsSb.append("/BiO/Research/rowi007/SCRIPT/Service_lims_reAnalysis.py ");
+			commandsSb.append(chipBarcode); // chip barcode parameter
+	
+			logger.info("execute cmd=" + commandsSb.toString());
+			
+			String commandFilePath = analysisPath + "/re_" + chipBarcode + shellExt;
+			BufferedWriter fw = new BufferedWriter(new FileWriter(commandFilePath));
+			fw.write(commandsSb.toString());
+			fw.close();
+	
+			logger.info("commands shell file path=" + commandFilePath);
+			File shFile = new File(commandFilePath);
+			if (!shFile.canExecute()) shFile.setExecutable(true); // 실행권한
+			if (!shFile.canWrite()) shFile.setWritable(true); // 쓰기권한
+	
+			List<String> commands = new ArrayList<String>();
+			commands.add(commandFilePath);
+			
+			ProcessBuilder processBuilder = new ProcessBuilder(commands);
+			processBuilder.redirectErrorStream(true);
+			Process process = processBuilder.start();
+			
+			// #. 명령어 실행 표준 및 오류 처리
+			BufferedReader standardErrorBr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			StringBuilder standardErrorSb = new StringBuilder();
+			String lineString = null;
+			while ((lineString = standardErrorBr.readLine()) != null) {
+				standardErrorSb.append(lineString);
+				standardErrorSb.append("<br>");
+			}
+			
+			logger.info(">> standardErrorSb=" + standardErrorSb.toString());
+			
+			process.destroy();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (textFileOs != null) textFileOs.close();
+				if (excelFileOs != null) excelFileOs.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+    }
 	
 	private XSSFWorkbook getAnalysisExcel(List<Sample> samples) {
 		XSSFWorkbook workbook = new XSSFWorkbook();
