@@ -50,6 +50,7 @@ public class CalendarExcelService {
 		// #. 발행완료일 기준으로 목록 조회
 		Specification<Sample> where = Specification
 				.where(SampleSpecification.customDateBetween("outputCmplDate", params))
+				.and(SampleSpecification.isNotTest())
 				.and(SampleSpecification.bundleId(params))
 				.and(SampleSpecification.bundleIsActive())
 				.and(SampleSpecification.statusCodeGt(710));
