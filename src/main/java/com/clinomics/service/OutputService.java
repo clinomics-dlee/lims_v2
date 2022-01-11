@@ -420,6 +420,7 @@ public class OutputService {
 		// #. paging param
 		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
 		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
+		int markerCount = NumberUtils.toInt(params.get("markerCount") + "", 0);
 		
 		// #. paging 관련 객체
 		Pageable pageable = Pageable.unpaged();
@@ -435,6 +436,11 @@ public class OutputService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusCodeGt(700))
 					.and(SampleSpecification.orderBy(params));
+
+		logger.info("☆☆☆ markerCount=[" + markerCount + "]");
+		if (markerCount > 0) {
+			where = where.and(SampleSpecification.markerCountGt(markerCount));
+		}
 					
 		
 		total = sampleRepository.count(where);

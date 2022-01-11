@@ -507,4 +507,16 @@ public class SampleSpecification {
 			return rtn;
 		};
 	}
+
+	public static Specification<Sample> markerCountGt(int markerCount) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.greaterThanOrEqualTo(criteriaBuilder.function("JSON_LENGTH", Integer.class, root.get("data")), markerCount));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
 }
