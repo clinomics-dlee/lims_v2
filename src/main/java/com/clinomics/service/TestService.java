@@ -292,16 +292,7 @@ public class TestService {
 			
 		});
 
-		boolean personalView = roleService.checkPersonalView();
-		
 		List<SampleItem> sortedSampleItems = sampleItems.stream()
-				.filter(fs -> {
-					if (fs.isVisible()) {
-						return personalView;
-					} else {
-						return true;
-					}
-				})
 				.sorted(Comparator.comparing(SampleItem::getOrd))
 				.collect(Collectors.toList());
 		
@@ -376,6 +367,22 @@ public class TestService {
 		return rtn;
 	}
 
+	@Transactional
+	@CacheEvict(value = "apiCache", allEntries = true)
+	public Map<String, String> outputReIssue(Map<String, String> inputItems, String memberId) {
+		logger.info("☆☆☆☆☆☆☆ outputReIssue ☆☆☆ Cache Evict ☆☆☆");
+
+		Map<String, String> rtn = save(inputItems, true);
+
+		if ("00".equals(rtn.getOrDefault("result", ""))) {
+			int id = NumberUtils.toInt(inputItems.getOrDefault("id", "0") + "");
+		
+			rtn = outputApprove(Arrays.asList(new Integer[] {id}), memberId);
+		}
+		
+		return rtn;
+	}
+
 	// ############################## private ##############################
 	private List<Map<String, Object>> filterItemsAndOrdering(List<Sample> list) {
 		Set<SampleItem> sampleItems = new HashSet<SampleItem>();
@@ -387,17 +394,9 @@ public class TestService {
 			});
 		});
 
-		boolean personalView = roleService.checkPersonalView();
-
-		List<SampleItem> filteredSampleItems = sampleItems.stream().filter(fs -> {
-			if (!fs.isActive()) {
-				return false;
-			} else if (fs.isVisible()) {
-				return personalView;
-			} else {
-				return true;
-			}
-		}).sorted(Comparator.comparing(SampleItem::getOrd)).collect(Collectors.toList());
+		List<SampleItem> filteredSampleItems = sampleItems.stream()
+			.sorted(Comparator.comparing(SampleItem::getOrd))
+			.collect(Collectors.toList());
 
 		filteredSampleItems.forEach(f -> {
 			Map<String, Object> tt = Maps.newLinkedHashMap();

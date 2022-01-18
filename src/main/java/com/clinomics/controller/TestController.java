@@ -96,6 +96,14 @@ public class TestController {
 		return testService.outputApprove(ids, userDetails.getUsername());
 	}
 
+	@PostMapping("/reissue")
+	@ResponseBody
+	public Map<String, String> outputReIssue(@RequestBody Map<String, String> datas) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return testService.outputReIssue(datas, userDetails.getUsername());
+	}
+
 	@PostMapping("/rslt/excel/import")
 	@ResponseBody
 	public Map<String, Object> importRsltExcel(@RequestParam("file") MultipartFile multipartFile, MultipartHttpServletRequest request)
