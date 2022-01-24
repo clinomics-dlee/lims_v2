@@ -137,16 +137,22 @@ public class VariousFieldsService {
         
         if (!existsSample && bundle.isAutoSequence()) {
         	
-        	String lastLaboratoryId = sampleRepository.findMaxTestLaboratoryId();
+        	String lastLaboratoryId = sampleRepository.findMaxTestLaboratoryId(bundle.getId());
         	String seq = "";
         	
-        	if(lastLaboratoryId == null) {
+        	String[] roles = bundle.getSequenceRole().split("-");
+        	String seqRoleHead = "";
+        	if (roles.length > 0) {
+        		seqRoleHead = roles[0];
+        	}
+        	
+        	if( lastLaboratoryId == null) {
         		
-        		seq = "TEST-"+StringUtils.right(receivedDate.format(DateTimeFormatter.ofPattern("yyyyMM")), 4)+"-0001";
+        		seq = seqRoleHead + "-TEST-0001";
         		
         	}else {
         		int newIndexNumber = NumberUtils.toInt(lastLaboratoryId) + 1;
-				seq = "TEST-"+StringUtils.right(receivedDate.format(DateTimeFormatter.ofPattern("yyyyMM")), 4) + String.format("-%04d", newIndexNumber);
+				seq = seqRoleHead + "-TEST-" + String.format("-%04d", newIndexNumber);
         	}
            // String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
             if (!seq.isEmpty()) sample.setLaboratoryId(seq);
