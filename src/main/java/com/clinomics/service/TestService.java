@@ -149,7 +149,7 @@ public class TestService {
 			sample.setCreatedMember(member);
 			sample.setStatusCode(StatusCode.S600_JDGM_APPROVE);
 
-			if (barcode.length() > 0) {
+			if (barcode.length() > 0 && barcode.matches("^[a-zA-Z]+\\-[0-9]+$")) {
 				String barcodeLetter = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$1");
 				String barcodeNumber = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$2");
 				sample.setBarcodeLetter(barcodeLetter);

@@ -152,7 +152,7 @@ public class VariousFieldsService {
         		
         	}else {
         		int newIndexNumber = NumberUtils.toInt(lastLaboratoryId) + 1;
-				seq = seqRoleHead + "-TEST-" + String.format("-%04d", newIndexNumber);
+				seq = seqRoleHead + "-TEST" + String.format("-%04d", newIndexNumber);
         	}
            // String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
             if (!seq.isEmpty()) sample.setLaboratoryId(seq);
