@@ -93,7 +93,7 @@ public class CalendarService {
 
 		List<String[]> cal1 = sampleRepository.findCalendarDataByCreatedDate(yyyymm, bundleIds, Arrays.asList(StatusCode.class.getEnumConstants()).stream().map(e -> e.toString()).collect(Collectors.toList()));
 		List<String[]> cal2 = sampleRepository.findCalendarDataByModifiedDate(yyyymm, bundleIds, STS_EXP.stream().map(e -> e.getKey()).collect(Collectors.toList()));
-		List<String[]> cal3 = sampleRepository.findCalendarDataByModifiedDate(yyyymm, bundleIds, STS_JDGM.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+		List<String[]> cal3 = sampleRepository.findCalendarDataByAnlsCmpldDate(yyyymm, bundleIds, STS_JDGM.stream().map(e -> e.getKey()).collect(Collectors.toList()));
 		List<String[]> cal4 = sampleRepository.findCalendarDataByOutputCmplDate(yyyymm, bundleIds, STS_REPORT.stream().map(e -> e.getKey()).collect(Collectors.toList()));
 
 		ObjectMapper mapper = new ObjectMapper();

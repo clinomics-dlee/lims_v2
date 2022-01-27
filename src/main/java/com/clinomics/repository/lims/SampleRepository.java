@@ -48,6 +48,18 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
 
+    @Query(value = "SELECT dayofmonth(s.anls_cmpl_date) AS c1, COUNT(*) AS c2"
+                + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
+                + " WHERE EXTRACT(YEAR_MONTH FROM s.anls_cmpl_date) = :yyyymm "
+                + " AND s.is_test = 0 "
+                + " AND s.is_last_version = 1 "
+                + " AND s.bundle_id in :bundleIds "
+                + " AND s.status_code in :statusCode "
+                + " GROUP BY dayofmonth(s.anls_cmpl_date) ", nativeQuery = true)
+    List<String[]> findCalendarDataByAnlsCmpldDate(@Param("yyyymm") String yyyymm
+                                            , @Param("bundleIds") List<Integer> bundleIds
+                                            , @Param("statusCode") List<String> statusCodes);
+
     @Query(value = "SELECT dayofmonth(s.output_cmpl_date) AS c1, COUNT(*) AS c2"
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
                 + " WHERE EXTRACT(YEAR_MONTH FROM s.output_cmpl_date) = :yyyymm "
