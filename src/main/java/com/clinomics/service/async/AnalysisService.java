@@ -262,11 +262,13 @@ public class AnalysisService {
 				File dir = new File(code.getValue());
 				logger.info("★★★ [" + code.getValue() + "] dir=" + dir);
 				logger.info("★★★ [" + code.getValue() + "] dir.list()=" + dir.list());
-				logger.info("★★★ [" + code.getValue() + "] dir.list().length=" + dir.list().length);
-				// #. 파일이 존재한다면 sourceFile에 셋팅
-				if (Arrays.asList(dir.list()).contains(sample.getFileName())) {
-					sourceFile = new File(code.getValue(), sample.getFileName());
-					break;
+				if (dir.list() != null) {
+					logger.info("★★★ [" + code.getValue() + "] dir.list().length=" + dir.list().length);
+					// #. 파일이 존재한다면 sourceFile에 셋팅
+					if (Arrays.asList(dir.list()).contains(sample.getFileName())) {
+						sourceFile = new File(code.getValue(), sample.getFileName());
+						break;
+					}
 				}
 			}
 

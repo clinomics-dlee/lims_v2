@@ -168,7 +168,9 @@ public class AnlsService {
 			logger.info("★★★ code.getValue()=[" + code.getValue() + "]");
 			logger.info("★★★ celDir=[" + celDir + "]");
 			logger.info("★★★ celDir.list()=[" + celDir.list() + "]");
-			logger.info("★★★ celDir.list().length=[" + celDir.list().length + "]");
+			if (celDir.list() != null) {
+				logger.info("★★★ celDir.list().length=[" + celDir.list().length + "]");
+			}
 		}
 
 		for (String mappingNo : mappingNos) {
