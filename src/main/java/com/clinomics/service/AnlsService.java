@@ -119,16 +119,18 @@ public class AnlsService {
 			logger.info("★★★ code.getValue()=[" + code.getValue() + "]");
 			logger.info("★★★ celDir=[" + celDir + "]");
 			logger.info("★★★ celDir.list()=[" + celDir.list() + "]");
-			for (String fileName : celDir.list()) {
-				if (fileName.indexOf("_") > -1) {
-					String filePrefix = fileName.substring(0, fileName.indexOf("_"));
-					String ext = FileUtil.getFileNameExt(fileName);
-
-					// #. 파일명 검색
-					if ("CEL".equals(ext) && filePrefix.equals(chipBarcode)) {
-						Map<String, Object> map = Maps.newHashMap();
-						map.put("fileName", fileName);
-						lstMapCelFiles.add(map);
+			if (celDir.list() != null) {
+				for (String fileName : celDir.list()) {
+					if (fileName.indexOf("_") > -1) {
+						String filePrefix = fileName.substring(0, fileName.indexOf("_"));
+						String ext = FileUtil.getFileNameExt(fileName);
+	
+						// #. 파일명 검색
+						if ("CEL".equals(ext) && filePrefix.equals(chipBarcode)) {
+							Map<String, Object> map = Maps.newHashMap();
+							map.put("fileName", fileName);
+							lstMapCelFiles.add(map);
+						}
 					}
 				}
 			}
