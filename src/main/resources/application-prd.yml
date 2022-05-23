@@ -74,6 +74,10 @@ titan:
     port: 21
     username: AFFXUSER
     password: affxpd
+genoDataApi: 
+  url: http://dev.genodata.net:8080/rest/
+  tokenName: limsApiKey
+  token: 1
 rest:
   http:
     auth-token-header-name: limsApiKey

@@ -181,14 +181,20 @@ public class OutputService {
 		if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
 			
 			samples.stream().forEach(s -> {
-				
 				StatusCode sc = s.getStatusCode();
 				if (sc.equals(StatusCode.S600_JDGM_APPROVE)) {
 
 					s.setOutputWaitDate(now);
 					s.setOutputWaitMember(member);
 					s.setModifiedDate(now);
-					s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+
+					if (s.getBundle().isGenoData()) {
+						// #. GenoData 검체는 출고완료 상태로 바로 설정
+						s.setOutputCmplDate(now);
+						s.setStatusCode(StatusCode.S710_OUTPUT_CMPL);
+					} else {
+						s.setStatusCode(StatusCode.S700_OUTPUT_WAIT);
+					}
 				}
 
 			});
@@ -236,7 +242,13 @@ public class OutputService {
 					sample.setReOutputWaitMember(member);
 					sample.setModifiedDate(now);
 					
-					sample.setStatusCode(StatusCode.S800_RE_OUTPUT_WAIT);
+					if (sample.getBundle().isGenoData()) {
+						// #. GenoData 검체는 재발행완료 상태로 바로 설정
+						sample.setReOutputCmplDate(now);
+						sample.setStatusCode(StatusCode.S810_RE_OUTPUT_CMPL);
+					} else {
+						sample.setStatusCode(StatusCode.S800_RE_OUTPUT_WAIT);
+					}
 				}
 
 			} else {

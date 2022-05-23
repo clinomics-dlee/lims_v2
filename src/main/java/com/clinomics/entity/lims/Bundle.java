@@ -59,6 +59,8 @@ public class Bundle implements Serializable {
 	private boolean isSingle;
 	
 	private boolean isActive = true;
+
+	private boolean isGenoData;
 	
 	private int sort;
 
@@ -154,6 +156,14 @@ public class Bundle implements Serializable {
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	public boolean isGenoData() {
+		return isGenoData;
+	}
+
+	public void setGenoData(boolean isGenoData) {
+		this.isGenoData = isGenoData;
 	}
 
 	public Set<Product> getProduct() {
