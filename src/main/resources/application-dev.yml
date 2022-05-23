@@ -75,7 +75,7 @@ titan:
     username: AFFXUSER
     password: affxpd
 genoDataApi: 
-  url: http://localhost:8080/rest/
+  url: http://localhost:8080/
   tokenName: limsApiKey
   token: fyhwp9e48fuq90p348yhtg09pq3874yhgt
 rest:
