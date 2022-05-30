@@ -295,6 +295,14 @@ public class OutputService {
 						data.put("name", items.get("h_name"));
 						data.put("tel", items.get("h_tel"));
 						data.put("address", items.get("h_address"));
+
+						// #. 출생연도 birthyear 값이 있는 경우는 api 호출시 birthday에 '01-01'을 고정으로 붙여서 보냄
+						if (items.get("birthyear") != null && items.get("birthyear").toString().length() > 0) {
+							String birthyear = (String)items.get("birthyear");
+							birthyear += "-01-01";
+
+							data.put("birthday", birthyear);
+						}
 					}
 
 					data.putAll(items);
@@ -410,6 +418,15 @@ public class OutputService {
 		if (samples.size() > 0) {
 			Sample sample = samples.get(0);
 			Map<String, Object> items = sample.getItems();
+
+			// #. 출생연도 birthyear 값이 있는 경우는 api 호출시 birthday에 '01-01'을 고정으로 붙여서 보냄
+			if (items.get("birthyear") != null && items.get("birthyear").toString().length() > 0) {
+				String birthyear = (String)items.get("birthyear");
+				birthyear += "-01-01";
+
+				data.put("birthday", birthyear);
+			}
+
 			data.putAll(items);
 			data.put("experimentid", sample.getLaboratoryId());
 			data.put("genedata", sample.getData());
