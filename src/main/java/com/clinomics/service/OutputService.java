@@ -299,7 +299,7 @@ public class OutputService {
 						// #. 출생연도 birthyear 값이 있는 경우는 api 호출시 birthday에 '01-01'을 고정으로 붙여서 보냄
 						if (items.get("birthyear") != null && items.get("birthyear").toString().length() > 0) {
 							String birthyear = (String)items.get("birthyear");
-							birthyear += "-01-01";
+							birthyear = birthyear.trim() + "-01-01";
 
 							data.put("birthday", birthyear);
 						}
