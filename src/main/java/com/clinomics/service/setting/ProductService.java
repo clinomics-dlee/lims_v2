@@ -194,6 +194,14 @@ public class ProductService {
 		if (datas.containsKey("hospital")) {
 			bundle.setHospital(BooleanUtils.toBooleanObject(datas.get("hospital")));
 		}
+
+		if (datas.containsKey("genoData")) {
+			bundle.setGenoData(BooleanUtils.toBooleanObject(datas.get("genoData")));
+		}
+
+		if (datas.containsKey("sort")) {
+			bundle.setSort(NumberUtils.toInt(datas.get("sort")));
+		}
 		
 		bundle.setSingle(true);
 		

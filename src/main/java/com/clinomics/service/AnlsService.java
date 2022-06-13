@@ -36,7 +36,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class AnlsService {
@@ -56,6 +62,15 @@ public class AnlsService {
 
 	@Value("${titan.ftp.password}")
 	private String ftpPassword;
+
+	@Value("${genoDataApi.url}")
+	private String genoDataApiUrl;
+
+	@Value("${genoDataApi.tokenName}")
+	private String genoDataApiTokenName;
+
+	@Value("${genoDataApi.token}")
+	private String genoDataApiToken;
 
 	@Autowired
 	SampleRepository sampleRepository;
@@ -181,6 +196,28 @@ public class AnlsService {
 			String chipDesc = samples.get(0).getChipTypeCode().getDesc();
 			File path = new File(filePath);
 			if (!path.exists()) path.mkdir();
+
+			boolean includeGenoData = false;
+
+			for (Sample sample : samples) {
+				// #. 해당 Mapping No에 Geno Data 검체가 한건이라도 존재하면 체크
+				if (sample.getBundle().isGenoData()) {
+					includeGenoData = true;
+					break;
+				}
+			}
+
+			// #. Geno Data 검체가 있으면 API 호출
+			if (includeGenoData) {
+				boolean isSuccess = sendGenoDataAnalysisByMappingNo(mappingNo);
+
+				// #. GenoData 분석 API 호출 실패시 결과 리턴
+				if (!isSuccess) {
+					rtn.put("result", ResultCode.FAIL_UNKNOWN.get());
+					rtn.put("message", "Geno Data 검체 분석 실행중 오류가 발생하였습니다.");
+					return rtn;
+				}
+			}
 
 			for (Sample sample : samples) {
 				// #. sample 분석관련값 셋팅
@@ -494,5 +531,49 @@ public class AnlsService {
 
 		rtn.put("result", ResultCode.SUCCESS.get());
 		return rtn;
+	}
+
+
+	// ############################# private ##################################
+
+	/**
+	 * GenoData 분석서버로 분석실행 요청
+	 * @param mappingNo
+	 * @return genodata 분석실행 정상처리 여부
+	 */
+	private boolean sendGenoDataAnalysisByMappingNo(String mappingNo) {
+		boolean isSuccess = false;
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setAccept(Arrays.asList(new MediaType[] { MediaType.APPLICATION_JSON }));
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set(genoDataApiTokenName, genoDataApiToken);
+			
+			HttpEntity<String> entity = new HttpEntity<String>("", headers);
+	
+			RestTemplate restTemplate = new RestTemplate();
+			
+			// #. url 변경 필요
+			String apiUrl = genoDataApiUrl + "anls/mapping/" + mappingNo;
+			logger.info("★★★ completeChipAnalysisForGenoData apiUrl=" + apiUrl);
+			// #. get parameter 붙이는 경우
+			// UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl).queryParam("experimentid", "GDX-T-2204-0012");
+			ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, String.class);
+	
+
+			// #. 결과가 json이면 아래를 이용
+			// ObjectMapper mapper = new ObjectMapper();
+			// Map<Object, Object> resultMap = mapper.readValue(responseEntity.getBody(), new TypeReference<Map<Object, Object>>(){});
+
+			logger.info("★★★ completeChipAnalysisForGenoData getBody=[" + responseEntity.getBody() + "]");
+
+			if (responseEntity.getBody().trim().toUpperCase().equals("OK")) {
+				isSuccess = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return isSuccess;
 	}
 }

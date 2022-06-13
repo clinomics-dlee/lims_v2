@@ -1,7 +1,10 @@
 package com.clinomics.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +95,16 @@ public class CalendarExcelService {
 			XSSFSheet sheet = wb.createSheet(month);
 			int index = 0;
 			int lastPageIndex = (sList.size() - 1) / pageSampleRowCount;
+
+			// #. 2022-04 이전 이면 (주)보광환경, 이후면 (주)삼원산업
+			String company = "(주)보광환경";
+			LocalDate standard = LocalDate.parse("2022-03-31");
+			LocalDate monthDate = LocalDate.parse(month + "-01");
+
+			if (monthDate.isAfter(standard)) {
+				company = "(주)삼원산업";
+			}
+
 			for (Sample s : sList) {
 				boolean isLastPage = (lastPageIndex == (index / pageSampleRowCount));
 				int startRowIndex = (index / pageSampleRowCount) * pageTotalRowCount;
@@ -133,7 +146,7 @@ public class CalendarExcelService {
 				row.getCell(9).setCellValue(s.getOutputCmplDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))); // 폐기내용 - 연월일
 				row.getCell(10).setCellValue("전량 폐기"); // 폐기내용 - 폐기량
 				row.getCell(11).setCellValue("-"); // 폐기내용 - 폐기방법 - 자가처리
-				row.getCell(12).setCellValue("(주)보광환경"); // 폐기내용 - 폐기방법 - 위탁처리
+				row.getCell(12).setCellValue(company); // 폐기내용 - 폐기방법 - 위탁처리
 				row.getCell(13).setCellValue("냉장"); // 기타 - 보관조건
 				row.getCell(14).setCellValue(s.getOutputWaitMember().getName()); // 결재 - 담당
 				row.getCell(15).setCellValue(s.getJdgmDrctApproveMember().getName()); // 결재 - 관리책임자

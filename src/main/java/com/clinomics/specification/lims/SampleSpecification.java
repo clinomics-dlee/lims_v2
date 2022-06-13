@@ -430,6 +430,19 @@ public class SampleSpecification {
 		};
 	}
 
+	public static Specification<Sample> isGenoData(boolean isGenoData) {
+
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			if (isGenoData) {
+				rtn = criteriaBuilder.isTrue(root.get("bundle").get("isGenoData"));
+			} else {
+				rtn = criteriaBuilder.isFalse(root.get("bundle").get("isGenoData"));
+			}
+			return rtn;
+		};
+	}
+
 	public static Specification<Sample> orderBy(Map<String, String> params) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = null;

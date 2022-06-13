@@ -21,20 +21,37 @@ import com.clinomics.service.SampleDbService;
 import com.clinomics.service.async.AnalysisService;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.EmailSender;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 public class Scheduler {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
+	@Value("${genoDataApi.url}")
+	private String genoDataApiUrl;
+
+	@Value("${genoDataApi.tokenName}")
+	private String genoDataApiTokenName;
+
+	@Value("${genoDataApi.token}")
+	private String genoDataApiToken;
+
 	@Autowired
 	SampleRepository sampleRepository;
 	
@@ -76,7 +93,8 @@ public class Scheduler {
             Specification<Sample> where = Specification
 					// .where(SampleSpecification.bundleIsActive())
                     .where(SampleSpecification.statusEqual(StatusCode.S410_ANLS_RUNNING))
-                    .and(SampleSpecification.checkCelFileEqual("PASS"));
+                    .and(SampleSpecification.checkCelFileEqual("PASS"))
+                    .and(SampleSpecification.isGenoData(false));
 		
             List<Sample> list = sampleRepository.findAll(where);
 			logger.info("completeChipAnalysis[" + resultDate + "]");
@@ -142,98 +160,6 @@ public class Scheduler {
                         String sampleKeyColumn = headerDatas.get(0);
                         successRowData.remove(sampleKeyColumn);
 
-                        // ##################### begin marker validate #############################
-                        // #. 분석완료 파일에 마커 목록
-                        // List<String> markers = successRowData.keySet().stream().collect(Collectors.toList());
-                        
-                        // #. 분석 성공 파일에 존재하는 경우 
-                        // // #. validate
-                        // Set<String> productTypes = Sets.newHashSet();
-                        // sample.getBundle().getProduct().stream().forEach(p -> {
-                        //     productTypes.add(p.getType());
-                        // });
-                        
-                        // // #. 상품목록이 가지고 있는 모든 마커 정보 조회
-                        // Map<String, List<Map<String, String>>> productTypeMarkerInfos = sampleDbService.getMarkerInfo(new ArrayList<String>(productTypes));
-                        // // #. marker 정보가 없는 경우
-                        // if (productTypeMarkerInfos.isEmpty()) {
-                        //     // #. 조회한 마커 목록이 비어있는경우
-                        //     logger.info(">> not found marker infomation error sample id=[" + genotypingId + "]");
-                        //     sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
-                        //     sample.setStatusMessage("not found marker infomation");
-                        //     sample.setAnlsEndDate(LocalDateTime.now());
-                        //     sampleRepository.save(sample);
-                        //     failSamples.add(sample);
-                        //     continue;
-                        // }
-                        
-                        // // #. 해당 product에 마커정보 목록
-                        // List<Map<String, String>> allMarkerInfos = new ArrayList<Map<String, String>>();
-                        // for (String key : productTypeMarkerInfos.keySet()) {
-                        //     List<Map<String, String>> mks = productTypeMarkerInfos.get(key);
-                        //     for (Map<String, String> mi : mks) {
-                        //         if (!allMarkerInfos.contains(mi)) {
-                        //             allMarkerInfos.add(mi);
-                        //         }
-                        //     }
-                        // }
-
-                        // List<String> notExistMarkers = new ArrayList<String>();
-
-                        // // #. 현재 상품에 마커 목록
-                        // List<String> checkMarkers = new ArrayList<String>();
-                        // for (Map<String, String> mi : allMarkerInfos) {
-                        //     checkMarkers.add(mi.get("name"));
-                        // }
-
-                        // // #. 마커 목록이 전부 있는 지 체크
-                        // for (String marker : checkMarkers) {
-                        //     if (!markers.contains(marker)) {
-                        //         notExistMarkers.add(marker);
-                        //     }
-                        // }
-
-                        // if (notExistMarkers.size() > 0) {
-                        //     // #. 마커가 존재하지 않는것이 있는 경우
-                        //     logger.info(">> Not Exist Markers error sample id=[" + genotypingId + "]");
-                        //     // #. resultUpload 상태 업데이트
-                        //     sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
-                        //     sample.setStatusMessage("Not Exist Markers[" + genotypingId + "]=" + notExistMarkers.toString());
-                        //     sample.setAnlsEndDate(LocalDateTime.now());
-                        //     sampleRepository.save(sample);
-                        //     failSamples.add(sample);
-                        //     continue;
-                        // }
-                        
-                        // // #. 마커는 있으나 값이 허용되지않은 값이 셋팅된것 체크
-                        // List<String> invalidMarkers = new ArrayList<String>();
-                        // for (Map<String, String> mi : allMarkerInfos) {
-                        //     String name = mi.get("name");
-                        //     String ref = mi.get("refValue");
-                        //     String alt = mi.get("altValue");
-                        //     // #. 마커는 있으나 값이 다른것
-                        //     String value = (String) successRowData.get(name);
-                            
-                        //     // #. 4가지 조합이 아닌경우
-                        //     if (!value.equals(ref + alt) && !value.equals(alt + alt)
-                        //             && !value.equals(ref + ref) && !value.equals(alt + ref )) {
-                        //         invalidMarkers.add(name);
-                        //     }
-                        // }
-                        
-                        // if (invalidMarkers.size() > 0) {
-                        //     // #. marker 값 유효하지 않은 경우
-                        //     logger.info(">> Invalid Markers error sample id=[" + genotypingId + "]");
-                        //     // #. resultUpload 상태 업데이트
-                        //     sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
-                        //     sample.setStatusMessage("Invalid Markers Result[" + genotypingId + "]=" + invalidMarkers.toString());
-                        //     sample.setAnlsEndDate(LocalDateTime.now());
-                        //     sampleRepository.save(sample);
-                        //     failSamples.add(sample);
-                        //     continue;
-                        // }
-                        // ##################### end marker validate #############################
-                        
                         Map<String, Object> data = Maps.newHashMap();
                         logger.info("★★★★ successRowData=" + successRowData.toString());
                         data.putAll(successRowData);
@@ -317,7 +243,123 @@ public class Scheduler {
 			e.printStackTrace();
 		}
 	}
+
+    /**
+	 * GenoData Chip Analysis 완료 스케쥴러
+	 * 스케쥴 5 분마다 (300초 = 1000 * 300)
+	 */
+	@Transactional
+	@Scheduled(fixedDelay = 1000 * 300)
+	public void completeChipAnalysisForGenoData() {
+		try {
+			Calendar cal = Calendar.getInstance();
+			String resultDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cal.getTime());
+			
+			//실패 목록
+            List<Sample> failSamples = new ArrayList<Sample>();
+            
+            // #. 상태가 S410_ANLS_RUNNING(분석중)이고 GenoData인 목록 조회
+            Specification<Sample> where = Specification
+					// .where(SampleSpecification.bundleIsActive())
+                    .where(SampleSpecification.statusEqual(StatusCode.S410_ANLS_RUNNING))
+                    .and(SampleSpecification.checkCelFileEqual("PASS"))
+                    .and(SampleSpecification.isGenoData(true));
+		
+            List<Sample> list = sampleRepository.findAll(where);
+			logger.info("completeChipAnalysisForGenoData[" + resultDate + "]");
+			LocalDateTime now = LocalDateTime.now();
+
+			for (Sample sample : list) {
+                // #. sample 별로 API를 통해서 해당 검체가 분석중인지 체크
+				String genoDataResult = getResultGenoDataAnalysisBySampleId(sample.getId());
+				logger.info("☆☆☆ completeChipAnalysisForGenoData check sample id = [" + sample.getGenotypingId() + "]");
+				if (genoDataResult.equals("OK")) {
+					// #. 분석완료면 성공 결과 상태값만 업데이트
+					Map<String, Object> data = Maps.newHashMap();
+					data.put("result", "success");
+					sample.setData(data);
+					sample.setModifiedDate(now);
+					sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
+					sample.setAnlsEndDate(now);
+					sampleRepository.save(sample);
+				} else if (genoDataResult.indexOf("FAIL") >= 0) {
+					String[] rts = genoDataResult.split(":");
+					String errorMsg = "";
+					if (rts.length > 1) {
+						errorMsg = rts[1];
+					}
+
+					// #. 실패면 문구 확인 및 상태 저장
+					logger.info(">> FAIL occurred during analysis[" + sample.getGenotypingId() + "]");
+					sample.setModifiedDate(now);
+                    sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
+                    sample.setStatusMessage(errorMsg);
+                    sample.setAnlsEndDate(now);
+                    sampleRepository.save(sample);
+
+					failSamples.add(sample);
+				} else if (genoDataResult.contains("RUNNING")) {
+					logger.info(">> RUNNING analysis[" + sample.getGenotypingId() + "]");
+					// #. 분석중이면 그냥 continue
+					continue;
+				} else {
+					// #. 그외 문자열이 오면 실패 처리 후 문자열 저장
+					logger.info(">> error occurred during analysis[" + sample.getGenotypingId() + "]");
+					sample.setModifiedDate(now);
+                    sample.setStatusCode(StatusCode.S430_ANLS_FAIL);
+                    sample.setStatusMessage(genoDataResult);
+                    sample.setAnlsEndDate(now);
+                    sampleRepository.save(sample);
+
+					failSamples.add(sample);
+				}
+            }
+            
+            if (failSamples.size() > 0) {
+                emailSender.sendMailToFail(failSamples);
+            }
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
+	/**
+	 * GenoData 검체중에 30일이 지나면 결과파일 삭제 요청
+	 * 스케쥴 매일 0시에 실행 (cron = "0 0 0 * * *")
+	 */
+	@Transactional
+	@Scheduled(cron = "0 0 0 * * *")
+	public void deleteResultFileForGenoData() {
+		try {
+			Calendar cal = Calendar.getInstance();
+			String nowDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cal.getTime());
+			cal.add(Calendar.DAY_OF_MONTH, -30);
+			String beforeDay = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
+			logger.info("deleteResultFileForGenoData now[" + nowDate + "]");
+			logger.info("deleteResultFileForGenoData beforeDay[" + beforeDay + "]");
+
+			Map<String, String> params = Maps.newHashMap();
+			params.put("sDate", beforeDay);
+			params.put("fDate", beforeDay);
+			
+            // #. 상태가 출고완료 GenoData인 목록 조회
+            Specification<Sample> where = Specification
+					// .where(SampleSpecification.bundleIsActive())
+                    .where(SampleSpecification.mappingInfoGroupBy())
+					.and(SampleSpecification.statusEqual(StatusCode.S710_OUTPUT_CMPL))
+                    .and(SampleSpecification.customDateBetween("outputCmplDate", params))
+                    .and(SampleSpecification.isGenoData(true));
+		
+            List<Sample> list = sampleRepository.findAll(where);
+			
+			for (Sample sample : list) {
+				deleteResultGenoDataByChipBarcode(sample.getChipBarcode());
+            }
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private List<String> getHeaderDatas(File csvFile) {
 		List<String> headers = new ArrayList<String>();
 		BufferedReader br = null;
@@ -424,5 +466,81 @@ public class Scheduler {
 		}
 		
 		return errorString;
+	}
+
+	/**
+	 * GenoData 분석서버에서 sampleId 값으로 상태조회
+	 * @param sampleId
+	 * @return
+	 */
+	private String getResultGenoDataAnalysisBySampleId(int sampleId) {
+		String result = "";
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setAccept(Arrays.asList(new MediaType[] { MediaType.APPLICATION_JSON }));
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set(genoDataApiTokenName, genoDataApiToken);
+			
+			HttpEntity<String> entity = new HttpEntity<String>("", headers);
+	
+			RestTemplate restTemplate = new RestTemplate();
+			
+			// #. 호출
+			String apiUrl = genoDataApiUrl + "anls/chk/" + sampleId;
+			logger.info("★★★ getResultGenoDataAnalysisBySampleId apiUrl=" + apiUrl);
+			// #. get parameter 붙이는 경우
+			// UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl).queryParam("experimentid", "GDX-T-2204-0012");
+			ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, String.class);
+
+			// #. 결과가 json이면 아래를 이용
+			// ObjectMapper mapper = new ObjectMapper();
+			// Map<Object, Object> resultMap = mapper.readValue(responseEntity.getBody(), new TypeReference<Map<Object, Object>>(){});
+	
+	
+			logger.info("★★★ getResultGenoDataAnalysisBySampleId getBody=[" + responseEntity.getBody() + "]");
+			result = responseEntity.getBody();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	/**
+	 * GenoData 분석서버에서 chipBarcode로 결과파일 삭제요청
+	 * @param sampleId
+	 * @return
+	 */
+	private String deleteResultGenoDataByChipBarcode(String chipBarcode) {
+		String result = "";
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setAccept(Arrays.asList(new MediaType[] { MediaType.APPLICATION_JSON }));
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set(genoDataApiTokenName, genoDataApiToken);
+			
+			HttpEntity<String> entity = new HttpEntity<String>("", headers);
+	
+			RestTemplate restTemplate = new RestTemplate();
+			
+			// #. 호출
+			String apiUrl = genoDataApiUrl + "delete/" + chipBarcode;
+			logger.info("★★★ deleteResultGenoDataByChipBarcode apiUrl=" + apiUrl);
+			// #. get parameter 붙이는 경우
+			// UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl).queryParam("experimentid", "GDX-T-2204-0012");
+			ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, String.class);
+
+			// #. 결과가 json이면 아래를 이용
+			// ObjectMapper mapper = new ObjectMapper();
+			// Map<Object, Object> resultMap = mapper.readValue(responseEntity.getBody(), new TypeReference<Map<Object, Object>>(){});
+	
+	
+			logger.info("★★★ deleteResultGenoDataByChipBarcode getBody=[" + responseEntity.getBody() + "]");
+			result = responseEntity.getBody();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 }

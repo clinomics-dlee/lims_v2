@@ -39,7 +39,9 @@ spring:
       max-file-size: 1024MB
       max-request-size: 1024MB
 management:
-  endpoint:    logfile:      external-file: /BiO/Serve/lims_v2/logs/lims_v2.log
+  endpoint:
+    logfile:
+      external-file: /BiO/Serve/lims_v2/logs/lims_v2.log
   endpoints:
     web:
       exposure:
@@ -72,6 +74,10 @@ titan:
     port: 21
     username: AFFXUSER
     password: affxpd
+genoDataApi: 
+  url: http://localhost:8080/
+  tokenName: limsApiKey
+  token: fyhwp9e48fuq90p348yhtg09pq3874yhgt
 rest:
   http:
     auth-token-header-name: limsApiKey
