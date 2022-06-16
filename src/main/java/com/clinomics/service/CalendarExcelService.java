@@ -1,19 +1,13 @@
 package com.clinomics.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-
-import com.clinomics.entity.lims.Sample;
-import com.clinomics.repository.lims.MemberRepository;
-import com.clinomics.repository.lims.SampleRepository;
-import com.clinomics.specification.lims.SampleSpecification;
-import com.clinomics.util.ExcelReadComponent;
-import com.google.common.collect.Maps;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -32,6 +26,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.clinomics.entity.lims.Holiday;
+import com.clinomics.entity.lims.Sample;
+import com.clinomics.repository.lims.HolidayRepository;
+import com.clinomics.repository.lims.MemberRepository;
+import com.clinomics.repository.lims.SampleRepository;
+import com.clinomics.specification.lims.SampleSpecification;
+import com.clinomics.util.ExcelReadComponent;
+import com.google.common.collect.Maps;
+
 @Service
 public class CalendarExcelService {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -39,6 +42,9 @@ public class CalendarExcelService {
 	@Autowired
 	SampleRepository sampleRepository;
 
+	@Autowired
+    HolidayRepository holidayRepository;
+	
 	@Autowired
 	MemberRepository memberRepository;
 
@@ -128,9 +134,11 @@ public class CalendarExcelService {
 
 				String sampleTarget = "구강상피세포";
 				String samplingSheep = "면봉 1ea, 가글 15mL";
+				String sampleDiscardAmount = "면봉 1ea, 가글 15mL, DNA 전량";
 				if ("Blood".equals(s.getSampleType())) {
 					sampleTarget = "혈액";
-					samplingSheep = "3mL";
+					samplingSheep = "전혈 3mL";
+					sampleDiscardAmount = "전혈 3mL, DNA 전량";
 				}
 
 				row.getCell(0).setCellValue((index + 1)); // 일련번호
@@ -143,12 +151,12 @@ public class CalendarExcelService {
 				// row.getCell(6).setCellValue(""); // 제공내용 - 연월일
 				// row.getCell(7).setCellValue(""); // 제공내용 - 제공량
 				// row.getCell(8).setCellValue(""); // 제공내용 - 제공 기관명
-				row.getCell(9).setCellValue(s.getOutputCmplDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))); // 폐기내용 - 연월일
-				row.getCell(10).setCellValue("전량 폐기"); // 폐기내용 - 폐기량
+				row.getCell(9).setCellValue(this.getDiscardDate(s.getOutputCmplDate())); // 폐기내용 - 연월일
+				row.getCell(10).setCellValue(sampleDiscardAmount); // 폐기내용 - 폐기량
 				row.getCell(11).setCellValue("-"); // 폐기내용 - 폐기방법 - 자가처리
 				row.getCell(12).setCellValue(company); // 폐기내용 - 폐기방법 - 위탁처리
 				row.getCell(13).setCellValue("냉장"); // 기타 - 보관조건
-				row.getCell(14).setCellValue(s.getOutputWaitMember().getName()); // 결재 - 담당
+				row.getCell(14).setCellValue("이선주"); // 결재 - 담당
 				row.getCell(15).setCellValue(s.getJdgmDrctApproveMember().getName()); // 결재 - 관리책임자
 
 				index++;
@@ -272,7 +280,7 @@ public class CalendarExcelService {
 		sheet.setColumnWidth(7, 72 * 32);
 		sheet.setColumnWidth(8, 126 * 32);
 		sheet.setColumnWidth(9, 78 * 32);
-		sheet.setColumnWidth(10, 72 * 32);
+		sheet.setColumnWidth(10, 200 * 32);
 		sheet.setColumnWidth(11, 77 * 32);
 		sheet.setColumnWidth(12, 85 * 32);
 		sheet.setColumnWidth(13, 85 * 32);
@@ -461,7 +469,7 @@ public class CalendarExcelService {
 		sheet.setColumnWidth(7, 72 * 32);
 		sheet.setColumnWidth(8, 126 * 32);
 		sheet.setColumnWidth(9, 78 * 32);
-		sheet.setColumnWidth(10, 72 * 32);
+		sheet.setColumnWidth(10, 200 * 32);
 		sheet.setColumnWidth(11, 77 * 32);
 		sheet.setColumnWidth(12, 85 * 32);
 		sheet.setColumnWidth(13, 85 * 32);
@@ -511,4 +519,38 @@ public class CalendarExcelService {
 		sheet.addMergedRegion(new CellRangeAddress(startRowIndex + 7, startRowIndex + 8, 15, 15));
 		sheet.addMergedRegion(new CellRangeAddress(startRowIndex + 34, startRowIndex + 34, 0, 15));
 	}
+
+	/**
+	 * 폐기일은 출고완료일에 영업일 기준으로 +7일을 한다
+	 * @param outputCmplDate
+	 * @return
+	 */
+	private String getDiscardDate(LocalDateTime outputCmplDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter yyyymmdd = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate start = outputCmplDate.toLocalDate();
+        LocalDate end = start.plusYears(1);
+
+        List<Holiday> holidays = holidayRepository.findByDateBetween(start.format(yyyymmdd), end.format(yyyymmdd));
+        List<String> hdays = holidays.stream().map(h -> { return h.getDate(); }).collect(Collectors.toList());
+
+        LocalDate temp;
+        int max = 7;
+        
+        for (int i = 0; i <= max; i++) {
+            temp = start.plusDays(i);
+            if (hdays.contains(temp.format(yyyymmdd)) || isWeekend(temp)) {
+                max++;
+            }
+        }
+
+        String rtn = start.plusDays(max).format(formatter);
+        //items.put("tat", rtn);
+        return rtn;
+        
+    }
+
+    private boolean isWeekend(LocalDate date) {
+        return date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+    }
 }
