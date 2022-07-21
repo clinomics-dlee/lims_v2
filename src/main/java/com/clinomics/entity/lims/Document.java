@@ -74,6 +74,8 @@ public class Document {
 
     private String stress;
 
+    private boolean isReg = false;
+
     @CreatedDate
 	private LocalDateTime createdDate;
 

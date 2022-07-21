@@ -337,6 +337,7 @@ public class InputService {
 		
 		Specification<Document> where = Specification
 					.where(DocumentSpecification.betweenDate(params))
+					.and(DocumentSpecification.isNotReg())
 					.and(DocumentSpecification.bundleId(params))
 					.and(DocumentSpecification.hNameIn(params))
 					.and(DocumentSpecification.keywordLike(params))
@@ -541,6 +542,11 @@ public class InputService {
 			if (!ResultCode.SUCCESS.get().equals(tmp.getOrDefault("result", "AA"))) {
 				return tmp;
 			}
+
+			// #. document 등록처리
+			doc.setReg(true);
+			documentRepository.save(doc);
+
 			rtn.putAll(tmp);
 		}
 		

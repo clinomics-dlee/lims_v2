@@ -20,6 +20,30 @@ import com.clinomics.entity.lims.Document;
 import com.google.common.collect.Lists;
 
 public class DocumentSpecification {
+	public static Specification<Document> isReg() {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.equal(root.get("isReg"), true));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+
+	public static Specification<Document> isNotReg() {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.equal(root.get("isReg"), false));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+
 	public static Specification<Document> betweenDate(Map<String, String> params) {
 
 		return (root, query, criteriaBuilder) -> {
