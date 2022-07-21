@@ -95,6 +95,17 @@ public class ApiController {
 		logger.info("☆☆☆☆☆ saveDocument ☆☆☆ request IP : [" + ip + "]");
 		return inputService.saveDocumentForRest(documentMap);
 	}
+
+	@RequestMapping(value = "/hospitalinfo/get")
+	public Map<String, Object> getHospitalInfos() {
+		logger.info("☆☆☆☆☆ getHospitalInfos ☆☆☆ IN interface : /hospitalinfo/get ");
+		HttpServletRequest req = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String ip = req.getHeader("X-FORWARDED-FOR");
+		if (ip == null)	ip = req.getRemoteAddr();
+		
+		logger.info("☆☆☆☆☆ getHospitalInfos ☆☆☆ request IP : [" + ip + "]");
+		return outputService.getHospitalInfos(ip);
+	}
 	
 //	@RequestMapping(value = "/mail/test")
 //	public String sendMailTest() {

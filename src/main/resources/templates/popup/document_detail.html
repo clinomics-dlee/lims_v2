@@ -64,7 +64,14 @@
 								</tr>
 								<tr>
 									<td>수검자 생년월일</td>
-									<td><input type="text" class="form-control form-control-sm" name="birthday" id="birthday" autocomplete="off" value=""></td>
+									<td>
+										<div class="input-group" id="date_group">
+											<input type="text" class="form-control form-control-sm"	placeholder="클릭하여 선택"	value="" name="birthday"  id="birthday" autocomplete="off"/>
+											<span class="input-group-append">
+												<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+											</span>
+										</div>
+									</td>
 								</tr>
 							</table>
 
@@ -449,7 +456,7 @@
 						$(this).prop("checked", true);
 					}
 				});
-				$("#birthday").val(doc.birthday);
+				$("#birthday").datepicker("setDate", doc.birthday);
 
 				// #. 설문정보
 				$("#height").val(doc.height);
@@ -535,6 +542,14 @@
 				}
 				CommonMsg.error(function() { });
 			}
+		});
+
+		$('#birthday').datepicker({
+			autoclose : true,
+			format: "yyyy-mm-dd",
+			changeMonth : true,
+			changeYear : true,
+			language: "ko"
 		});
 	}
 

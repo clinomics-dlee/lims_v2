@@ -264,6 +264,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			for (var cr in checkedRows) {
 				data.push(checkedRows[cr].id);
 			}
+
+			if (data.length == 0) {
+				CommonMsg.warning(function() { }, "등록승인할 문서를 선택해주세요.");
+				return;
+			}
+
 			$.ajax({
 				url: '/input/document/approve',
 				type: 'post',

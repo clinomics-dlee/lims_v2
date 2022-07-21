@@ -11,20 +11,6 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
-import com.clinomics.entity.lims.Member;
-import com.clinomics.entity.lims.Product;
-import com.clinomics.entity.lims.Role;
-import com.clinomics.entity.lims.Sample;
-import com.clinomics.enums.ResultCode;
-import com.clinomics.enums.RoleCode;
-import com.clinomics.enums.StatusCode;
-import com.clinomics.repository.lims.MemberRepository;
-import com.clinomics.repository.lims.SampleRepository;
-import com.clinomics.specification.lims.SampleSpecification;
-import com.clinomics.util.CustomIndexPublisher;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -38,6 +24,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.clinomics.entity.lims.Agency;
+import com.clinomics.entity.lims.Bundle;
+import com.clinomics.entity.lims.Member;
+import com.clinomics.entity.lims.Product;
+import com.clinomics.entity.lims.Role;
+import com.clinomics.entity.lims.Sample;
+import com.clinomics.enums.ResultCode;
+import com.clinomics.enums.RoleCode;
+import com.clinomics.enums.StatusCode;
+import com.clinomics.repository.lims.AgencyRepository;
+import com.clinomics.repository.lims.BundleRepository;
+import com.clinomics.repository.lims.MemberRepository;
+import com.clinomics.repository.lims.SampleRepository;
+import com.clinomics.specification.lims.SampleSpecification;
+import com.clinomics.util.CustomIndexPublisher;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 @Service
 public class OutputService {
 
@@ -46,6 +50,12 @@ public class OutputService {
 	
 	@Autowired
 	MemberRepository memberRepository;
+
+	@Autowired
+	AgencyRepository agencyRepository;
+
+	@Autowired
+	BundleRepository bundleRepository;
 	
 	@Autowired
 	DataTableService dataTableService;
@@ -214,7 +224,7 @@ public class OutputService {
 	public Map<String, String> outputReIssue(Map<String, String> inputItems, String memberId) {
 		logger.info("☆☆☆☆☆☆☆ outputReIssue ☆☆☆ Cache Evict ☆☆☆");
 
-		Map<String, String> rtn = inputService.save(inputItems, true);
+		Map<String, String> rtn = inputService.save(inputItems, null, true);
 
 		if ("00".equals(rtn.getOrDefault("result", ""))) {
 			String id = inputItems.getOrDefault("id", "0") + "";
@@ -303,6 +313,9 @@ public class OutputService {
 
 							data.put("birthday", birthyear);
 						}
+
+						// #. 설문지정보 값을 추가
+						data.put("docinfos", sample.getDocInfos());
 					}
 
 					data.putAll(items);
@@ -502,6 +515,20 @@ public class OutputService {
 
 		rtn.put("result", "success");
 		rtn.put("list", list);
+		
+		return rtn;
+	}
+
+	public Map<String, Object> getHospitalInfos(String ip) {
+		logger.info("☆☆☆☆☆☆☆ getHospitalInfos ☆☆☆☆☆");
+		Map<String, Object> rtn = Maps.newHashMap();
+
+		List<Agency> agencies = agencyRepository.findAll();
+		List<Bundle> bundles = bundleRepository.findAll();
+		
+		rtn.put("result", "success");
+		rtn.put("agencies", agencies);
+		rtn.put("bundles", bundles);
 		
 		return rtn;
 	}

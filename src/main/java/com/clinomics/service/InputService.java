@@ -1,6 +1,7 @@
 package com.clinomics.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,8 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -43,7 +46,8 @@ import com.google.common.collect.Maps;
 
 @Service
 public class InputService {
-
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	@Autowired
 	SampleRepository sampleRepository;
 
@@ -121,9 +125,10 @@ public class InputService {
 	
 	@Transactional
 	@CacheEvict(value = "hospitalCache", allEntries = true)
-	public Map<String, String> save(Map<String, String> inputItems, boolean history) {
+	public Map<String, String> save(Map<String, String> inputItems, Map<String, Object> docInfos, boolean history) {
 		Map<String, Object> items = Maps.newHashMap();
 		items.putAll(inputItems);
+
 		Map<String, String> rtn = Maps.newHashMap();
 		
 		String id = items.getOrDefault("id", "0") + "";
@@ -212,6 +217,10 @@ public class InputService {
 		Map<String, Object> newItems = Maps.newHashMap();
 		newItems.putAll(items);
 		sample.setItems(newItems);
+
+		if (docInfos != null) {
+			sample.setDocInfos(docInfos);
+		}
 		
 		sampleRepository.save(sample);
 		
@@ -224,7 +233,7 @@ public class InputService {
 		Map<String, String> rtn = Maps.newHashMap();
 		for (Map<String, String> l : list) {
 			l.put("memberId", memberId);
-			Map<String, String> tmp = this.save(l, false);
+			Map<String, String> tmp = this.save(l, null, false);
 			if (!ResultCode.SUCCESS.get().equals(tmp.getOrDefault("result", "AA"))) {
 				return tmp;
 			}
@@ -362,6 +371,9 @@ public class InputService {
 		String agencyName = documentMap.get("agencyName");
 		int bundleId = NumberUtils.toInt(documentMap.get("bundleId"));
 
+		Optional<Member> oMember = memberRepository.findById(documentMap.getOrDefault("memberId", "") + "");
+		Member member = oMember.orElse(null);
+
 		Optional<Agency> oAgency = agencyRepository.findByName(agencyName);
 		if (!oAgency.isPresent()) {
 			rtn.put("result", ResultCode.FAIL_UNKNOWN.get());
@@ -401,6 +413,8 @@ public class InputService {
 		doc.setAgency(oAgency.get());
 		doc.setBundle(oBundle.get());
 
+		doc.setLastModifiedMember(member);
+
 		documentRepository.save(doc);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
@@ -415,7 +429,7 @@ public class InputService {
 		int agencyId = NumberUtils.toInt((String)documentMap.get("agencyId"));
 		int bundleId = NumberUtils.toInt((String)documentMap.get("bundleId"));
 
-		System.out.println("★★★ documentMap=" + documentMap.toString());
+		logger.info("★★★ documentMap=" + documentMap.toString());
 
 		Optional<Agency> oAgency = agencyRepository.findById(agencyId);
 		if (!oAgency.isPresent()) {
@@ -488,8 +502,47 @@ public class InputService {
 		Optional<Member> oMember = memberRepository.findById(memberId);
 		Member member = oMember.get();
 		LocalDateTime now = LocalDateTime.now();
+		
+		
+		// #. Document객체로 sample 로 등록
+		for (int id : ids) {
+			Optional<Document> oDocument = documentRepository.findById(id);
+			Document doc = oDocument.orElseThrow(NullPointerException::new);
+			Map<String, String> items = Maps.newHashMap();
 
-		// #. TODO sample 로 등록
+			String birthyear = (doc.getBirthday() != null ? doc.getBirthday().split("-")[0] : "");
+			String receivedDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+			// #. document 객체 mapping
+			items.put("memberId", member.getId());
+			items.put("h_name", doc.getAgency().getName());
+			items.put("bundleId", Integer.toString(doc.getBundle().getId()));
+			items.put("d_name", doc.getDoctorName());
+			items.put("chart_number", doc.getChartNumber());
+			items.put("sex", doc.getSex());
+			items.put("birthyear", birthyear);
+			items.put("receiveddate", receivedDate);
+			items.put("sampletype", "Buccal swabs");
+
+			Map<String, Object> docInfos = Maps.newHashMap();
+			docInfos.put("height", doc.getHeight());
+			docInfos.put("weight", doc.getWeight());
+			docInfos.put("smoking", doc.getSmoking());
+			docInfos.put("alcohol", doc.getAlcohol());
+			docInfos.put("meat", doc.getMeat());
+			docInfos.put("instant", doc.getInstant());
+			docInfos.put("fried", doc.getFried());
+			docInfos.put("salt", doc.getSalt());
+			docInfos.put("exercise", doc.getExercise());
+			docInfos.put("depression", doc.getDepression());
+			docInfos.put("stress", doc.getStress());
+
+			Map<String, String> tmp = this.save(items, docInfos, false);
+			if (!ResultCode.SUCCESS.get().equals(tmp.getOrDefault("result", "AA"))) {
+				return tmp;
+			}
+			rtn.putAll(tmp);
+		}
 		
 		return rtn;
 	}

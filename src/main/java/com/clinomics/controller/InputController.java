@@ -89,7 +89,7 @@ public class InputController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		datas.put("memberId", userDetails.getUsername());
 		
-		return inputService.save(datas, false);
+		return inputService.save(datas, null, false);
 	}
 	
 	@PostMapping("/saveall")

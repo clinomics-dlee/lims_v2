@@ -60,6 +60,10 @@ public class Sample implements Serializable {
 	@Convert(converter = StringMapConverter.class)
 	private Map<String, Object> items = new HashMap<>();
 
+	@Column(columnDefinition = "json")
+	@Convert(converter = StringMapConverter.class)
+	private Map<String, Object> docInfos = new HashMap<>();
+
 	@Column(length = 10)
 	@JsonIgnore
 	private String barcodeLetter;
