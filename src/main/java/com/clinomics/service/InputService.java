@@ -1,6 +1,5 @@
 package com.clinomics.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +16,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.clinomics.entity.lims.Agency;
 import com.clinomics.entity.lims.Bundle;
+import com.clinomics.entity.lims.Document;
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
@@ -34,10 +31,12 @@ import com.clinomics.enums.RoleCode;
 import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.AgencyRepository;
 import com.clinomics.repository.lims.BundleRepository;
+import com.clinomics.repository.lims.DocumentRepository;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.ProductRepository;
 import com.clinomics.repository.lims.SampleHistoryRepository;
 import com.clinomics.repository.lims.SampleRepository;
+import com.clinomics.specification.lims.DocumentSpecification;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.clinomics.util.CustomIndexPublisher;
 import com.google.common.collect.Maps;
@@ -62,6 +61,9 @@ public class InputService {
 
 	@Autowired
 	MemberRepository memberRepository;
+
+	@Autowired
+	DocumentRepository documentRepository;
 	
 	@Autowired
 	DataTableService dataTableService;
@@ -307,6 +309,187 @@ public class InputService {
 			return rtn;
 		}
 		sampleRepository.saveAll(samples);
+		
+		return rtn;
+	}
+
+	public Map<String, Object> findDocment(Map<String, String> params) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
+		
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount);
+		}
+		long total;
+		
+		Specification<Document> where = Specification
+					.where(DocumentSpecification.betweenDate(params))
+					.and(DocumentSpecification.bundleId(params))
+					.and(DocumentSpecification.hNameIn(params))
+					.and(DocumentSpecification.keywordLike(params))
+					.and(DocumentSpecification.bundleIsActive())
+					.and(DocumentSpecification.orderBy(params));
+					
+		
+		total = documentRepository.count(where);
+		Page<Document> page = documentRepository.findAll(where, pageable);
+		
+		List<Document> list = page.getContent();
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list);
+	}
+
+	public Map<String, Object> findDocumentById(String id) {
+		Optional<Document> oDocument= documentRepository.findById(NumberUtils.toInt(id));
+		Document document = oDocument.orElse(new Document());
+		
+		Map<String, Object> rtn = Maps.newHashMap();
+		rtn.put("document", document);
+		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> saveDocument(Map<String, String> documentMap) {
+		Map<String, String> rtn = Maps.newHashMap();
+
+		int id = NumberUtils.toInt(documentMap.get("id"));
+		String agencyName = documentMap.get("agencyName");
+		int bundleId = NumberUtils.toInt(documentMap.get("bundleId"));
+
+		Optional<Agency> oAgency = agencyRepository.findByName(agencyName);
+		if (!oAgency.isPresent()) {
+			rtn.put("result", ResultCode.FAIL_UNKNOWN.get());
+			rtn.put("message", ResultCode.FAIL_UNKNOWN.getMsg());
+			return rtn;
+		}
+
+		Optional<Bundle> oBundle = bundleRepository.findById(bundleId);
+		if (!oBundle.isPresent()) {
+			rtn.put("result", ResultCode.FAIL_UNKNOWN.get());
+			rtn.put("message", ResultCode.FAIL_UNKNOWN.getMsg());
+			return rtn;
+		}
+
+		Optional<Document> oDocument = documentRepository.findById(id);
+		Document doc = oDocument.orElse(new Document());
+		
+		doc.setDoctorName(documentMap.get("doctorName"));
+		doc.setChartNumber(documentMap.get("chartNumber"));
+		doc.setName(documentMap.get("name"));
+		doc.setTel(documentMap.get("tel"));
+		doc.setAddress(documentMap.get("address"));
+		doc.setSex(documentMap.get("sex"));
+		doc.setBirthday(documentMap.get("birthday"));
+		doc.setHeight(documentMap.get("height"));
+		doc.setWeight(documentMap.get("weight"));
+		doc.setSmoking(documentMap.get("smoking"));
+		doc.setAlcohol(documentMap.get("alcohol"));
+		doc.setMeat(documentMap.get("meat"));
+		doc.setInstant(documentMap.get("instant"));
+		doc.setFried(documentMap.get("fried"));
+		doc.setSalt(documentMap.get("salt"));
+		doc.setExercise(documentMap.get("exercise"));
+		doc.setDepression(documentMap.get("depression"));
+		doc.setStress(documentMap.get("stress"));
+
+		doc.setAgency(oAgency.get());
+		doc.setBundle(oBundle.get());
+
+		documentRepository.save(doc);
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		rtn.put("message", ResultCode.SUCCESS.getMsg());
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, Object> saveDocumentForRest(Map<String, Object> documentMap) {
+		Map<String, Object> rtn = Maps.newHashMap();
+
+		int agencyId = NumberUtils.toInt((String)documentMap.get("agencyId"));
+		int bundleId = NumberUtils.toInt((String)documentMap.get("bundleId"));
+
+		System.out.println("★★★ documentMap=" + documentMap.toString());
+
+		Optional<Agency> oAgency = agencyRepository.findById(agencyId);
+		if (!oAgency.isPresent()) {
+			rtn.put("result", "fail");
+			rtn.put("message", "병원 코드가 정확하지 않습니다.");
+			return rtn;
+		}
+
+		Optional<Bundle> oBundle = bundleRepository.findById(bundleId);
+		if (!oBundle.isPresent()) {
+			rtn.put("result", "fail");
+			rtn.put("message", "상품 코드가 정확하지 않습니다.");
+			return rtn;
+		}
+
+		Map<String, String> map = Maps.newHashMap();
+		map.put("doctorName", (String)documentMap.get("doctorName"));
+		map.put("chartNumber", (String)documentMap.get("chartNumber"));
+		map.put("name", (String)documentMap.get("name"));
+		map.put("tel", (String)documentMap.get("tel"));
+		map.put("address", (String)documentMap.get("address"));
+		map.put("sex", (String)documentMap.get("sex"));
+		map.put("birthday", (String)documentMap.get("birthday"));
+		map.put("height", (String)documentMap.get("height"));
+		map.put("weight", (String)documentMap.get("weight"));
+		map.put("smoking", (String)documentMap.get("smoking"));
+		map.put("alcohol", (String)documentMap.get("alcohol"));
+		map.put("meat", (String)documentMap.get("meat"));
+		map.put("instant", (String)documentMap.get("instant"));
+		map.put("fried", (String)documentMap.get("fried"));
+		map.put("salt", (String)documentMap.get("salt"));
+		map.put("exercise", (String)documentMap.get("exercise"));
+		map.put("depression", (String)documentMap.get("depression"));
+		map.put("stress", (String)documentMap.get("stress"));
+		map.put("agencyName", oAgency.get().getName());
+		map.put("bundleId", Integer.toString(oBundle.get().getId()));
+
+		Map<String, String> result = this.saveDocument(map);
+
+		if (result.get("result").equals(ResultCode.SUCCESS.get())) {
+			rtn.put("result", "success");
+			rtn.put("message", "");
+		} else {
+			rtn.put("result", result.get("result"));
+			rtn.put("message", result.get("message"));
+		}
+
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> deleteDocument(List<Integer> ids) {
+		Map<String, String> rtn = Maps.newHashMap();
+		List<Document> documents = documentRepository.findByIdIn(ids);
+		
+		rtn.put("result", ResultCode.SUCCESS_DELETE.get());
+		rtn.put("message", ResultCode.SUCCESS_DELETE.getMsg());
+
+		
+		documentRepository.deleteAll(documents);
+		
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> approveDocument(List<Integer> ids, String memberId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		
+		// sample.set
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.get();
+		LocalDateTime now = LocalDateTime.now();
+
+		// #. TODO sample 로 등록
 		
 		return rtn;
 	}

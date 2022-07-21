@@ -41,6 +41,7 @@ page:
       sampleReceiptRate: Sample Receipt Rate
   input:
     tit: Wearing
+    reg: Waiting for registration
     reg: Sample registration
     rcv: Sample receipt
     aprv: Warehousing payment

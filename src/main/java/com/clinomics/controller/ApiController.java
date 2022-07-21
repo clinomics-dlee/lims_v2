@@ -4,12 +4,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.clinomics.service.OutputService;
-import com.clinomics.util.EmailSender;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,11 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.clinomics.service.InputService;
+import com.clinomics.service.OutputService;
+import com.clinomics.util.EmailSender;
+
 @RequestMapping("/rest")
 @RestController
 public class ApiController {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
+	@Autowired
+	InputService inputService;
+
 	@Autowired
 	OutputService outputService;
 	
@@ -79,6 +84,16 @@ public class ApiController {
 		
 		logger.info("☆☆☆☆☆ getResultByParams ☆☆☆ request IP : [" + ip + "]");
 		return outputService.getResultByLaboratoryIdsForRest(params, ip);
+	}
+
+	@PostMapping(value = "/doc/save")
+	public Map<String, Object> saveDocument(@RequestBody Map<String, Object> documentMap, HttpServletRequest req) {
+		logger.info("☆☆☆☆☆ saveDocument ☆☆☆ IN interface : /doc/save ");
+		String ip = req.getHeader("X-FORWARDED-FOR");
+		if (ip == null)	ip = req.getRemoteAddr();
+		
+		logger.info("☆☆☆☆☆ saveDocument ☆☆☆ request IP : [" + ip + "]");
+		return inputService.saveDocumentForRest(documentMap);
 	}
 	
 //	@RequestMapping(value = "/mail/test")

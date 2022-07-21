@@ -49,6 +49,9 @@
                     <span th:text="#{page.input.tit}">입고</span>
                 </a>
 				<ul class="sub-menu">
+					<li th:class="${#strings.contains(path,'/p/input/rdy')} ? active : ''">
+                    	<a href="/p/input/rdy" th:text="#{page.input.rdy}">검체등록대기</a>
+                    </li>
                     <li th:class="${#strings.contains(path,'/p/input/reg')} ? active : ''">
                     	<a href="/p/input/reg" th:text="#{page.input.reg}">검체등록</a>
                     </li>

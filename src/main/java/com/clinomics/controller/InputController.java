@@ -55,6 +55,12 @@ public class InputController {
 	@Autowired
 	BundleService bundleService;
 	
+	@GetMapping("/rdy")
+	@ResponseBody
+	public Map<String, Object> rdy(@RequestParam Map<String, String> params) {
+		return inputService.findDocment(params);
+	}
+
 	@GetMapping("/rvc")
 	@ResponseBody
 	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
@@ -140,6 +146,37 @@ public class InputController {
 	@ResponseBody
 	public Map<String, Object> getItemByBundle(@PathVariable String id) {
 		return sampleItemService.findSampleItemByBundle(id);
+	}
+
+	@GetMapping("/document/{id}")
+	@ResponseBody
+	public Map<String, Object> getDocument(@PathVariable String id) {
+		return inputService.findDocumentById(id);
+	}
+
+	@PostMapping("/document/delete")
+	@ResponseBody
+	public Map<String, String> deleteDocument(@RequestBody List<Integer> ids) {
+		
+		return inputService.deleteDocument(ids);
+	}
+
+	@PostMapping("/document/save")
+	@ResponseBody
+	public Map<String, String> saveDocument(@RequestBody Map<String, String> datas) {
+		
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		datas.put("memberId", userDetails.getUsername());
+		
+		return inputService.saveDocument(datas);
+	}
+
+	@PostMapping("/document/approve")
+	@ResponseBody
+	public Map<String, String> approveDocument(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return inputService.approveDocument(ids, userDetails.getUsername());
 	}
 	
 	@GetMapping("/excel/form")

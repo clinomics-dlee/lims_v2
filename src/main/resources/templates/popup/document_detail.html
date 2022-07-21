@@ -1,0 +1,606 @@
+<!-- begin modal-dialog -->
+<style>
+@media screen and (min-width: 1024px) {
+	.modal-dialog {
+	  	max-width: 1024px; /* New width for default modal */
+	  	max-height: 600px;
+	}
+}
+</style>
+
+<div class="modal fade" id="modal-document-detail">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">문서 정보 수정</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<div id="div_popup_document_detail">
+					<form id="frm_popup_document_detail" data-parsley-validate="true">
+						<input type="hidden" name="id" id="id" value="">
+						<div class="form-group row m-b-15">
+							<table id="table_form" class="table">
+								<tr>
+									<td>의뢰기관명</td>
+									<td>
+										<select class="form-control width-200" id="agencyName" name="agencyName">
+											<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
+										</select>
+									</td>
+									<td>서비스</td>
+									<td>
+										<select class="form-control width-200" data-parsley-required="true" id="bundleId" name="bundleId">
+											<option th:each="bnd : ${bundles}" th:value="${bnd.getId()}" th:text="${bnd.getName()}"></option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>담당의사명</td>
+									<td><input type="text" class="form-control form-control-sm" name="doctorName" id="doctorName" autocomplete="off" value=""></td>
+									<td>차트번호</td>
+									<td><input type="text" class="form-control form-control-sm" name="chartNumber" id="chartNumber" autocomplete="off" value=""></td>
+								</tr>
+								<tr>
+									<td>수검자 이름</td>
+									<td><input type="text" class="form-control form-control-sm" name="name" id="name" autocomplete="off" value=""></td>
+									<td>수검자 전화번호</td>
+									<td><input type="text" class="form-control form-control-sm" name="tel" id="tel" autocomplete="off" value=""></td>
+								</tr>
+								<tr>
+									<td>수검자 주소</td>
+									<td><input type="text" class="form-control form-control-sm" name="address" id="address" autocomplete="off" value=""></td>
+									<td>수검자 성별</td>
+									<td>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" name="sex" id="sex1" value="남">
+											<label class="form-check-label" for="sex1">남</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" name="sex" id="sex2" value="여">
+											<label class="form-check-label" for="sex2">여</label>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>수검자 생년월일</td>
+									<td><input type="text" class="form-control form-control-sm" name="birthday" id="birthday" autocomplete="off" value=""></td>
+								</tr>
+							</table>
+
+							<div class="col-md-12">
+								<h4>설문 정보</h4>
+								<table class="table table-bordered">
+									<tr>
+										<td>키</td>
+										<td colspan="2">
+											<input type="text" class="form-control form-control-sm" name="height" id="height" autocomplete="off" value="">
+										</td>
+										<td>몸무게</td>
+										<td colspan="2">
+											<input type="text" class="form-control form-control-sm" name="weight" id="weight" autocomplete="off" value="">
+										</td>
+									</tr>
+									<tr>
+										<td>흡연 습관</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="smoking" id="smoking1" value="1">
+												<label class="form-check-label" for="smoking1">현재 흡연</label>
+											</div>
+										</td>
+										<td colspan="2">
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="smoking" id="smoking2" value="2">
+												<label class="form-check-label" for="smoking2">현재 흡연하지 않으나, 과거에 흡연</label>
+											</div>
+										</td>
+										<td colspan="2">
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="smoking" id="smoking3" value="3">
+												<label class="form-check-label" for="smoking3">흡연 경험 없음</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<input type="hidden" name="alcohol" id="alcohol" value="">
+										<td rowspan="3">음주 량<br/> 소주/맥주/와인 중 택1 작성</td>
+										<td>소주</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholSoju" id="alcoholSoju1" value="1-1">
+												<label class="form-check-label" for="alcoholSoju1">주 3병 초과</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholSoju" id="alcoholSoju2" value="2-1">
+												<label class="form-check-label" for="alcoholSoju2">주 1~3병</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholSoju" id="alcoholSoju3" value="3-1">
+												<label class="form-check-label" for="alcoholSoju3">주 1병 미만</label>
+											</div>
+										</td>
+										<td rowspan="3">
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="notAlcohol" id="notAlcohol" value="4">
+												<label class="form-check-label" for="notAlcohol">전혀 음주 안함</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>맥주</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholBeer" id="alcoholBeer1" value="1-2">
+												<label class="form-check-label" for="alcoholBeer1">주 16잔 초과</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholBeer" id="alcoholBeer2" value="2-2">
+												<label class="form-check-label" for="alcoholBeer2">주 5~16잔</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholBeer" id="alcoholBeer3" value="3-2">
+												<label class="form-check-label" for="alcoholBeer3">주 5잔 미만</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>와인</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholWine" id="alcoholWine1" value="1-3">
+												<label class="form-check-label" for="alcoholWine1">주 20잔 초과</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholWine" id="alcoholWine2" value="2-3">
+												<label class="form-check-label" for="alcoholWine2">주 7~20잔</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="alcoholWine" id="alcoholWine3" value="3-3">
+												<label class="form-check-label" for="alcoholWine3">주 7잔 미만</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>육류 섭취 빈도<br/> (붉은육류 및 가공육)</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="meat" id="meat1" value="1">
+												<label class="form-check-label" for="meat1">거의 매일</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="meat" id="meat2" value="2">
+												<label class="form-check-label" for="meat2">주 3~5일</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="meat" id="meat3" value="3">
+												<label class="form-check-label" for="meat3">주 1~2</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="meat" id="meat4" value="4">
+												<label class="form-check-label" for="meat4">주 1회 미만</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="meat" id="meat5" value="5">
+												<label class="form-check-label" for="meat5">전혀 먹지 않음</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>인스턴트 / 가공식품 섭취 빈도</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="instant" id="instant1" value="1">
+												<label class="form-check-label" for="instant1">거의 매일</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="instant" id="instant2" value="2">
+												<label class="form-check-label" for="instant2">주 3~5일</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="instant" id="instant3" value="3">
+												<label class="form-check-label" for="instant3">주 1~2</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="instant" id="instant4" value="4">
+												<label class="form-check-label" for="instant4">주 1회 미만</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="instant" id="instant5" value="5">
+												<label class="form-check-label" for="instant5">전혀 먹지 않음</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>튀김식품 섭취 빈도</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="fried" id="fried1" value="1">
+												<label class="form-check-label" for="fried1">거의 매일</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="fried" id="fried2" value="2">
+												<label class="form-check-label" for="fried2">주 3~5일</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="fried" id="fried3" value="3">
+												<label class="form-check-label" for="fried3">주 1~2</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="fried" id="fried4" value="4">
+												<label class="form-check-label" for="fried4">주 1회 미만</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="fried" id="fried5" value="5">
+												<label class="form-check-label" for="fried5">전혀 먹지 않음</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>짠 음식 섭취 습관</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="salt" id="salt1" value="1">
+												<label class="form-check-label" for="salt1">매우 짜게 먹음</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="salt" id="salt2" value="2">
+												<label class="form-check-label" for="salt2">약간 짜게 먹음</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="salt" id="salt3" value="3">
+												<label class="form-check-label" for="salt3">적당한 간</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="salt" id="salt4" value="4">
+												<label class="form-check-label" for="salt4">싱겁게 먹음</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="salt" id="salt5" value="5">
+												<label class="form-check-label" for="salt5">간이 거의 안된 음식을 먹음</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>운동 습관</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="exercise" id="exercise1" value="1">
+												<label class="form-check-label" for="exercise1">거의 매일 함</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="exercise" id="exercise2" value="2">
+												<label class="form-check-label" for="exercise2">주 3~5회</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="exercise" id="exercise3" value="3">
+												<label class="form-check-label" for="exercise3">주 1~2회</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="exercise" id="exercise4" value="4">
+												<label class="form-check-label" for="exercise4">한달 1~3회</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="exercise" id="exercise5" value="5">
+												<label class="form-check-label" for="exercise5">거의 안함</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>우울감</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="depression" id="depression1" value="1">
+												<label class="form-check-label" for="depression1">항상 느낌</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="depression" id="depression2" value="2">
+												<label class="form-check-label" for="depression2">자주 느낌</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="depression" id="depression3" value="3">
+												<label class="form-check-label" for="depression3">보통</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="depression" id="depression4" value="4">
+												<label class="form-check-label" for="depression4">약간 느낌</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="depression" id="depression5" value="5">
+												<label class="form-check-label" for="depression5">거의 없음</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>스트레스</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="stress" id="stress1" value="1">
+												<label class="form-check-label" for="stress1">항상 느낌</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="stress" id="stress2" value="2">
+												<label class="form-check-label" for="stress2">자주 느낌</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="stress" id="stress3" value="3">
+												<label class="form-check-label" for="stress3">보통</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="stress" id="stress4" value="4">
+												<label class="form-check-label" for="stress4">약간 느낌</label>
+											</div>
+										</td>
+										<td>
+											<div class="form-check">
+												<input class="form-check-input" type="radio" name="stress" id="stress5" value="5">
+												<label class="form-check-label" for="stress5">거의 없음</label>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
+				<a href="javascript:saveDocument();" class="btn btn-success">저장</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script th:inline="javascript">
+/* <![CDATA[ */    
+	function documentPopupOnload(documentId) {
+		$("#modal-document-detail").modal();
+		
+		$.ajax({
+			url : "/input/document/" + documentId,
+			type : "GET",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success: function (data, xhr) {
+				var doc = data.document;
+				
+				// #. 기본정보
+				$("#id").val(doc.id);
+				$("#agencyName").val(doc.agency.name);
+				$("#bundleId").val(doc.bundle.id);
+
+				$("#doctorName").val(doc.doctorName);
+				$("#chartNumber").val(doc.chartNumber);
+				$("#name").val(doc.name);
+				$("#tel").val(doc.tel);
+				$("#address").val(doc.address);
+				$("input:radio[name=sex]").each(function () {
+					if ($(this).val() == doc.sex) {
+						$(this).prop("checked", true);
+					}
+				});
+				$("#birthday").val(doc.birthday);
+
+				// #. 설문정보
+				$("#height").val(doc.height);
+				$("#weight").val(doc.weight);
+
+				$("input:radio[name=smoking]").each(function () {
+					if ($(this).val() == doc.smoking) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				var alcohols = (doc.alcohol != null ? doc.alcohol.split(",") : "");
+				$("input:radio[name=alcoholSoju]").each(function () {
+					if (doc.alcohol.indexOf($(this).val()) > -1) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=alcoholBeer]").each(function () {
+					if (doc.alcohol.indexOf($(this).val()) > -1) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=alcoholWine]").each(function () {
+					if (doc.alcohol.indexOf($(this).val()) > -1) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=notAlcohol]").each(function () {
+					if (doc.alcohol.indexOf($(this).val()) > -1) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=meat]").each(function () {
+					if ($(this).val() == doc.meat) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=instant]").each(function () {
+					if ($(this).val() == doc.instant) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=fried]").each(function () {
+					if ($(this).val() == doc.fried) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=salt]").each(function () {
+					if ($(this).val() == doc.salt) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=exercise]").each(function () {
+					if ($(this).val() == doc.exercise) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=depression]").each(function () {
+					if ($(this).val() == doc.depression) {
+						$(this).prop("checked", true);
+					}
+				});
+
+				$("input:radio[name=stress]").each(function () {
+					if ($(this).val() == doc.stress) {
+						$(this).prop("checked", true);
+					}
+				});
+			},
+			error : function(data, xhr) {
+				
+				if (data.status == "200") {
+					location.reload();
+				}
+				CommonMsg.error(function() { });
+			}
+		});
+	}
+
+	$(document).on('change', '#notAlcohol:checked', function() {
+		$("input:radio[name=alcoholSoju]:checked").each(function() { $(this).prop("checked", false); });
+		$("input:radio[name=alcoholBeer]:checked").each(function() { $(this).prop("checked", false); });
+		$("input:radio[name=alcoholWine]:checked").each(function() { $(this).prop("checked", false); });
+	});
+
+	$(document).on('change', 'input:radio[name=alcoholSoju]:checked,input:radio[name=alcoholBeer]:checked,input:radio[name=alcoholWine]:checked', function() {
+		$('#notAlcohol').prop("checked", false);
+	});
+
+	function saveDocument() {
+		if (!$('#frm_popup_document_detail').parsley().validate()) {
+			return;	
+		}
+
+		// #. alcohol 값 설정
+		if ($('#notAlcohol:checked').val() != null) {
+			$('#alcohol').val($('#notAlcohol:checked').val());
+		} else {
+			var alcohol = "";
+			
+			if ($("input:radio[name=alcoholSoju]:checked").val() != null) {
+				alcohol += $("input:radio[name=alcoholSoju]:checked").val();
+			}
+			if ($("input:radio[name=alcoholBeer]:checked").val() != null) {
+				if (alcohol.length > 0) alcohol += ",";
+				alcohol += $("input:radio[name=alcoholBeer]:checked").val();
+			}
+			if ($("input:radio[name=alcoholWine]:checked").val() != null) {
+				if (alcohol.length > 0) alcohol += ",";
+				alcohol += $("input:radio[name=alcoholWine]:checked").val();
+			}
+			$('#alcohol').val(alcohol);
+		}
+
+		CommonMsg.okCancel(function() {
+			$.ajax({
+				url: '/input/document/save',
+				type: 'post',
+				data : JSON.stringify($('#frm_popup_document_detail').serializeObject()),
+				dataType : 'json',
+				contentType : "application/json;charset=utf-8",
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function(data, xhr) {
+					if (data.result == "00") {
+						CommonMsg.save(function() {
+							$("#modal-document-detail").modal('hide');
+							UserTable.reload('_document_grid');
+						});
+					} else {
+						CommonMsg.error(function() { }, data.message);
+					}
+				},
+				error : function(data) {
+					CommonMsg.error(function() { });
+				},
+				complete : function() {
+					
+				}
+			});
+		});
+	}
+/* ]]> */
+</script>

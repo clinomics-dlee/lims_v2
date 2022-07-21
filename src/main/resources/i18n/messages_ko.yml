@@ -41,6 +41,7 @@ page:
       sampleReceiptRate: 검체 입고 비율
   input:
     tit: 입고
+    rdy: 검체등록대기
     reg: 검체등록
     rcv: 검체입고
     aprv: 입고결재
