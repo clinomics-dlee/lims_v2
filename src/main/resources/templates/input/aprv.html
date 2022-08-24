@@ -79,9 +79,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 									<select class="form-control width-150" id="sel_status">
 										<option value>전체</option>
 										<option selected value="S020_INPUT_RCV" th:text="${statusCodes.get('S020_INPUT_RCV')}"></option>
-										<option value="S200_EXP_READY" th:text="${statusCodes.get('S200_EXP_READY')}"></option>
-										<option value="S460_ANLS_CMPL" th:text="${statusCodes.get('S460_ANLS_CMPL')}"></option>
-										<option value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
 										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option>
 									</select>
 								</div>
@@ -109,7 +106,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<hr/>
 							<div class="form-group row m-b-12">
 								
-								<div sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_INPUT_40', 'ROLE_EXP_80')">
+								<div sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_EXP_80')">
 									<button onClick="approve();" class="btn btn-primary p-l-20 p-r-20 m-l-10">승인</button>
 								</div>
 							</div>
@@ -237,15 +234,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			},
 			{
-				title : '검사실ID', 
-				data : 'laboratoryId'
+				title : '검체 관리번호', 
+				data : 'managementNumber'
 			},
 			{
 				title : '서비스', 
 				data : 'bundle.name'
 			},
 			{
-				title : '입고담당자', 
+				title : '검사서비스관리 담당자', 
 				data : 'inputApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -263,25 +260,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			},
 			{
-				title : '중간관리자', 
-				data : 'inputMngApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = rhDiv;
-					html += data ? rhDivAprv
-						+ row.inputMngApproveMember.name + '</div>'
-						: rhDivNotAprv;
-					html += '</div></div>';
-					return html;
-				}
-			},
-			{
-				title : '승인일시', 
-				data : 'inputMngApproveDate',
-				type : 'date'
-			},
-			{
-				title : '검사실책임자', 
+				title : '총괄 책임자', 
 				data : 'inputDrctApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {

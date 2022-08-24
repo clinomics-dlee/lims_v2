@@ -48,6 +48,9 @@ public class Sample implements Serializable {
     @Column(length = 30)
     private String laboratoryId;
 
+	@Column(length = 30)
+	private String managementNumber;
+
 	private int version;
 
 	private boolean isLastVersion = true;

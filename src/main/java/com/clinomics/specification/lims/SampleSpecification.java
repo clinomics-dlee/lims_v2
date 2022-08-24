@@ -228,10 +228,29 @@ public class SampleSpecification {
 				predicateLikes.add(criteriaBuilder.like(criteriaBuilder.function("JSON_EXTRACT", String.class,
 						root.get("items"), criteriaBuilder.literal("$.*")), text));
 
-				predicateLikes.add(criteriaBuilder.like(root.get("laboratoryId"), text));
+				predicateLikes.add(criteriaBuilder.like(root.get("managementNumber"), text));
 				predicateLikes.add(criteriaBuilder.like(root.get("bundle").get("name"), text));
 				// predicates.add(criteriaBuilder.like(root.get("member"), "%" + text + "%"));
 
+				rtn = criteriaBuilder.or(predicateLikes.toArray(new Predicate[predicateLikes.size()]));
+			}
+
+			return rtn;
+
+		};
+	}
+
+	public static Specification<Sample> laboratoryIdLike(Map<String, String> params) {
+
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicateLikes = new ArrayList<>();
+
+			if (params.containsKey("keyword") && !params.get("keyword").toString().isEmpty()) {
+				String text = "%" + params.get("keyword") + "%";
+				
+				predicateLikes.add(criteriaBuilder.like(root.get("laboratoryId"), text));
+				
 				rtn = criteriaBuilder.or(predicateLikes.toArray(new Predicate[predicateLikes.size()]));
 			}
 
@@ -340,6 +359,14 @@ public class SampleSpecification {
 	public static Specification<Sample> statusCodeGt(int number) {
 		return (root, query, criteriaBuilder) -> {
 			Predicate rtn = criteriaBuilder.greaterThanOrEqualTo(
+					criteriaBuilder.substring(root.get("statusCode"), 2, 3).as(Integer.class), number);
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> statusCodeLt(int number) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = criteriaBuilder.lessThanOrEqualTo(
 					criteriaBuilder.substring(root.get("statusCode"), 2, 3).as(Integer.class), number);
 			return rtn;
 		};
@@ -527,6 +554,37 @@ public class SampleSpecification {
 			List<Predicate> predicatesAnds = new ArrayList<>();
 
 			predicatesAnds.add(criteriaBuilder.greaterThanOrEqualTo(criteriaBuilder.function("JSON_LENGTH", Integer.class, root.get("data")), markerCount));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> tatEqual(String tat) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+				root.get("items"), criteriaBuilder.literal("$.tat")), tat));
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> tatLt(String tat) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+			predicatesAnds.add(
+				criteriaBuilder.lessThanOrEqualTo(
+					criteriaBuilder.function("JSON_UNQUOTE", String.class,
+						criteriaBuilder.function("JSON_EXTRACT", String.class,	root.get("items"), criteriaBuilder.literal("$.tat"))
+					)
+					, tat
+				)
+			);
 
 			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
 			return rtn;

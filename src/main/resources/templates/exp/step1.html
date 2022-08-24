@@ -215,14 +215,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			title : "서비스",
 			data : "bundle.name"
 		}, {
-			title : "검사실 ID",
+			title : "검체 관리번호",
+			data : "managementNumber"
+		}, {
+			title : "실험 관리번호",
 			data : "laboratoryId",
 			render : function(row, data, index) {
 				return '<a href="javascript:dnaqcPopupOnload(\'' + row.id + '\')">' + data + '</string>';
 			}
-		}, {
-			title : "바코드",
-			data : "items.barcode"
 		}, {
 			title : "검체종류",
 			data : "sampleType"
@@ -266,7 +266,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			for (var i = 0; i < checkedRows.length; i++) {
 				var row = checkedRows[i];
 				var data = {
-					"검사실 ID" : row.laboratoryId,
+					"실험 관리번호" : row.laboratoryId,
 					"A 260/280" : row.a260280,
 					"농도 (ng/μL)" : row.cncnt,
 					"DNA QC" : row.dnaQc
@@ -275,7 +275,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			}
 		} else {
 			excelDatas = [{
-				"검사실 ID" : "",
+				"실험 관리번호" : "",
 				"A 260/280" : "",
 				"농도 (ng/μL)" : "",
 				"DNA QC" : ""

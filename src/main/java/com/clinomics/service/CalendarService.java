@@ -1,5 +1,7 @@
 package com.clinomics.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -212,6 +214,33 @@ public class CalendarService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
 
+	public Map<String, Object> selectDelayed(Map<String, String> params) {
+		int draw = 1;
+		// #. paging param
+		int pageNumber = NumberUtils.toInt(params.get("pgNmb") + "", 0);
+		int pageRowCount = NumberUtils.toInt(params.get("pgrwc") + "", 10);
+
+		List<Order> orders = Arrays.asList(new Order[] { Order.asc("id") });
+		// #. paging 관련 객체
+		Pageable pageable = Pageable.unpaged();
+		if (pageRowCount > 1) {
+			pageable = PageRequest.of(pageNumber, pageRowCount, Sort.by(orders));
+		}
+
+		// #. tat가 조회일 기준 하루전, 당일, 이미 지난 경우 포함 해서 조회
+		LocalDateTime now = LocalDateTime.now();
+		params.put("tat", now.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+		
+		Specification<Sample> where = getDelayedWhere(params);
+		Page<Sample> sample = sampleRepository.findAll(where, pageable);
+		long total = sample.getTotalElements();
+		List<Sample> list = sample.getContent();
+		List<Map<String, Object>> header = sampleItemService.filterItemsAndOrdering(list);
+		long filtered = total;
+		
+		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
+	}
+
 	private Specification<Sample> getCreateDateWhere(Map<String, String> params) {
 		if (params.containsKey("yyyymm")) {
 			return SampleSpecification.createdDateOneMonth(params);
@@ -302,6 +331,18 @@ public class CalendarService {
 				.and(SampleSpecification.isNotTest())
 				.and(SampleSpecification.bundleIsActive())
 				.and(SampleSpecification.statusIn(STS_REPORT));
+	}
+
+	private Specification<Sample> getDelayedWhere(Map<String, String> params) {
+		return Specification
+			.where(getCreateDateWhere(params))
+				.and(SampleSpecification.isLastVersionTrue())
+				.and(SampleSpecification.bundleId(params))
+				.and(SampleSpecification.hNameIn(params))
+				.and(SampleSpecification.isNotTest())
+				.and(SampleSpecification.bundleIsActive())
+				.and(SampleSpecification.tatLt(params.get("tat")))
+				.and(SampleSpecification.statusCodeLt(700));
 	}
 	
 	private Map<String, Long> getGroupingMap(List<Map<String, String>> map, String key) {

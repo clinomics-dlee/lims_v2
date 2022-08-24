@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import javax.transaction.Transactional;
+
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
@@ -257,7 +259,7 @@ public class AnlsService {
 					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))
 					.and(SampleSpecification.statusIn(Arrays.asList(new StatusCode[] {StatusCode.S410_ANLS_RUNNING, StatusCode.S430_ANLS_FAIL})))
 					.and(SampleSpecification.orderBy(params));
 		
@@ -369,8 +371,7 @@ public class AnlsService {
 		}
 		roles = roles.substring(1);
 
-		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
-			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+		if (!roles.contains(RoleCode.ROLE_EXP_40.toString())
 			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
 				
 			rtn.put("result", ResultCode.NO_PERMISSION.get());
@@ -397,6 +398,7 @@ public class AnlsService {
 
 			// #. 해당 검체 복사 step2전까지만 사용한 데이터 복사
 			Sample nSample = new Sample();
+			nSample.setManagementNumber(sample.getManagementNumber());
 			nSample.setLaboratoryId(sample.getLaboratoryId());
 			nSample.setVersion(sample.getVersion() + 1);
 			nSample.setBundle(sample.getBundle());
@@ -448,7 +450,7 @@ public class AnlsService {
 					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))
 					.and(SampleSpecification.statusEqual(StatusCode.S420_ANLS_SUCC))
 					.and(SampleSpecification.orderBy(params));
 		
@@ -530,6 +532,56 @@ public class AnlsService {
 		sampleRepository.saveAll(savedSamples);
 
 		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
+	@Transactional
+	public Map<String, String> jdgmApprove(List<Integer> ids, String memberId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, Arrays.asList(new StatusCode[] { StatusCode.S460_ANLS_CMPL }));
+		
+		// sample.set
+		Optional<Member> oMember = memberRepository.findById(memberId);
+		Member member = oMember.get();
+		LocalDateTime now = LocalDateTime.now();
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
+		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
+
+		if (roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+			
+			samples.stream().forEach(s -> {
+				s.setJdgmDrctApproveDate(now);
+				s.setModifiedDate(now);
+				s.setJdgmDrctApproveMember(member);
+				if (s.getJdgmApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
+					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
+				}
+			});
+
+		} else if (roles.contains(RoleCode.ROLE_EXP_40.toString())) {
+			
+			samples.stream().forEach(s -> {
+				s.setJdgmApproveDate(now);
+				s.setModifiedDate(now);
+				s.setJdgmApproveMember(member);
+				if (s.getJdgmApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
+					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
+				}
+			});
+
+		} else {
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+		sampleRepository.saveAll(samples);
+		
 		return rtn;
 	}
 

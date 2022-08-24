@@ -395,7 +395,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : "검사실ID",
+				title : "검체 관리번호",
+				data : "managementNumber",
+				render : function(row, data, index) {
+					var value = "";
+					if (data) {
+						value = data;
+					}
+					return value;
+				},
+				sorting : true
+			},
+			{
+				title : "실험 관리번호",
 				data : "laboratoryId",
 				render : function(row, data, index) {
 					return '<a href="javascript:sampleTestPopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
@@ -676,7 +688,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							}
 							if (data[r].nameCode == "barcode") {
 								notnull = true;
-								parsley = ' data-parsley-pattern="^[A-Z]+\-[0-9]+$" data-parsley-error-message="올바른 바코드로 형태로 입력해 주세요.(알파벳대문자-숫자)"'
+								parsley = ' data-parsley-pattern="^[A-Z]+\-[0-9]+$" data-parsley-error-message="올바른 동의서 관리번호로 형태로 입력해 주세요.(알파벳대문자-숫자)"'
 							}
 							
 							var val = "";

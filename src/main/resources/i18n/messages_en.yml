@@ -58,6 +58,7 @@ page:
     rdy: Waiting for analysis
     stts: Analysis status
     rslt: Analysis result
+    jdgm: Result Confirm
     db: Analysis DB
   output:
     all: Sample list
@@ -101,6 +102,7 @@ common:
   prev: Previous
   downloadHumanMaterials: Download human materials
   specimenRecord : Specimen record
+  delayedSamples : Delayed Samples
   pleaseSelect: Please select
   save: Save
   delete: Delete

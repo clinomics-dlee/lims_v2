@@ -72,6 +72,25 @@ public class CustomIndexPublisher {
 
 		return index;
 	}
+
+	public String getNextManagementByBundle(Bundle bundle, LocalDate receivedDate) {
+		String role = bundle.getManagementRole();
+		if (role == null || role.isEmpty()) {
+			return "";
+		}
+		String index = "";
+		String yyyymmdd = "";
+
+		String lastManagementNumber = sampleRepository.findMaxManagementNumber(bundle.getId());
+
+		// #. 병원용이 아닌 DTC 서비스에 경우만 채번함
+		if (!bundle.isHospital()) {
+			yyyymmdd = getYYYYMMDD("yyyyMMdd");
+			index = getIndex(role.split(separator), lastManagementNumber, yyyymmdd);
+		}
+
+		return index;
+	}
 	
 	private String getIndex(String[] arrRole, String current, String yyyymmdd) {
 		String index = "";
@@ -87,6 +106,8 @@ public class CustomIndexPublisher {
 					index += separator + yyyymmdd.substring(2);
 				} else if (t.equals("YYYYMM")) {
 					index += separator + yyyymm;
+				} else if (t.equals("YYYY")) {
+					index += separator + yyyymmdd.substring(0, 4);
 				} else if (t.matches("[0]+")) {
 					
 					int zero_cnt = StringUtils.countMatches(t, "0");

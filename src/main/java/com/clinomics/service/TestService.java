@@ -227,7 +227,7 @@ public class TestService {
 					.and(SampleSpecification.betweenModifiedDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
-					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusCodeGt(statusCodeNumber))
 					.and(SampleSpecification.orderBy(params));
@@ -260,7 +260,7 @@ public class TestService {
 					.and(SampleSpecification.betweenModifiedDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
-					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.statusEqual(StatusCode.valueOf(statusCode)))
 					.and(SampleSpecification.orderBy(params));

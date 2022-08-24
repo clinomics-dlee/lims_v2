@@ -58,12 +58,7 @@ page:
     rdy: 분석대기
     stts: 분석상황
     rslt: 분석결과
-    db: 분석DB
-  anls:
-    tit: 분석
-    rdy: 분석대기
-    stts: 분석상황
-    rslt: 분석결과
+    jdgm: 실험결과확인
     db: 분석DB
   output:
     all: 검체목록
@@ -107,6 +102,7 @@ common:
   prev: 이전
   downloadHumanMaterials: 인체유래물등 다운로드
   specimenRecord : 검체기록지
+  delayedSamples : 지연 검체 항목
   pleaseSelect: 선택해 주세요
   save: 저장
   delete: 삭제

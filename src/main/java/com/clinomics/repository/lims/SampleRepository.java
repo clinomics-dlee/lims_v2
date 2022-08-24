@@ -20,6 +20,8 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
 	String findMaxLaboratoryId(int bundleId);
 	@Query(value = "SELECT MAX(laboratory_id) FROM sample WHERE is_test = 0 AND bundle_id = ?1 AND DATE_FORMAT(received_date, '%Y%m') = ?2", nativeQuery = true)
 	String findMaxHospitalLaboratoryId(int bundleId, String yyyymm);
+    @Query(value = "SELECT MAX(management_number) FROM sample WHERE is_test = 0 AND bundle_id = ?1", nativeQuery = true)
+	String findMaxManagementNumber(int bundleId);
     @Query(value = "SELECT DISTINCT REPLACE(JSON_EXTRACT(items, '$.h_name'), '\"', '') AS name FROM sample WHERE is_test = 0 AND JSON_EXTRACT(items, '$.h_name') IS NOT NULL", nativeQuery = true)
     List<String> findDistinctHospitalName();
 
@@ -116,4 +118,7 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
 
     @Query(value = "SELECT MAX(SUBSTR(laboratory_id, -4, 4)) FROM sample WHERE is_test = 1 AND bundle_id = :bundleId", nativeQuery = true)
     String findMaxTestLaboratoryId(@Param("bundleId") int bundleId);
+
+    @Query(value = "SELECT MAX(SUBSTR(management_number, -7, 7)) FROM sample WHERE is_test = 1 AND bundle_id = :bundleId", nativeQuery = true)
+    String findMaxTestManagementNumber(@Param("bundleId") int bundleId);
 }

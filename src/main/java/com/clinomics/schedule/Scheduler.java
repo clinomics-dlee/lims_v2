@@ -7,22 +7,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-
-import com.clinomics.entity.lims.Sample;
-import com.clinomics.enums.StatusCode;
-import com.clinomics.repository.lims.ProductRepository;
-import com.clinomics.repository.lims.SampleRepository;
-import com.clinomics.service.SampleDbService;
-import com.clinomics.service.async.AnalysisService;
-import com.clinomics.specification.lims.SampleSpecification;
-import com.clinomics.util.EmailSender;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +28,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import com.clinomics.entity.lims.Sample;
+import com.clinomics.enums.StatusCode;
+import com.clinomics.repository.lims.ProductRepository;
+import com.clinomics.repository.lims.SampleRepository;
+import com.clinomics.service.SampleDbService;
+import com.clinomics.service.async.AnalysisService;
+import com.clinomics.specification.lims.SampleSpecification;
+import com.clinomics.util.EmailSender;
+import com.google.common.collect.Maps;
 
 @Component
 public class Scheduler {
@@ -355,6 +355,56 @@ public class Scheduler {
 			for (Sample sample : list) {
 				deleteResultGenoDataByChipBarcode(sample.getChipBarcode());
             }
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 하루에 한번씩 지연된 검체가 있는 확인하고 메일발송
+	 * 스케줄 매일 0시에 실행 (cron = "0 0 0 * * *")
+	 */
+	@Transactional
+	@Scheduled(cron = "0 0 0 * * *")
+	public void sendMailForDelayedSamples() {
+		try {
+			LocalDateTime now = LocalDateTime.now();
+			String nowDateString = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			String beforeDateString = now.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			logger.info("sendMailForDelayedSamples nowDate[" + nowDateString + "]");
+			logger.info("sendMailForDelayedSamples beforeDay[" + beforeDateString + "]");
+
+			// #. 상태가 출고 완료 이전의 검체중 TAT 당일인 목록 조회
+			Specification<Sample> nowWhere = Specification
+			.where(SampleSpecification.isLastVersionTrue())
+			.and(SampleSpecification.isNotTest())
+			.and(SampleSpecification.bundleIsActive())
+			.and(SampleSpecification.tatEqual(nowDateString))
+			.and(SampleSpecification.statusCodeLt(700));
+	
+			List<Sample> nowList = sampleRepository.findAll(nowWhere);
+
+            // #. 상태가 출고 완료 이전의 검체중 TAT가 하루 남은 목록 조회
+            Specification<Sample> beforeWhere = Specification
+				.where(SampleSpecification.isLastVersionTrue())
+				.and(SampleSpecification.isNotTest())
+				.and(SampleSpecification.bundleIsActive())
+				.and(SampleSpecification.tatEqual(beforeDateString))
+				.and(SampleSpecification.statusCodeLt(700));
+		
+            List<Sample> beforeList = sampleRepository.findAll(beforeWhere);
+
+
+			// #. 당일인 목록은 dtc1@clinomics.co.kr, dtc2@clinomics.co.kr
+			if (nowList != null && nowList.size() > 0) {
+				emailSender.sendMailToDelay(nowList, Arrays.asList(new String[] { "dtc1@clinomics.co.kr", "dtc2@clinomics.co.kr" }));
+			}
+
+			// #. 하루 남은 목록은 dtc2@clinomics.co.kr로 메일 발송
+			if (beforeList != null && beforeList.size() > 0) {
+				emailSender.sendMailToDelay(beforeList, Arrays.asList(new String[] { "dtc2@clinomics.co.kr" }));
+			}
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

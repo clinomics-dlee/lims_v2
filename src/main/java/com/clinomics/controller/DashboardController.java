@@ -67,6 +67,12 @@ public class DashboardController {
 		return calendarService.selectReported(params);
 	}
 
+	@GetMapping("/popup/delayed")
+	@ResponseBody
+	public Map<String, Object> delayed(@RequestParam Map<String, String> params) {
+		return calendarService.selectDelayed(params);
+	}
+
 	@GetMapping("/chart/get/statistics")
 	@ResponseBody
 	public Map<String, Object> chart(@RequestParam Map<String, String> params) {

@@ -23,8 +23,8 @@ public enum StatusCode {
 	S600_JDGM_APPROVE("판정완료"),
 	S700_OUTPUT_WAIT("출고대기"),
 	S710_OUTPUT_CMPL("출고완료"),
-	S800_RE_OUTPUT_WAIT("재발행대기"),
-	S810_RE_OUTPUT_CMPL("재발행완료"),
+	S800_RE_OUTPUT_WAIT("수정발급대기"),
+	S810_RE_OUTPUT_CMPL("수정발급완료"),
 	S900_OUTPUT_CMPL("출고완료") /* 마이그레이션 전용 */
 	;
 

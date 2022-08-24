@@ -39,10 +39,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<div id="content" class="content">
 			<!-- begin page header -->
 			<ol class="breadcrumb float-xl-right">
-				<li class="breadcrumb-item active">판정</li>
+				<li class="breadcrumb-item active">실험결과확인</li>
 			</ol>
 			
-			<h1 id="page-header" class="page-header">판정</h1>
+			<h1 id="page-header" class="page-header">실험결과확인</h1>
 			
 			<div class="row">
 				<div class="col-xl-12">
@@ -71,10 +71,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										<option value>전체</option>
 										<option selected value="S460_ANLS_CMPL" th:text="${statusCodes.get('S460_ANLS_CMPL')}"></option>
 										<option value="S600_JDGM_APPROVE" th:text="${statusCodes.get('S600_JDGM_APPROVE')}"></option>
-										<option value="S700_OUTPUT_WAIT" th:text="${statusCodes.get('S700_OUTPUT_WAIT')}"></option>
-										<option value="S710_OUTPUT_CMPL" th:text="${statusCodes.get('S710_OUTPUT_CMPL')}"></option>
-										<option value="S800_RE_OUTPUT_WAIT" th:text="${statusCodes.get('S800_RE_OUTPUT_WAIT')}"></option>
-										<option value="S810_RE_OUTPUT_CMPL" th:text="${statusCodes.get('S810_RE_OUTPUT_CMPL')}"></option>
 									</select>
 								</div>
 								
@@ -99,7 +95,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							</div>
 							<hr/>
 							<div class="form-group row m-b-12">
-								<div sec:authorize="hasAnyRole('ROLE_EXP_20', 'ROLE_EXP_40', 'ROLE_EXP_80')">
+								<div sec:authorize="hasAnyRole('ROLE_EXP_40', 'ROLE_EXP_80')">
 									<button onClick="approve();" class="btn btn-primary f-w-100 m-l-10">승인</button>
 								</div>
 							</div>
@@ -180,7 +176,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		dateFormat = "MM-DD HH:mm";
 		
 		UserTable.draw('_collect_grid', {
-			url : "/jdgm/list",
+			url : "/anls/jdgm/get",
 			type : "GET",
 			data : function() {
 				var param = {
@@ -219,7 +215,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : '검사실ID', 
+				title : '검체 관리번호', 
+				data : 'managementNumber'
+			},
+			{
+				title : '실험 관리번호', 
 				data : 'laboratoryId',
 				render : function(row, data, index) {
 					return '<a href="javascript:sampleReadonlyPopupOnload(\'' + row.id + '\')">' + data + '</string>';
@@ -272,25 +272,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				type : 'date'
 			},
 			{
-				title : '중간관리자', 
-				data : 'jdgmMngApproveDate',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = rhDiv;
-					html += data ? rhDivAprv
-						+ row.jdgmMngApproveMember.name + '</div>'
-						: rhDivNotAprv;
-					html += '</div></div>';
-					return html;
-				}
-			},
-			{
-				title : '승인일시', 
-				data : 'jdgmMngApproveDate',
-				type : 'date'
-			},
-			{
-				title : '검사실책임자', 
+				title : '총괄 책임자', 
 				data : 'jdgmDrctApproveDate',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -333,7 +315,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		CommonMsg.okCancel(function() {
 			
 			$.ajax({
-				url: '/jdgm/approve',
+				url: '/anls/jdgm/approve',
 				type: 'post',
 				data : JSON.stringify(data),
 				dataType : 'json',

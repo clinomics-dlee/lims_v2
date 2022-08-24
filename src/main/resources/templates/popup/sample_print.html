@@ -66,13 +66,11 @@
 					<div>
 						<table id="print_table" style="width: 25%; float: right; margin-bottom: 10px;">
 							<tr>
-								<th>입고담당자</th>
-								<th>중간관리자</th>
-								<th>검사실책임자</th>
+								<th>검사서비스관리 담당자</th>
+								<th>총괄 책임자</th>
 							</tr>
 							<tr>
 								<td id="inputApproveMember"> </td>
-								<td id="inputMngApproveMember"> </td>
 								<td id="inputDrctMember"> </td>
 							</tr>
 						</table>
@@ -84,7 +82,7 @@
 							<td id="createdDate"> </td>
 							<th>서비스 종류</th>
 							<td id="bundle">개인유전자검사</td>
-							<th>입고담당자</th>
+							<th>검사서비스관리 담당자</th>
 							<td id="inputApproveMember2"> </td>
 						</tr>
 					</table>
@@ -92,8 +90,8 @@
 						<thead>
 							<tr>
 								<th>순번</th>
-								<th>검사실 ID</th>
-								<th>바코드</th>
+								<th>검체 관리번호</th>
+								<th>동의서 관리번호</th>
 								<th>검체채취일</th>
 								<th>결과보고일</th>
 								<th>검체종류</th>
@@ -192,7 +190,7 @@
 					let index = Number(r) + 1;
 					html += '<tr>';
 					html += '<td>' + index + '</td>';
-					html += '<td>' + (col.laboratoryId ? col.laboratoryId : "") + '</td>';
+					html += '<td>' + (col.managementNumber ? col.managementNumber : "") + '</td>';
 					html += '<td>' + (col.items.barcode ? col.items.barcode : "") + '</td>';
 					html += '<td>' + (col.collectedDate ? col.collectedDate : "") + '</td>';
 					html += '<td>' + (col.items.tat ? col.items.tat : "") + '</td>';
@@ -202,9 +200,9 @@
 					html += '<td></td>';
 					html += '</tr>';
 					
-					if (r == 1) {
+					if (r == 0) {
 						$('#inputApproveMember').text((col.inputApproveMember ? col.inputApproveMember.name : "-"));
-						$('#inputMngApproveMember').text((col.inputMngApproveMember ? col.inputMngApproveMember.name : "-"));
+						// $('#inputMngApproveMember').text((col.inputMngApproveMember ? col.inputMngApproveMember.name : "-"));
 						$('#inputDrctMember').text((col.inputDrctMember ? col.inputDrctMember.name : "-"));
 
 						// $('#bundle').text(col.bundle.name);

@@ -228,10 +228,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				}
 			},
 			{
-				title : "검사실ID",
-				data : "laboratoryId",
+				title : "검체 관리번호",
+				data : "managementNumber",
 				render : function(row, data, index) {
-					return '<a href="javascript:samplePopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
+					var value = "";
+					if (data) {
+						value = '<a href="javascript:samplePopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
+					}
+					return value;
 				},
 				sorting : true
 			},

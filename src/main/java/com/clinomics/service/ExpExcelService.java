@@ -61,7 +61,7 @@ public class ExpExcelService {
 		// #. excel header
 		XSSFRow row1 = sheet.createRow(0);
 		XSSFCell cell1_1 = row1.createCell(0);
-		cell1_1.setCellValue("검사실 ID");
+		cell1_1.setCellValue("실험 관리번호");
 		cell1_1.setCellStyle(pink);
 		XSSFCell cell1_2 = row1.createCell(1);
 		cell1_2.setCellValue("A 260/280");
@@ -146,7 +146,7 @@ public class ExpExcelService {
 			if (samples.size() < 1) {
 				logger.info(">> not found laboratory Id=" + laboratoryId);
 				rtn.put("result", ResultCode.FAIL_NOT_EXISTS.get());
-				rtn.put("message", "검사실 ID를 찾을 수 없습니다.[" + laboratoryId + "]");
+				rtn.put("message", "실험 관리번호를 찾을 수 없습니다.[" + laboratoryId + "]");
 				return rtn;
 			}
 			

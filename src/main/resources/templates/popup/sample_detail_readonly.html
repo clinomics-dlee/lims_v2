@@ -20,10 +20,24 @@
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 			</div>
 			<div class="modal-body">
-				<div style="">
-					<table id="_readonly_sample_popup_table" class="table table-bordered" style="width: 100%">
-					</table>
-				</div>
+				<table id="_readonly_sample_popup_table" class="table table-bordered" style="width: 100%">
+					<tr>
+						<th>검체 관리번호</th>
+						<td id="managementNumber"></td>
+						<th>실험 관리번호</th>
+						<td id="laboratoryId"></td>
+					</tr>
+					<tr>
+						<th>검체 채취일</th>
+						<td id="collectedDate"></td>
+						<th>검체 수령일</th>
+						<td id="receivedDate"></td>
+					</tr>
+					<tr>
+						<th>Sample type</th>
+						<td id="sampleType"></td>
+					</tr>
+				</table>
 			</div>
 			<div class="modal-footer">
 				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">닫기</a>
@@ -46,42 +60,14 @@
 				xhr.setRequestHeader(header, token);
 			},
 			success: function (data) {
+				var sample = data.sample;
 				
-				var html = "", aSplit = [], aDateInputs = [], parsley = ' data-parsley-required="true"';
-				var notnull = false, readonly = '', code, value = "";
-				if (data.sampleItem) {
-					
-					
-					var sitm = data.sampleItem;
-					
-					for (var r in sitm) {
-						code = sitm[r].nameCode;
-						value = data.sample.items[code];
-						if (!value) value = "";
-						
-						if (r % 2 == 0) html += '<tr>'
-						
-						html += '<th>' + sitm[r].name + '</th>';
-						html += '<td><span>' + value + '</span></td>';
-						
-						if (r % 2 == 1) html += '</tr>';
-					}
-					
-					html += '<th>검체 채취일</th>';
-					html += '<td><span>' + data.collectedDate + '</span></td>';
-					
-					html += '<th>검체 수령일</th>';
-					html += '<td><span>' + data.receivedDate + '</span></td>';
-					
-					html += '<th>Sample type</th>';
-					html += '<td><span>' + data.sampleType + '</span></td>';
-					
-					//html += '<button type="button" class="btn btn-success m-r-5 m-b-5" onclick="save();">Save</button>';
-					
-					$("#_readonly_sample_popup_table").html(html);
-				}
-				
-				
+				$("#managementNumber").html(sample.managementNumber);
+				$("#laboratoryId").html(sample.laboratoryId);
+				$("#collectedDate").html(sample.collectedDate);
+				$("#receivedDate").html(sample.receivedDate);
+				$("#sampleType").html(sample.sampleType);
+
 				
 			},
 			error : function(data) {

@@ -164,7 +164,7 @@ public class InputService {
 		LocalDateTime now = LocalDateTime.now();
 		Bundle bundle;
 		if (existsSample) {
-			if (!sampleRepository.existsById(NumberUtils.toInt(id)) && history) {
+			if (history) {
 				saveSampleHistory(sample);
 			}
 			bundle = sample.getBundle();
@@ -288,18 +288,7 @@ public class InputService {
 				s.setInputDrctApproveDate(now);
 				s.setInputDrctMember(member);
 				s.setModifiedDate(now);
-				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
-					s.setStatusCode(StatusCode.S200_EXP_READY);
-				}
-			});
-
-		} else if (roles.contains(RoleCode.ROLE_INPUT_40.toString())) {
-			
-			samples.stream().forEach(s -> {
-				s.setInputMngApproveDate(now);
-				s.setInputMngApproveMember(member);
-				s.setModifiedDate(now);
-				if (s.getInputApproveDate() != null && s.getInputMngApproveDate() != null && s.getInputDrctApproveDate() != null) {
+				if (s.getInputApproveDate() != null && s.getInputDrctApproveDate() != null) {
 					s.setStatusCode(StatusCode.S200_EXP_READY);
 				}
 			});

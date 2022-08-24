@@ -145,7 +145,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	<input type="hidden" name="finishDate" id="finishDate" value="" />
 	<!-- end page container -->
 	
-	
 	<script th:inline="javascript">
 	/* <![CDATA[ */       
 	var g_statusCodeInfo = /*[[${statusCodes}]]*/ {};
@@ -201,27 +200,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		rhDivNotAprv = '<div class="progress-bar bg-red " style="width: 100%">';
 		dateFormat = "MM-DD HH:mm";
 
-		UserTable.draw('_collect_grid', {
-			url : "/all/list",
-			type : "GET",
-			data : function() {
-				var param = {
-					bundleId : $("#sel_bundle").val() + "",
-					agencies : $("#sel_agency").val() + "",
-					keyword : $("#keyword").val(),
-					statusCode : $("#sel_status").val(),
-					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
-					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
-				};
-
-				return param;
-			},
-			dataType : "json",
-			contentType : "application/json; charset=utf-8",
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			}
-		}, [
+		var columns = [
 			{
 				title : 'No', 
 				type : 'index',
@@ -229,9 +208,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				headClassName : 'width-50',
 				bodyClassName : 'text-center'
 			}, {
-				title : '검사실ID', 
-				data : 'laboratoryId',
+				title : '검체 관리번호', 
+				data : 'managementNumber',
 				sorting : true
+			}, {
+				title : "실험 관리번호",
+				data : "laboratoryId"
 			}, {
 				title : '서비스', 
 				data : 'bundle.name',
@@ -289,7 +271,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				title : '등록자', 
 				data : 'createdMember.name'
 			}, {
-				title : '입고담당자', 
+				title : '입고 검사서비스관리 담당자', 
 				data : 'inputApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -301,27 +283,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					return html;
 				}
 			}, {
-				title : '입고승인일시', 
+				title : '입고 검사서비스관리 승인일시', 
 				data : 'inputApproveDate',
 				type : 'date'
 			}, {
-				title : '중간관리자', 
-				data : 'inputMngApproveMember.name',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = rhDiv;
-					html += data ? rhDivAprv
-						+ data + '</div>'
-						: rhDivNotAprv;
-					html += '</div></div>';
-					return html;
-				}
-			}, {
-				title : '입고 중간관리자 승인일시', 
-				data : 'inputMngApproveDate',
-				type : 'date'
-			}, {
-				title : '입고 검사실책임자', 
+				title : '입고 총괄 책임자', 
 				data : 'inputDrctMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -333,7 +299,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					return html;
 				}
 			}, {
-				title : '입고 검사실책임자 승인일시', 
+				title : '입고 총괄 책임자 승인일시', 
 				data : 'inputDrctApproveDate',
 				type : 'date'
 			}, {
@@ -437,7 +403,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'anlsCmplDate',
 				type : 'date'
 			}, {
-				title : '판정 검사담당자', 
+				title : '실험결과 검사담당자', 
 				data : 'jdgmApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -449,27 +415,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					return html;
 				}
 			}, {
-				title : '판정승인일시', 
+				title : '실험결과 승인일시', 
 				data : 'jdgmApproveDate',
 				type : 'date'
 			}, {
-				title : '판정 중간관리자', 
-				data : 'jdgmMngApproveMember.name',
-				bodyClassName : 'text-center',
-				render : function(row, data, index) {
-					var html = rhDiv;
-					html += data ? rhDivAprv
-						+ data + '</div>'
-						: rhDivNotAprv;
-					html += '</div></div>';
-					return html;
-				}
-			}, {
-				title : '판정 중간관리자 승인일시', 
-				data : 'jdgmMngApproveDate',
-				type : 'date'
-			}, {
-				title : '판정 검사실책임자', 
+				title : '실험결과 총괄 책임자', 
 				data : 'jdgmDrctApproveMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -481,7 +431,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					return html;
 				}
 			}, {
-				title : '판정 검사실책임자 승인일시', 
+				title : '실험결과 총괄 책임자 승인일시', 
 				data : 'jdgmDrctApproveDate',
 				type : 'date'
 			}, {
@@ -505,7 +455,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				data : 'outputCmplDate',
 				type : 'date'
 			}, {
-				title : '재발행 담당자', 
+				title : '수정발급 담당자', 
 				data : 'reOutputWaitMember.name',
 				bodyClassName : 'text-center',
 				render : function(row, data, index) {
@@ -517,15 +467,37 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					return html;
 				}
 			}, {
-				title : '재발행대기일시', 
+				title : '수정발급대기일시', 
 				data : 'reOutputWaitDate',
 				type : 'date'
 			}, {
-				title : '재발행완료일시', 
+				title : '수정발급완료일시', 
 				data : 'reOutputCmplDate',
 				type : 'date'
 			}
-		], null);
+		];
+
+		UserTable.draw('_collect_grid', {
+			url : "/all/list",
+			type : "GET",
+			data : function() {
+				var param = {
+					bundleId : $("#sel_bundle").val() + "",
+					agencies : $("#sel_agency").val() + "",
+					keyword : $("#keyword").val(),
+					statusCode : $("#sel_status").val(),
+					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
+					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
+				};
+
+				return param;
+			},
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			}
+		}, columns, null);
 			
 	});
 	

@@ -46,6 +46,9 @@ public class Bundle implements Serializable {
 	@Column(length = 100)
 	private String sequenceRole;
 
+	@Column(length = 100)
+	private String managementRole;
+
 	private int tatDay;
 
 	private boolean isTatTueThu;
@@ -124,6 +127,14 @@ public class Bundle implements Serializable {
 
 	public void setSequenceRole(String sequenceRole) {
 		this.sequenceRole = sequenceRole;
+	}
+
+	public String getManagementRole() {
+		return managementRole;
+	}
+
+	public void setManagementRole(String managementRole) {
+		this.managementRole = managementRole;
 	}
 
 	public boolean isAutoBarcode() {

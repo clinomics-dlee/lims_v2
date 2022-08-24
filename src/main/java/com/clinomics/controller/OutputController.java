@@ -1,6 +1,5 @@
 package com.clinomics.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -14,12 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.clinomics.service.setting.BundleService;
+import com.clinomics.service.InputExcelService;
 import com.clinomics.service.OutputService;
 import com.clinomics.service.SampleDbService;
-import com.clinomics.enums.StatusCode;
-import com.clinomics.service.InputExcelService;
 import com.clinomics.service.SampleItemService;
+import com.clinomics.service.setting.BundleService;
 
 @Controller
 public class OutputController {
@@ -47,25 +45,6 @@ public class OutputController {
 		}
 
 		return sampleDbService.find(params, 0);
-	}
-	
-	@GetMapping("/jdgm/list")
-	@ResponseBody
-	public Map<String, Object> rvc(@RequestParam Map<String, String> params) {
-		
-		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
-			return sampleDbService.findByModifiedDate(params, params.get("statusCode") + "");
-		}
-		return sampleDbService.findByModifiedDate(params, 600);
-		
-	}
-	
-	@PostMapping("/jdgm/approve")
-	@ResponseBody
-	public Map<String, String> approve(@RequestBody List<Integer> ids) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		return outputService.jdgmApprove(ids, userDetails.getUsername());
 	}
 	
 	@GetMapping("/output/list")

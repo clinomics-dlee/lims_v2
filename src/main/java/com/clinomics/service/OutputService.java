@@ -107,66 +107,6 @@ public class OutputService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
     
-    @Transactional
-	public Map<String, String> jdgmApprove(List<Integer> ids, String memberId) {
-		Map<String, String> rtn = Maps.newHashMap();
-		List<Sample> samples = sampleRepository.findByIdInAndStatusCodeIn(ids, Arrays.asList(new StatusCode[] { StatusCode.S460_ANLS_CMPL }));
-		
-		// sample.set
-		Optional<Member> oMember = memberRepository.findById(memberId);
-		Member member = oMember.get();
-		LocalDateTime now = LocalDateTime.now();
-		String roles = "";
-		for (Role r : member.getRole()) {
-			roles += "," + r.getCode();
-		}
-		roles = roles.substring(1);
-
-		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
-		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
-
-		if (roles.contains(RoleCode.ROLE_EXP_80.toString())) {
-			
-			samples.stream().forEach(s -> {
-				s.setJdgmDrctApproveDate(now);
-				s.setModifiedDate(now);
-				s.setJdgmDrctApproveMember(member);
-				if (s.getJdgmApproveDate() != null && s.getJdgmMngApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
-					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
-				}
-			});
-
-		} else if (roles.contains(RoleCode.ROLE_EXP_40.toString())) {
-			
-			samples.stream().forEach(s -> {
-				s.setJdgmMngApproveDate(now);
-				s.setModifiedDate(now);
-				s.setJdgmMngApproveMember(member);
-				if (s.getJdgmApproveDate() != null && s.getJdgmMngApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
-					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
-				}
-			});
-
-		} else if (roles.contains(RoleCode.ROLE_EXP_20.toString())) {
-			
-			samples.stream().forEach(s -> {
-				s.setJdgmApproveDate(now);
-				s.setModifiedDate(now);
-				s.setJdgmApproveMember(member);
-				if (s.getJdgmApproveDate() != null && s.getJdgmMngApproveDate() != null && s.getJdgmDrctApproveDate() != null) {
-					s.setStatusCode(StatusCode.S600_JDGM_APPROVE);
-				}
-			});
-		} else {
-			rtn.put("result", ResultCode.NO_PERMISSION.get());
-			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
-			return rtn;
-		}
-		sampleRepository.saveAll(samples);
-		
-		return rtn;
-	}
-
 	@Transactional
 	@CacheEvict(value = "apiCache", allEntries = true)
 	public Map<String, String> outputApprove(List<Integer> ids, String memberId) {
@@ -244,7 +184,9 @@ public class OutputService {
 			rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
 			rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
 
-			if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
+			if (roles.contains(RoleCode.ROLE_INPUT_20.toString())
+				|| roles.contains(RoleCode.ROLE_OUTPUT_20.toString())
+				|| roles.contains(RoleCode.ROLE_EXP_80.toString())) {
 				
 				StatusCode sc = sample.getStatusCode();
 				if (sc.equals(StatusCode.S710_OUTPUT_CMPL) || sc.equals(StatusCode.S810_RE_OUTPUT_CMPL)) {

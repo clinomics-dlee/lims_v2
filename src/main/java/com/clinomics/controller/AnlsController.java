@@ -101,6 +101,23 @@ public class AnlsController {
 		return anlsService.completeAnls(sampleIds, userDetails.getUsername());
 	}
 
+	@GetMapping("/jdgm/get")
+	public Map<String, Object> getJdgm(@RequestParam Map<String, String> params) {
+		
+		if (params.containsKey("statusCode") && !params.get("statusCode").toString().isEmpty()) {
+			return sampleDbService.findByModifiedDate(params, params.get("statusCode") + "");
+		}
+		return sampleDbService.findByModifiedDate(params, 600);
+		
+	}
+	
+	@PostMapping("/jdgm/approve")
+	public Map<String, String> approve(@RequestBody List<Integer> ids) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		return anlsService.jdgmApprove(ids, userDetails.getUsername());
+	}
+
 	@GetMapping("/db/get")
 	public Map<String, Object> getSampleDb(@RequestParam Map<String, String> params) {
 		return sampleDbService.find(params, 440);

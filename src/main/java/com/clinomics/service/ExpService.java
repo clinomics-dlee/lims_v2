@@ -80,7 +80,7 @@ public class ExpService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))
 					.and(SampleSpecification.statusEqual(StatusCode.S200_EXP_READY))
 					.and(SampleSpecification.orderBy(params));
 					
@@ -162,7 +162,7 @@ public class ExpService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))
 					.and(SampleSpecification.statusEqual(StatusCode.S210_EXP_STEP1))
 					.and(SampleSpecification.orderBy(params));
 		
@@ -311,7 +311,7 @@ public class ExpService {
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleId(params))
-					.and(SampleSpecification.keywordLike(params))
+					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))
 					.and(SampleSpecification.statusEqual(StatusCode.S220_EXP_STEP2))
 					.and(SampleSpecification.orderBy(params));
 		

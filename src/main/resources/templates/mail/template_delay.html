@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Demystifying Email Design</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<style>
+		
+		table.normal {
+			border-collapse: collapse;
+			text-align: left;
+			line-height: 1.5;
+
+		}
+		table.normal thead th {
+			padding: 10px;
+			font-weight: bold;
+			vertical-align: top;
+			color: #369;
+			border-bottom: 3px solid #036;
+		}
+		table.normal tbody th {
+			width: 150px;
+			padding: 10px;
+			font-weight: bold;
+			vertical-align: top;
+			border-bottom: 1px solid #ccc;
+			background: #f3f6f7;
+		}
+		table.normal td {
+			width: 350px;
+			padding: 10px;
+			vertical-align: top;
+			border-bottom: 1px solid #ccc;
+		}
+	</style>
+</head>
+<body style="margin: 0; padding: 0;">
+	<h2>
+		출고 지연 항목
+	</h2>
+    <table class="normal"> 
+		<colgroup>
+			<col width="25%"/>
+			<col width="25%"/>
+			<col width="25%"/>
+			<col width="25%"/>
+		</colgroup>
+		<thead>
+			<tr>
+				<th scope="cols">서비스</th>
+				<th scope="cols">검체 관리번호</th>
+				<th scope="cols">상태</th>
+				<th scope="cols">TAT</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="sample : ${samples}">
+				<th scope="row" th:text="${sample.bundle.getName()}"> </th>
+				<td th:text="${sample.managementNumber}"> </td>
+				<td th:text="${sample.statusCode.getValue()}"> </td>
+				<td th:text="${sample.items.tat}"> </td>
+			</tr>
+		</tbody>
+    </table>
+</body>
+</html>

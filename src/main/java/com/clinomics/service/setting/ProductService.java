@@ -190,6 +190,9 @@ public class ProductService {
 			bundle.setType(datas.get("type"));
 			product.setType(datas.get("type"));
 		}
+		if (datas.containsKey("managementRole")) {
+			bundle.setManagementRole(datas.get("managementRole"));
+		}
 
 		if (datas.containsKey("hospital")) {
 			bundle.setHospital(BooleanUtils.toBooleanObject(datas.get("hospital")));

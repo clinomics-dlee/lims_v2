@@ -55,10 +55,20 @@ public class VariousFieldsService {
         sample.setSampleType(items.getOrDefault("sampletype", "").toString());
         items.remove("sampletype");
         
-        if (!existsSample && bundle.isAutoSequence()) {
-            
-            String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
-            if (!seq.isEmpty()) sample.setLaboratoryId(seq);
+        if (!existsSample) {
+            String managementNumber = customIndexPublisher.getNextManagementByBundle(bundle, receivedDate);
+            if (!managementNumber.isEmpty()) sample.setManagementNumber(managementNumber);
+
+            if (bundle.isAutoSequence()) {
+                String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
+                if (!seq.isEmpty()) {
+                    sample.setLaboratoryId(seq);
+                    // #. 병원용 검체에 경우는 검체 관리번호에 실험 관리번호와 동일한 값으로 설정한다.
+                    if (bundle.isHospital()) {
+                        sample.setManagementNumber(seq);
+                    }
+                }
+            }
         } else if (items.containsKey("laboratory")) {
             sample.setLaboratoryId(items.get("laboratory").toString());
         }
@@ -135,27 +145,45 @@ public class VariousFieldsService {
         sample.setSampleType(items.getOrDefault("sampletype", "").toString());
         items.remove("sampletype");
         
-        if (!existsSample && bundle.isAutoSequence()) {
-        	
-        	String lastLaboratoryId = sampleRepository.findMaxTestLaboratoryId(bundle.getId());
-        	String seq = "";
-        	
-        	String[] roles = bundle.getSequenceRole().split("-");
-        	String seqRoleHead = "";
-        	if (roles.length > 0) {
-        		seqRoleHead = roles[0];
-        	}
-        	
-        	if( lastLaboratoryId == null) {
-        		
-        		seq = seqRoleHead + "-TEST-0001";
-        		
-        	}else {
-        		int newIndexNumber = NumberUtils.toInt(lastLaboratoryId) + 1;
-				seq = seqRoleHead + "-TEST" + String.format("-%04d", newIndexNumber);
-        	}
-           // String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
-            if (!seq.isEmpty()) sample.setLaboratoryId(seq);
+        if (!existsSample) {
+            String lastManagementNumber = sampleRepository.findMaxTestManagementNumber(bundle.getId());
+            String[] seqRoles = bundle.getSequenceRole().split("-");
+            String seqRole = "";
+            String newMn = "";
+            if (seqRoles.length > 0) {
+                seqRole = seqRoles[0];
+            }
+
+            if (lastManagementNumber == null) {
+                newMn = seqRole + "-TEST-0000001";
+            } else {
+                int newIndexNumber = NumberUtils.toInt(lastManagementNumber) + 1;
+                newMn = seqRole + "-TEST" + String.format("-%07d", newIndexNumber);
+            }
+            if (!newMn.isEmpty()) sample.setManagementNumber(newMn);
+
+
+            if (bundle.isAutoSequence()) {
+                String lastLaboratoryId = sampleRepository.findMaxTestLaboratoryId(bundle.getId());
+                String seq = "";
+                
+                String[] roles = bundle.getSequenceRole().split("-");
+                String seqRoleHead = "";
+                if (roles.length > 0) {
+                    seqRoleHead = roles[0];
+                }
+                
+                if( lastLaboratoryId == null) {
+                    
+                    seq = seqRoleHead + "-TEST-0001";
+                    
+                }else {
+                    int newIndexNumber = NumberUtils.toInt(lastLaboratoryId) + 1;
+                    seq = seqRoleHead + "-TEST" + String.format("-%04d", newIndexNumber);
+                }
+            // String seq = customIndexPublisher.getNextSequenceByBundle(bundle, receivedDate);
+                if (!seq.isEmpty()) sample.setLaboratoryId(seq);
+            }
         } else if (items.containsKey("laboratory")) {
             sample.setLaboratoryId(items.get("laboratory").toString());
         }

@@ -1,37 +1,33 @@
 <style>
-@media screen and (min-width: 768px) {
-	.modal-dialog {
-	  	max-width: 1024px; /* New width for default modal */
-	  	max-height: 600px;
+	@media screen and (min-width: 768px) {
+		.modal-dialog {
+			  max-width: 1024px; /* New width for default modal */
+			  max-height: 600px;
+		}
 	}
-}
-
-#_com_all_popup_table th {
-	white-space: nowrap;
-    word-break: nowrap;
-}
-
-#_com_all_popup_table td {
-	white-space: nowrap;
-	word-break: nowrap;
-}
-</style>
-<div class="modal fade" id="modal-after">
+	
+	#_com_all_popup_table th {
+		white-space: nowrap;
+		word-break: nowrap;
+	}
+	
+	#_com_all_popup_table td {
+		white-space: nowrap;
+		word-break: nowrap;
+	}
+	</style>
+<div class="modal fade" id="modal-sample-delayed">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">검체 현황</h4>
+				<h4 class="modal-title">지연 검체 현황</h4>
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 			</div>
 			<div class="modal-body">
-				<div id="_com_after_popup">
-				</div>
-				
+				<div id="_sample_delayed_popup"></div>
 			</div>
 			<div class="modal-footer">
-				<a href="javascript:;" id="sample_print" class="btn btn-white fade m-r-5" sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_OUTPUT_20', 'ROLE_EXP_80', 'ROLE_IT_99')" data-dismiss="modal">검체 기록지</a>
 				<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
-				<!-- <a href="javascript:popupSave();" class="btn btn-success">Save</a> -->
 			</div>
 		</div>
 	</div>
@@ -41,31 +37,17 @@
 	
 <script th:inline="javascript">
 /* <![CDATA[ */       
-//ajax Data List
 
-function afterPopupOnload(type, bundleId, startDate, endDate) {
-	$("#modal-after").modal();
+function delayedSamplePopupOnload(bundleId, startDate, endDate) {
+	$("#modal-sample-delayed").modal();
 	
-	UserTable.init('_com_after_popup', true, [10, 50, 100, 200, 500, 1000, 2000] , [10, 50, 100, 200, 500, 1000, 2000], true);
-	afterAfterGetItem(type, bundleId, startDate, endDate);
+	UserTable.init('_sample_delayed_popup', true, [10, 50, 100, 200, 500, 1000, 2000] , [10, 50, 100, 200, 500, 1000, 2000], true);
+			
+	delayedSampleGetItem(bundleId, startDate, endDate);
+	
 }
 
-function afterAfterGetItem(type, bundleId, startDate, endDate) {
-	var url = "/popup/registered";
-	if (type == 1) {
-		url = "/popup/analysis";
-	} else if (type == 2) {
-		url = "/popup/completed";
-	} else if (type == 3) {
-		url = "/popup/reported";
-	} else {
-		$('#sample_print').addClass('show');
-		$('#sample_print').click(function (e) {
-			var bundleId = $("#sel_bundle").val();
-			printPopupOnload(bundleId, startDate);
-		});
-	}
-
+function delayedSampleGetItem(bundleId, startDate, endDate) {
 	var columns = [{
 			title : 'No', 
 			data : 'id',
@@ -121,8 +103,8 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 		if (laboratoryIdIndex > -1) columns.splice(laboratoryIdIndex, 1);
 	}
 
-	UserTable.draw('_com_after_popup', {
-		url : url,
+	UserTable.draw('_sample_delayed_popup', {
+		url : "/popup/delayed",
 		type : "GET",
 		data : function() {
 			return {
@@ -137,7 +119,6 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 			xhr.setRequestHeader(header, token);
 		}
 	}, columns);
-	
 }	
 
 
