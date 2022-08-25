@@ -16,7 +16,9 @@
 					<div class="form-group row m-b-12">
 						<label class="col-form-label col-md-4">Mapping File *</label>
 						<div class="col-xs-push-0">
-							<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="excelForm();">엑셀 양식 다운로드</button>
+							<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="excelForm('mini96');">mini96 양식</button>
+							<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="excelForm('96');">96 양식</button>
+							<button type="button" class="btn btn-green m-r-5 m-b-5" onclick="excelForm('24');">24 양식</button>
 						</div>
 						<div class="col-xs-push-0">
 							<input type="file" id="file" name="file" class="d-none">
@@ -198,8 +200,8 @@ function saveMapping() {
 	});
 }
 
-function excelForm() {
-	location.href = '/exp/step2/excel/form';
+function excelForm(type) {
+	location.href = '/exp/step2/excel/form?type=' + type;
 	// var excelDatas = [];
 	// // #. 기본 데이터
 	// var wellPositionPrefixs = ["A", "C", "E", "G", "I", "K", "M", "O"];

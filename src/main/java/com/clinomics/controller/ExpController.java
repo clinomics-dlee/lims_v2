@@ -104,7 +104,8 @@ public class ExpController {
 	@GetMapping("/step2/excel/form")
 	public void exportStep2ExcelForm(@RequestParam Map<String, String> params, HttpServletResponse response) {
 		XSSFWorkbook xlsx = expExcelService.exportStep2ExcelForm(params);
-		requestExcel(xlsx, "Mapping_Template", response);
+		String excelType = params.get("type");
+		requestExcel(xlsx, "Mapping_Template_" + excelType, response);
 	}
 
 	@PostMapping("/step2/mapping/saveall")

@@ -204,13 +204,45 @@ public class ExpExcelService {
 		cell1_2.setCellValue("Genotyping ID");
 		cell1_2.setCellStyle(orange);
 
-		// #. well position 기본값 셋팅
-		List<String> prefixChars = Arrays.asList(new String[] {
-			"A", "C", "E", "G", "I", "K", "M", "O"
-		});
-		
+		String excelType = params.get("type");
+
+		List<String> prefixChars = new ArrayList<String>();
+		int startNumber = 1;
+		int endNumber = 1;
+		int addNumber = 1;
+
+		if ("96".equals(excelType)) {
+			// #. APMRA 96 양식
+			prefixChars = Arrays.asList(new String[] {
+				"A", "B", "C", "D", "E", "F", "G", "H"
+			});
+
+			startNumber = 1;
+			endNumber = 13;
+			addNumber = 1;
+		} else if ("24".equals(excelType)) {
+			// #. APMRA 24 양식
+			prefixChars = Arrays.asList(new String[] {
+				"A", "B", "C", "D", "E", "F", "G", "H"
+			});
+
+			startNumber = 5;
+			endNumber = 10;
+			addNumber = 2;
+		} else {
+			// #. Custom 96 양식
+			// #. well position 기본값 셋팅
+			prefixChars = Arrays.asList(new String[] {
+				"A", "C", "E", "G", "I", "K", "M", "O"
+			});
+
+			startNumber = 1;
+			endNumber = 24;
+			addNumber = 2;
+		}
+
 		int rowCount = 1;
-		for (int i = 1; i < 24; i += 2) {
+		for (int i = startNumber; i < endNumber; i += addNumber) {
 			for (String prefixChar : prefixChars) {
 				String wp = prefixChar + String.format("%02d", i);
 				XSSFRow row = sheet.createRow(rowCount);
