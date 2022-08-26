@@ -52,6 +52,12 @@ public class Scheduler {
 	@Value("${genoDataApi.token}")
 	private String genoDataApiToken;
 
+	@Value("${lims.managerEmail}")
+	private String managerEmail;
+
+	@Value("${lims.serviceManagerEmail}")
+	private String serviceManagerEmail;
+
 	@Autowired
 	SampleRepository sampleRepository;
 	
@@ -395,14 +401,14 @@ public class Scheduler {
             List<Sample> beforeList = sampleRepository.findAll(beforeWhere);
 
 
-			// #. 당일인 목록은 dtc1@clinomics.co.kr, dtc2@clinomics.co.kr
+			// #. 당일인 목록은 총괄책임자 email, 입출고 서비스 email 로 발송
 			if (nowList != null && nowList.size() > 0) {
-				emailSender.sendMailToDelay(nowList, Arrays.asList(new String[] { "dtc1@clinomics.co.kr", "dtc2@clinomics.co.kr" }));
+				emailSender.sendMailToDelay(nowList, Arrays.asList(new String[] { managerEmail, serviceManagerEmail }));
 			}
 
-			// #. 하루 남은 목록은 dtc2@clinomics.co.kr로 메일 발송
+			// #. 하루 남은 목록은 입출고 서비스 email로 메일 발송
 			if (beforeList != null && beforeList.size() > 0) {
-				emailSender.sendMailToDelay(beforeList, Arrays.asList(new String[] { "dtc2@clinomics.co.kr" }));
+				emailSender.sendMailToDelay(beforeList, Arrays.asList(new String[] { serviceManagerEmail }));
 			}
 			
 		} catch(Exception e) {

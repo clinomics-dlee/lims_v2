@@ -63,6 +63,8 @@ lims:
   workspacePath : /BiO/Serve/lims_v2/workspace
   apmraChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis_GSK.py
   customChipPath : /BiO/Research/Cel2GSSInput/Script/runAnalysis.py
+  managerEmail: dtc1@clinomics.co.kr
+  serviceManagerEmail: dtc2@clinomics.co.kr
 externalApi: 
   url: https://api.genosolutiony.com/etc/
   tokenName: apiKey
