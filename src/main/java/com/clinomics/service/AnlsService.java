@@ -469,15 +469,21 @@ public class AnlsService {
 		
 		Map<String, Object> resultData = sample.getData();
 
+		Map<String, Object> markerMap = sample.getBundle().getMarkers();
+		
 		TreeMap<String, Object> tm = new TreeMap<String, Object>(resultData);
 		Iterator<String> iteratorKey = tm.keySet().iterator();   //키값 오름차순 정렬(기본)
 		List<Map<String, String>> datas = new ArrayList<Map<String, String>>();
 		while(iteratorKey.hasNext()) {
 			String key = iteratorKey.next();
 			Map<String, String> map = Maps.newHashMap();
-			map.put("marker", key);
-			map.put("value", (String)resultData.get(key));
-			datas.add(map);
+			
+			// #. marker 목록에 있는 항목만 표시
+			if (markerMap.containsKey(key)) {
+				map.put("marker", key);
+				map.put("value", (String)resultData.get(key));
+				datas.add(map);
+			}
 		}
 
 		Map<String, Object> rtn = Maps.newHashMap();

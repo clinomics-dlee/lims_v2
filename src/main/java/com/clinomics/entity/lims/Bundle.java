@@ -1,11 +1,14 @@
 package com.clinomics.entity.lims;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+
+import com.clinomics.config.StringMapConverter;
 
 @Entity
 @Table(name="bundle")
@@ -66,6 +71,10 @@ public class Bundle implements Serializable {
 	private boolean isGenoData;
 	
 	private int sort;
+
+	@Column(columnDefinition = "json")
+	@Convert(converter = StringMapConverter.class)
+	private Map<String, Object> markers = new HashMap<>();
 
 	@ManyToMany(cascade =  CascadeType.ALL)
 	@JoinTable(name="bundle_product",
@@ -215,6 +224,14 @@ public class Bundle implements Serializable {
 
 	public void setSort(int sort) {
 		this.sort = sort;
+	}
+
+	public Map<String, Object> getMarkers() {
+		return markers;
+	}
+
+	public void setMarkers(Map<String, Object> markers) {
+		this.markers = markers;
 	}
 
 }

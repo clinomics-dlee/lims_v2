@@ -24,6 +24,7 @@ var UserTable = function() {
 			}
 			
 			h += '</div>';
+			h += '<div class="dataTables_length" style="color: green; font-weight: bold; margin-top: 8px;" id="' + uid + '_checkedCountDiv"></div>';
 			h += '<div class="dt-buttons btn-group pull-right">';
 			if (isDownloadExcel) {
 				h += '<button id="' + uid + '_sort_btn" class="btn btn-default">정렬 초기화</button>';
@@ -142,6 +143,8 @@ var UserTable = function() {
 				contentType : ajax.contentType,
 				beforeSend : ajax.beforeSend,
 				success: function (rtn) {
+
+					$("#" + uid + "_checkedCountDiv").text("");
 					excelDatas[uid] = [];
 					items[uid] = rtn.data;
 					var rows = rtn.data;
@@ -302,9 +305,7 @@ var UserTable = function() {
 								if (aColumns[r].excelDataColumn) {
 									var excelDataValue = eval('rows[s].' + aColumns[r].excelDataColumn);
 									if (excelDataValue instanceof Object) {
-										for (var dataKey in excelDataValue) {
-											excelData[dataKey] = excelDataValue[dataKey];
-										}
+										excelData = aColumns[r].excelDataFunc(rows[Number(s)], excelDataValue, excelData);
 									} else {
 										excelData[aColumns[r].excelDataColumn] = excelDataValue;
 									}
@@ -420,6 +421,9 @@ var UserTable = function() {
 							var checkedValue = false;
 							if ($(this).is(":checked")) {
 								checkedValue = true;
+								$("#" + uid + "_checkedCountDiv").text("체크된 개수 : " + rowCount + " 건");
+							} else {
+								$("#" + uid + "_checkedCountDiv").text("");
 							}
 							
 							for (var i = 0; i < rowCount; i++) {
@@ -471,13 +475,21 @@ var UserTable = function() {
 						var rowCount = UserTable.getRowCount(uid);
 						if (rowCount > 0) {
 							var allCheckedValue = true;
+							var checkedCount = 0;
 							for (var i = 0; i < rowCount; i++) {
 								if (!$("#" + uid + "_checkbox_" + i).is(":checked")) {
 									allCheckedValue = false;
-									break;
+								} else {
+									checkedCount++;
 								}
 							}
 							$("#" + uid + "_checkbox_all").prop("checked", allCheckedValue);
+
+							if (checkedCount > 0) {
+								$("#" + uid + "_checkedCountDiv").text("체크된 개수 : " + checkedCount + " 건");
+							} else {
+								$("#" + uid + "_checkedCountDiv").text("");
+							}
 						}
 					});
 					

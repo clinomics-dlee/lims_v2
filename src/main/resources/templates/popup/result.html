@@ -97,7 +97,6 @@ function resultPopupOnload(sampleId, genotypingId) {
 		},
 		success: function (data) {
 			var html = "";
-			console.log(data.datas);
 			for (var i = 0; i < data.datas.length; i++) {
 				var rd = data.datas[i];
 				if (i % 5 == 0) html += "<tr>";
