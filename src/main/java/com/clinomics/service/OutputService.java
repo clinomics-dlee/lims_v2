@@ -127,8 +127,10 @@ public class OutputService {
 
 		rtn.put("result", ResultCode.SUCCESS_APPROVED.get());
 		rtn.put("message", ResultCode.SUCCESS_APPROVED.getMsg());
-
-		if (roles.contains(RoleCode.ROLE_OUTPUT_20.toString())) {
+		
+		if (roles.contains(RoleCode.ROLE_INPUT_20.toString())
+				|| roles.contains(RoleCode.ROLE_OUTPUT_20.toString())
+				|| roles.contains(RoleCode.ROLE_EXP_80.toString())) {
 			
 			samples.stream().forEach(s -> {
 				StatusCode sc = s.getStatusCode();
