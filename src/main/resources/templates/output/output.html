@@ -242,6 +242,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			{
 				title : '서비스', 
 				data : 'bundle.name',
+				render : function(row, data, index) {
+					var value = "";
+					if (data) {
+						value = '<a href="javascript:samplePopupOnload(\'' + row.id + '\', true)">' + data + '</string>';
+					}
+					return value;
+				},
 				sorting : true
 			},
 			{
