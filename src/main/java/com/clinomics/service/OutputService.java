@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -263,7 +264,26 @@ public class OutputService {
 					}
 
 					data.putAll(items);
-					data.put("genedata", sample.getData());
+
+					Map<String, Object> dataMap = Maps.newHashMap();
+					dataMap.putAll(sample.getData());
+
+					// #. bundle에 type이 GS, GP, GPH 중 하나라도 포함되어 있는 경우 15_VF_rs495366, 15_AJ_rs11226373 값이 없으면 추가
+					if ("GS".equals(sample.getBundle().getType())
+					 	|| "GP".equals(sample.getBundle().getType())
+					 	|| "GPH".equals(sample.getBundle().getType())) {
+
+						// #. 15_VF_rs495366, 15_AJ_rs11226373 값이 비어있는 경우 고정값 A/A를 추가
+						if (StringUtils.isBlank((String)dataMap.get("15_VF_rs495366"))) {
+							dataMap.put("15_VF_rs495366", "A/A");
+						}
+
+						if (StringUtils.isBlank((String)dataMap.get("15_AJ_rs11226373"))) {
+							dataMap.put("15_AJ_rs11226373", "A/A");
+						}
+					}
+
+					data.put("genedata", dataMap);
 					data.put("experimentid", sample.getLaboratoryId());
 					data.put("collecteddate", (sample.getCollectedDate() != null ? sample.getCollectedDate().format(formatter) : ""));
 					data.put("receiveddate", (sample.getReceivedDate() != null ? sample.getReceivedDate().format(formatter) : ""));
