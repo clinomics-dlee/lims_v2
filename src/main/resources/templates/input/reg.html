@@ -368,7 +368,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	}
 	
 	function createRow(excelData) {
-		console.log(excelData);
 		if ($("#sel_bundle").parsley().validate() != true) return;
 		var bundleId = $("#sel_bundle").val();
 		//if (bundleId == "") return;

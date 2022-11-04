@@ -221,6 +221,7 @@ public class SampleDbService {
 		
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.betweenModifiedDate(params))
+					.and(SampleSpecification.betweenOutputScheduledDate(params))
 					.and(SampleSpecification.bundleId(params))
 					.and(SampleSpecification.hNameIn(params))
 					.and(SampleSpecification.keywordLike(params).or(SampleSpecification.laboratoryIdLike(params)))

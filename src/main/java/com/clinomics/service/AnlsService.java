@@ -423,6 +423,7 @@ public class AnlsService {
 			nSample.setCollectedDate(sample.getCollectedDate());
 			nSample.setReceivedDate(sample.getReceivedDate());
 			nSample.setSampleType(sample.getSampleType());
+			nSample.setAgency(sample.getAgency());
 
 			savedSamples.add(nSample);
 		}

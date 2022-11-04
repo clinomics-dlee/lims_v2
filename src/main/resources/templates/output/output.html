@@ -70,6 +70,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 										<option th:each="agc : ${agencies}" th:value="${agc}" th:text="${agc}"></option>
 									</select>
 								</div>
+								<label class="col-form-label m-l-5">LIMS 결과출고예정일</label>
+								<div class="input-group" id="outputScheduledDate"  style="width: auto; float: right; padding-left: 10px; min-width: 220px" >
+								    <input type="text" name="outputScheduledDate" class="form-control" value="" placeholder="클릭하여 선택" readonly="readonly"/>
+								    <span class="input-group-append">
+								    	<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+									</span>
+								</div>
 							</div>
 							<div class="form-group row m-b-12">
 
@@ -133,6 +140,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	
 	<input type="hidden" name="startDate" id="startDate" value="" />
 	<input type="hidden" name="finishDate" id="finishDate" value="" />
+
+	<input type="hidden" name="outputStartDate" id="outputStartDate" value="" />
+	<input type="hidden" name="outputFinishDate" id="outputFinishDate" value="" />
 	<!-- end page container -->
 	
 	
@@ -166,6 +176,24 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			maxHeight: 450
 		});
 
+		$('#outputScheduledDate').daterangepicker({
+			opens: 'right',
+			format : 'YYYY/MM/DD',
+			separator: ' to ',
+			startDate: startDate,
+			endDate: endDate,
+			locale: { cancelLabel: 'Clear' }
+		}, function (start, end) {
+			
+			setDaterangepicker("outputScheduledDate", "outputStartDate", "outputFinishDate", start, end);
+		});
+
+		$('#outputScheduledDate').on('cancel.daterangepicker', function(ev, picker) {
+			$('#outputScheduledDate input').val('');
+			$('#outputStartDate').val("");
+			$('#outputFinishDate').val("");
+		});
+
 		$('#default-daterange').daterangepicker({
 			opens: 'right',
 			format : 'YYYY/MM/DD',
@@ -175,9 +203,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			locale: { cancelLabel: 'Clear' }
 		}, function (start, end) {
 			
-			setDaterangepicker(start, end);
+			setDaterangepicker("default-daterange", "startDate", "finishDate", start, end);
 		});
-		setDaterangepicker(startDate, endDate);
+		setDaterangepicker("default-daterange", "startDate", "finishDate", startDate, endDate);
 
 		$('#default-daterange').on('cancel.daterangepicker', function(ev, picker) {
 			$('#default-daterange input').val('');
@@ -195,7 +223,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 					statusCode : $("#sel_status").val(),
 					keyword : $("#keyword").val(),
 					sDate : $('#startDate').val() == "" || $('#startDate').val() == null ? "" : $('#startDate').val(),
-					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val()
+					fDate : $('#finishDate').val() == "" || $('#finishDate').val() == null ? "" : $('#finishDate').val(),
+					oStartDate : $('#outputStartDate').val() == "" || $('#outputStartDate').val() == null ? "" : $('#outputStartDate').val(),
+					oFinishDate : $('#outputFinishDate').val() == "" || $('#outputFinishDate').val() == null ? "" : $('#outputFinishDate').val()
 				};
 				return param;
 			},
@@ -263,6 +293,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			{
 				serverHeader : true
 			}, {
+				title : 'LIMS 결과출고 예정일', 
+				data : 'outputScheduledDate',
+				type : 'date',
+				sorting : true
+			}, {
 				title : '검체 출고일자', 
 				data : 'outputCmplDate',
 				type : 'date'
@@ -294,13 +329,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			
 	});
 	
-	function setDaterangepicker(start, end) {
+	function setDaterangepicker(pickerId, startDateId, finishDateId, start, end) {
 		
-		$('#default-daterange input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
-		$('#startDate').val(start.format('YYYY-MM-DD'));
-		$('#finishDate').val(end.format('YYYY-MM-DD'));
+		$('#' + pickerId + ' input').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+		$('#' + startDateId).val(start.format('YYYY-MM-DD'));
+		$('#' + finishDateId).val(end.format('YYYY-MM-DD'));
 	}
-	
+
 	function approve() {
 		var checkedRows = UserTable.getCheckedRows('_collect_grid');
 		var data = [];

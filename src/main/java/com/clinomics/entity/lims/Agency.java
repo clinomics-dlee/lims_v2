@@ -28,4 +28,6 @@ public class Agency {
     private String etc;
 
     private int sort;
+
+    private int tatDay;
 }

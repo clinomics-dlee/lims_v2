@@ -1,5 +1,7 @@
 package com.clinomics.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -7,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 import com.clinomics.entity.lims.Agency;
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Document;
+import com.clinomics.entity.lims.Holiday;
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Role;
 import com.clinomics.entity.lims.Sample;
@@ -35,6 +39,7 @@ import com.clinomics.enums.StatusCode;
 import com.clinomics.repository.lims.AgencyRepository;
 import com.clinomics.repository.lims.BundleRepository;
 import com.clinomics.repository.lims.DocumentRepository;
+import com.clinomics.repository.lims.HolidayRepository;
 import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.ProductRepository;
 import com.clinomics.repository.lims.SampleHistoryRepository;
@@ -77,6 +82,9 @@ public class InputService {
 	
 	@Autowired
 	SampleItemService sampleItemService;
+
+	@Autowired
+    HolidayRepository holidayRepository;
 
 	@Autowired
 	CustomIndexPublisher customIndexPublisher;
@@ -197,12 +205,48 @@ public class InputService {
 				Agency ag = agencyRepository.findByName(hName).orElseGet(() -> {
 					Agency newag = new Agency();
 					newag.setName(hName);
+					// #. tatDay 기본값 6
+					newag.setTatDay(6);
 					agencyRepository.save(newag);
 					agencyRepository.flush();
 					return newag;
 				});
 				
 				sample.setAgency(ag);
+			}
+
+			// #. 병원용 검체에 경우 동일 검체 중복 체크
+			if (bundle.isHospital()) {
+				// #. 동일한 병원명, 차트번호, 생년, 성별인 경우 duplication 값 'O'
+				Map<String, String> params = Maps.newHashMap();
+				params.put("h_name", (String)items.get("h_name"));
+				params.put("chart_number", (String)items.get("chart_number"));
+				params.put("birthyear", (String)items.get("birthyear"));
+				params.put("sex", (String)items.get("sex"));
+				params.put("order", ",id:desc");
+
+				Specification<Sample> where = Specification
+					.where(SampleSpecification.hospitalDuplication(params))
+					.and(SampleSpecification.statusCodeGt(710))
+					.and(SampleSpecification.isLastVersionTrue())
+					.and(SampleSpecification.isNotTest())
+					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.orderBy(params));
+
+				// #. 병원용 중복 검사이고 출고가 완료된 상태의 검체목록
+				List<Sample> list = sampleRepository.findAll(where);
+				
+				// #. 결과값에 현재 상품 결과마커정보를 전부 포함하는지 확인
+				list.stream().forEach(s -> {
+					if (s.getData().keySet().containsAll(bundle.getMarkers().keySet())) {
+						sample.setDuplication("O");
+						return;
+					}
+				});
+
+				// #. lims 결과출고예정일 계산후 셋팅
+				sample.setOutputScheduledDate(getAgencyTat(sample.getAgency()));
+				
 			}
 		}
 		
@@ -571,4 +615,31 @@ public class InputService {
 		
 		sampleHistoryRepository.save(sh);
 	}
+
+	private LocalDateTime getAgencyTat(Agency agency) {
+
+        DateTimeFormatter yyyymmdd = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = start.plusYears(1);
+
+        List<Holiday> holidays = holidayRepository.findByDateBetween(start.format(yyyymmdd), end.format(yyyymmdd));
+
+        List<String> hdays = holidays.stream().map(h -> { return h.getDate(); }).collect(Collectors.toList());
+
+        LocalDateTime temp;
+        int max = agency.getTatDay();
+        
+        for (int i = 0; i <= max; i++) {
+            temp = start.plusDays(i);
+            if (hdays.contains(temp.format(yyyymmdd)) || isWeekend(temp)) {
+                max++;
+            }
+        }
+
+        return start.plusDays(max);
+    }
+
+	private boolean isWeekend(LocalDateTime date) {
+        return date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+    }
 }

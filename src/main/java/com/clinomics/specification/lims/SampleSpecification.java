@@ -164,6 +164,25 @@ public class SampleSpecification {
 		};
 	}
 
+	public static Specification<Sample> betweenOutputScheduledDate(Map<String, String> params) {
+
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			if (params.containsKey("oStartDate") && params.containsKey("oFinishDate")) {
+				if (params.get("oStartDate").length() > 0 && params.get("oFinishDate").length() > 0) {
+					List<Predicate> predicatesAnds = new ArrayList<>();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					LocalDateTime start = LocalDateTime.parse(params.get("oStartDate") + " 00:00:00", formatter);
+					LocalDateTime end = LocalDateTime.parse(params.get("oFinishDate") + " 23:59:59", formatter);
+					predicatesAnds.add(criteriaBuilder.between(root.get("outputScheduledDate"), start, end));
+					rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+				}
+			}
+			return rtn;
+
+		};
+	}
+
 	// public static Specification<Sample> bundleId(Map<String, String> params) {
 
 	// 	return (root, query, criteriaBuilder) -> {
@@ -585,6 +604,31 @@ public class SampleSpecification {
 					, tat
 				)
 			);
+
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> hospitalDuplication(Map<String, String> params) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+
+			// #. 병원용 검체만 
+			predicatesAnds.add(criteriaBuilder.and(criteriaBuilder.isTrue(root.get("bundle").get("isHospital"))));
+
+			predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+				root.get("items"), criteriaBuilder.literal("$.h_name")), params.get("h_name")));
+
+			predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+				root.get("items"), criteriaBuilder.literal("$.chart_number")), params.get("chart_number")));
+
+			predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+				root.get("items"), criteriaBuilder.literal("$.birthyear")), params.get("birthyear")));
+
+			predicatesAnds.add(criteriaBuilder.equal(criteriaBuilder.function("JSON_EXTRACT", String.class,
+				root.get("items"), criteriaBuilder.literal("$.sex")), params.get("sex")));
 
 			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
 			return rtn;

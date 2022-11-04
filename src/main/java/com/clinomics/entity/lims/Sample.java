@@ -137,6 +137,8 @@ public class Sample implements Serializable {
 
 	// #. test sample 체크용, 기본 false
 	private boolean isTest = false;
+
+	private String duplication;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
@@ -276,6 +278,10 @@ public class Sample implements Serializable {
 	// #. 실제 출고 완료일
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime deliveryCmplDate;
+
+	// #. 출고 예정일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+	private LocalDateTime outputScheduledDate;
 	
 	public String getGenotypingId() {
 		return this.laboratoryId + "-V" + this.version;
