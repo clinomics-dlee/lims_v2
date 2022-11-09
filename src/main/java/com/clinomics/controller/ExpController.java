@@ -53,6 +53,12 @@ public class ExpController {
 		return expService.startExp(sampleIds, userDetails.getUsername());
 	}
 
+	@PostMapping("/rdy/dupl/data/update")
+	public Map<String, String> updateDuplData(@RequestBody List<Integer> sampleIds) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return expService.updateDuplData(sampleIds, userDetails.getUsername());
+	}
+
 	@GetMapping("/step1/get")
 	public Map<String, Object> getStep1(@RequestParam Map<String, String> params) {
 		return expService.findSampleByExpStep1Status(params);

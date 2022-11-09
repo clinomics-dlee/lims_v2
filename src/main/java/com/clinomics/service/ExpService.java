@@ -2,7 +2,6 @@ package com.clinomics.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,17 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.transaction.Transactional;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 import com.clinomics.entity.lims.Bundle;
 import com.clinomics.entity.lims.Member;
@@ -25,20 +35,6 @@ import com.clinomics.repository.lims.MemberRepository;
 import com.clinomics.repository.lims.SampleRepository;
 import com.clinomics.specification.lims.SampleSpecification;
 import com.google.common.collect.Maps;
-
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ExpService {
@@ -710,4 +706,77 @@ public class ExpService {
 		
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, list, header);
 	}
+
+	public Map<String, String> updateDuplData(List<Integer> sampleIds, String userId) {
+		Map<String, String> rtn = Maps.newHashMap();
+		LocalDateTime now = LocalDateTime.now();
+		Optional<Member> oMember = memberRepository.findById(userId);
+		Member member = oMember.orElseThrow(NullPointerException::new);
+		String roles = "";
+		for (Role r : member.getRole()) {
+			roles += "," + r.getCode();
+		}
+		roles = roles.substring(1);
+
+		if (!roles.contains(RoleCode.ROLE_EXP_20.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_40.toString())
+			&& !roles.contains(RoleCode.ROLE_EXP_80.toString())) {
+
+			rtn.put("result", ResultCode.NO_PERMISSION.get());
+			rtn.put("message", ResultCode.NO_PERMISSION.getMsg());
+			return rtn;
+		}
+
+		List<Sample> savedSamples = new ArrayList<Sample>();
+		for (int id : sampleIds) {
+			Optional<Sample> oSample = sampleRepository.findById(id);
+			Sample sample = oSample.orElseThrow(NullPointerException::new);
+			Sample duplSample = sample.getDuplicationSample();
+
+			if (duplSample == null) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+				rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
+				return rtn;
+			}
+
+
+			// #. 상태는 분석완료 처리
+			sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
+
+			// #. 분석완료전까지 모든 데이터 복사
+			sample.setA260280(duplSample.getA260280());
+			sample.setCncnt(duplSample.getCncnt());
+			sample.setDnaQc(duplSample.getDnaQc());
+			sample.setGenotypingMethodCode(duplSample.getGenotypingMethodCode());
+			sample.setWellPosition(duplSample.getWellPosition());
+			sample.setMappingNo(duplSample.getMappingNo());
+			sample.setChipBarcode(duplSample.getChipBarcode());
+			sample.setChipTypeCode(duplSample.getChipTypeCode());
+			sample.setFilePath(duplSample.getFilePath());
+			sample.setFileName(duplSample.getFileName());
+			sample.setCheckCelFile(duplSample.getCheckCelFile());
+			sample.setData(duplSample.getData());
+
+			sample.setExpStartDate(now);
+			sample.setExpStartMember(member);
+			sample.setExpStep1Date(now);
+			sample.setExpStep1Member(member);
+			sample.setExpStep2Date(now);
+			sample.setExpStep2Member(member);
+			sample.setExpStep3Date(now);
+			sample.setExpStep3Member(member);
+			sample.setAnlsStartDate(now);
+			sample.setAnlsStartMember(member);
+			sample.setAnlsEndDate(now);
+			sample.setModifiedDate(now);
+
+			savedSamples.add(sample);
+		}
+
+		sampleRepository.saveAll(savedSamples);
+
+		rtn.put("result", ResultCode.SUCCESS.get());
+		return rtn;
+	}
+
 }

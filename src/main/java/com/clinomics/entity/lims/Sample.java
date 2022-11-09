@@ -138,7 +138,9 @@ public class Sample implements Serializable {
 	// #. test sample 체크용, 기본 false
 	private boolean isTest = false;
 
-	private String duplication;
+	@ManyToOne()
+	@JoinColumn(name="duplicationSampleId")
+	private Sample duplicationSample;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;

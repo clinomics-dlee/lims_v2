@@ -1,7 +1,6 @@
 package com.clinomics.service;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -217,7 +216,7 @@ public class InputService {
 
 			// #. 병원용 검체에 경우 동일 검체 중복 체크
 			if (bundle.isHospital()) {
-				// #. 동일한 병원명, 차트번호, 생년, 성별인 경우 duplication 값 'O'
+				// #. 동일한 병원명, 차트번호, 생년, 성별인 경우 duplicationSample에 넣기
 				Map<String, String> params = Maps.newHashMap();
 				params.put("h_name", (String)items.get("h_name"));
 				params.put("chart_number", (String)items.get("chart_number"));
@@ -239,7 +238,7 @@ public class InputService {
 				// #. 결과값에 현재 상품 결과마커정보를 전부 포함하는지 확인
 				list.stream().forEach(s -> {
 					if (s.getData().keySet().containsAll(bundle.getMarkers().keySet())) {
-						sample.setDuplication("O");
+						sample.setDuplicationSample(s);
 						return;
 					}
 				});

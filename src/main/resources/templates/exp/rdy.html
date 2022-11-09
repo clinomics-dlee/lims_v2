@@ -70,6 +70,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<hr/>
 							<div class="row">
 								<button onClick="startExp();" class="btn btn-success m-l-20">실험시작</button>
+								<button onClick="updateDuplData();" class="btn btn-yellow m-l-20">데이터 불러오기</button>
 							</div>
 						</div>
 					</div>
@@ -199,7 +200,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "date"
 		}, {
 			title : '기타', 
-			data : 'duplication'
+			data : 'duplicationSample',
+			render : function(row, data, index) {
+				var value = "";
+				if (data != null) {
+					value = "O";
+				}
+				return value;
+			}
 		}]);
 	}
 	
@@ -219,6 +227,50 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 				$.ajax({
 		            url: '/exp/rdy/start',
+			        type : "post",
+			        dataType : 'json',
+			        data : JSON.stringify(sampleIds),
+					contentType : "application/json;charset=utf-8",
+			        beforeSend: function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+				    success: function(data, xhr) {
+				    	if (data.result == "00") {
+				    		CommonMsg.save(function() {
+				    			$("#modal-sample-detail").modal('hide');
+				    			UserTable.reload('_rdy_grid');
+							});
+						} else {
+							CommonMsg.error(function() { }, data.message);
+						}
+					},
+					error : function(data) {
+						CommonMsg.error(function() { });
+					},
+					complete : function() {
+						
+					}
+				});
+			});
+		}
+	}
+
+	function updateDuplData() {
+		var checkedRows = UserTable.getCheckedRows("_rdy_grid");
+		if (checkedRows.length > 0) {
+			CommonMsg.okCancel(function() {
+				var sampleIds = [];
+				for (var i = 0; i < checkedRows.length; i++) {
+					var row = checkedRows[i];
+					if (row.duplicationSample == null) {
+						CommonMsg.error();
+						return;
+					}
+					sampleIds.push(row.id);
+				}
+
+				$.ajax({
+		            url: '/exp/rdy/dupl/data/update',
 			        type : "post",
 			        dataType : 'json',
 			        data : JSON.stringify(sampleIds),
