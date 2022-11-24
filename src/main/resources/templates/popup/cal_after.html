@@ -104,14 +104,7 @@ function afterAfterGetItem(type, bundleId, startDate, endDate) {
 			data : 'sampleType'
 		}, {
 			title : '기타', 
-			data : 'duplicationSample',
-			render : function(row, data, index) {
-				var value = "";
-				if (data != null) {
-					value = "O";
-				}
-				return value;
-			}
+			data : 'checkDuplicationSample'
 		}, {
 			title : "최근수정일자",
 			data : "modifiedDate",

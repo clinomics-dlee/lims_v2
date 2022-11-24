@@ -424,6 +424,7 @@ public class AnlsService {
 			nSample.setReceivedDate(sample.getReceivedDate());
 			nSample.setSampleType(sample.getSampleType());
 			nSample.setAgency(sample.getAgency());
+			nSample.setCheckDuplicationSample(sample.getCheckDuplicationSample());
 
 			savedSamples.add(nSample);
 		}

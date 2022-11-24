@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -226,26 +227,39 @@ public class InputService {
 
 				Specification<Sample> where = Specification
 					.where(SampleSpecification.hospitalDuplication(params))
-					.and(SampleSpecification.statusCodeGt(710))
 					.and(SampleSpecification.isLastVersionTrue())
 					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.bundleIsActive())
 					.and(SampleSpecification.orderBy(params));
 
-				// #. 병원용 중복 검사이고 출고가 완료된 상태의 검체목록
+				// #. 병원용 중복 검체목록
 				List<Sample> list = sampleRepository.findAll(where);
-				
+
 				// #. 결과값에 현재 상품 결과마커정보를 전부 포함하는지 확인
 				list.stream().forEach(s -> {
-					if (s.getData().keySet().containsAll(bundle.getMarkers().keySet())) {
-						sample.setDuplicationSample(s);
+					if (!MapUtils.isEmpty(s.getData()) && s.getData().keySet().containsAll(bundle.getMarkers().keySet())) {
+						sample.setCheckDuplicationSample("○");
 						return;
 					}
 				});
 
+				if (list.size() > 0 && !"○".equals(sample.getCheckDuplicationSample())) {
+					// #. 중복검체가 있는데 결과값이 정상적으로 있는 검체가 없다면 '△' 처리
+					sample.setCheckDuplicationSample("△");
+					// #. 중복검체로 조회된 목록중 실험대기 이전 상태의 검체들도 전부 '△' 처리
+					list.stream().forEach(s -> {
+						if (NumberUtils.toInt(s.getStatusCode().getKey().substring(1, 4)) < 210) {
+							// #. checkDuplicationSample 값이 없는 경우만 처리
+							if (StringUtils.isBlank(s.getCheckDuplicationSample())) {
+								s.setCheckDuplicationSample("△");
+								sampleRepository.save(s);
+							}
+						}
+					});
+				}
+				
 				// #. lims 결과출고예정일 계산후 셋팅
 				sample.setOutputScheduledDate(getAgencyTat(sample.getAgency()));
-				
 			}
 		}
 		

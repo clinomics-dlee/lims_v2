@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -665,6 +666,7 @@ public class ExpService {
 		Specification<Sample> where = Specification
 					.where(SampleSpecification.mappingInfoGroupBy())
 					.and(SampleSpecification.bundleIsActive())
+					.and(SampleSpecification.isLastVersionTrue())
 					.and(SampleSpecification.isNotTest())
 					.and(SampleSpecification.statusCodeGt(400))
 					.and(SampleSpecification.mappingInfoLike(params))
@@ -731,46 +733,79 @@ public class ExpService {
 		for (int id : sampleIds) {
 			Optional<Sample> oSample = sampleRepository.findById(id);
 			Sample sample = oSample.orElseThrow(NullPointerException::new);
-			Sample duplSample = sample.getDuplicationSample();
+			String checkDupl = sample.getCheckDuplicationSample();
 
-			if (duplSample == null) {
+			if (!"○".equals(checkDupl)) {
 				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
 				rtn.put("message", "상태값이 다른 검체가 존재합니다.[" + sample.getLaboratoryId() + "]");
 				return rtn;
 			}
 
+			// #. 중복검체 조회
+			Map<String, String> params = Maps.newHashMap();
+			params.put("h_name", (String)sample.getItems().get("h_name"));
+			params.put("chart_number", (String)sample.getItems().get("chart_number"));
+			params.put("birthyear", (String)sample.getItems().get("birthyear"));
+			params.put("sex", (String)sample.getItems().get("sex"));
+			params.put("order", ",id:desc");
 
-			// #. 상태는 분석완료 처리
-			sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
+			Specification<Sample> where = Specification
+				.where(SampleSpecification.hospitalDuplication(params))
+				.and(SampleSpecification.statusCodeGt(420))
+				.and(SampleSpecification.isLastVersionTrue())
+				.and(SampleSpecification.isNotTest())
+				.and(SampleSpecification.bundleIsActive())
+				.and(SampleSpecification.orderBy(params));
 
-			// #. 분석완료전까지 모든 데이터 복사
-			sample.setA260280(duplSample.getA260280());
-			sample.setCncnt(duplSample.getCncnt());
-			sample.setDnaQc(duplSample.getDnaQc());
-			sample.setGenotypingMethodCode(duplSample.getGenotypingMethodCode());
-			sample.setWellPosition(duplSample.getWellPosition());
-			sample.setMappingNo(duplSample.getMappingNo());
-			sample.setChipBarcode(duplSample.getChipBarcode());
-			sample.setChipTypeCode(duplSample.getChipTypeCode());
-			sample.setFilePath(duplSample.getFilePath());
-			sample.setFileName(duplSample.getFileName());
-			sample.setCheckCelFile(duplSample.getCheckCelFile());
-			sample.setData(duplSample.getData());
+			// #. 병원용 중복 검사이고 출고가 완료된 상태의 검체목록
+			List<Sample> list = sampleRepository.findAll(where);
 
-			sample.setExpStartDate(now);
-			sample.setExpStartMember(member);
-			sample.setExpStep1Date(now);
-			sample.setExpStep1Member(member);
-			sample.setExpStep2Date(now);
-			sample.setExpStep2Member(member);
-			sample.setExpStep3Date(now);
-			sample.setExpStep3Member(member);
-			sample.setAnlsStartDate(now);
-			sample.setAnlsStartMember(member);
-			sample.setAnlsEndDate(now);
-			sample.setModifiedDate(now);
+			if (list.size() == 0) {
+				rtn.put("result", ResultCode.FAIL_EXISTS_VALUE.get());
+				rtn.put("message", "조회된 중복검체가 존재하지 않습니다.[" + sample.getLaboratoryId() + "]");
+				return rtn;
+			}
 
-			savedSamples.add(sample);
+
+			list.stream().forEach(duplSample -> {
+				// #. 중복검체 결과값이 현재 셋팅하려고하는 검체에 결과를 전부 포함하는지 확인
+				if (!MapUtils.isEmpty(duplSample.getData()) && duplSample.getData().keySet().containsAll(sample.getBundle().getMarkers().keySet())) {
+					logger.info("☆☆☆ duplication setting source [" + duplSample.getLaboratoryId() + "], copy [" + sample.getLaboratoryId() + "]");
+					// #. 상태는 분석완료 처리
+					sample.setStatusCode(StatusCode.S420_ANLS_SUCC);
+
+					// #. 분석완료전까지 모든 데이터 복사
+					sample.setA260280(duplSample.getA260280());
+					sample.setCncnt(duplSample.getCncnt());
+					sample.setDnaQc(duplSample.getDnaQc());
+					sample.setGenotypingMethodCode(duplSample.getGenotypingMethodCode());
+					sample.setWellPosition(duplSample.getWellPosition());
+					sample.setMappingNo(duplSample.getMappingNo());
+					sample.setChipBarcode(duplSample.getChipBarcode());
+					sample.setChipTypeCode(duplSample.getChipTypeCode());
+					sample.setFilePath(duplSample.getFilePath());
+					sample.setFileName(duplSample.getFileName());
+					sample.setCheckCelFile(duplSample.getCheckCelFile());
+					sample.setData(duplSample.getData());
+
+					sample.setExpStartDate(now);
+					sample.setExpStartMember(member);
+					sample.setExpStep1Date(now);
+					sample.setExpStep1Member(member);
+					sample.setExpStep2Date(now);
+					sample.setExpStep2Member(member);
+					sample.setExpStep3Date(now);
+					sample.setExpStep3Member(member);
+					sample.setAnlsStartDate(now);
+					sample.setAnlsStartMember(member);
+					sample.setAnlsEndDate(now);
+					sample.setModifiedDate(now);
+
+					savedSamples.add(sample);
+					return;
+				}
+			});
+
 		}
 
 		sampleRepository.saveAll(savedSamples);

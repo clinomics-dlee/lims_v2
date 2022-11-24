@@ -183,6 +183,34 @@ public class Scheduler {
                         //LocalDateTime now = LocalDateTime.now();
                         sample.setAnlsEndDate(now);
                         sampleRepository.save(sample);
+
+						// #. sample checkDuplicationSample 값이 '△'인경우 실험대기 포함한 이전 상태 중복검체를 조회해 수정
+						if ("△".equals(sample.getCheckDuplicationSample())) {
+							Map<String, String> params = Maps.newHashMap();
+							params.put("h_name", (String)sample.getItems().get("h_name"));
+							params.put("chart_number", (String)sample.getItems().get("chart_number"));
+							params.put("birthyear", (String)sample.getItems().get("birthyear"));
+							params.put("sex", (String)sample.getItems().get("sex"));
+							params.put("order", ",id:desc");
+
+							Specification<Sample> duplWhere = Specification
+								.where(SampleSpecification.hospitalDuplication(params))
+								.and(SampleSpecification.statusCodeLt(200))
+								.and(SampleSpecification.isLastVersionTrue())
+								.and(SampleSpecification.isNotTest())
+								.and(SampleSpecification.bundleIsActive())
+								.and(SampleSpecification.orderBy(params));
+
+							// #. 병원용 중복 검사이고 출고가 완료된 상태의 검체목록
+							List<Sample> duplicationSamples = sampleRepository.findAll(duplWhere);
+
+							duplicationSamples.stream().forEach(ds -> {
+								if ("△".equals(ds.getCheckDuplicationSample())) {
+									ds.setCheckDuplicationSample("○");
+									sampleRepository.save(ds);
+								}
+							});
+						}
                         
                     } else if (!failRowData.isEmpty()) {
                         String failMessage = "";

@@ -210,14 +210,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				serverHeader : true
 			}, {
 				title : '기타', 
-				data : 'duplicationSample',
-				render : function(row, data, index) {
-					var value = "";
-					if (data != null) {
-						value = "O";
-					}
-					return value;
-				}
+				data : 'checkDuplicationSample'
 			}, {
 				title : '검체 출고일자', 
 				data : 'outputCmplDate',

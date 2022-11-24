@@ -70,7 +70,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 							<hr/>
 							<div class="row">
 								<button onClick="startExp();" class="btn btn-success m-l-20">실험시작</button>
-								<button onClick="updateDuplData();" class="btn btn-yellow m-l-20">데이터 넘기기</button>
+								<button onClick="updateDuplData();" class="btn btn-yellow m-l-20">데이터 불러오기</button>
 							</div>
 						</div>
 					</div>
@@ -200,14 +200,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			type : "date"
 		}, {
 			title : '기타', 
-			data : 'duplicationSample',
-			render : function(row, data, index) {
-				var value = "";
-				if (data != null) {
-					value = "O";
-				}
-				return value;
-			}
+			data : 'checkDuplicationSample'
 		}]);
 	}
 	
@@ -262,8 +255,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				var sampleIds = [];
 				for (var i = 0; i < checkedRows.length; i++) {
 					var row = checkedRows[i];
-					if (row.duplicationSample == null) {
-						CommonMsg.error();
+					if (row.checkDuplicationSample != '○') {
+						CommonMsg.error({}, "체크된 목록중 기타값에 문제가 있는 검체가 있습니다.");
 						return;
 					}
 					sampleIds.push(row.id);

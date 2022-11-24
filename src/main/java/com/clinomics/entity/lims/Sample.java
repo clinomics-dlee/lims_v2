@@ -138,9 +138,9 @@ public class Sample implements Serializable {
 	// #. test sample 체크용, 기본 false
 	private boolean isTest = false;
 
-	@ManyToOne()
-	@JoinColumn(name="duplicationSampleId")
-	private Sample duplicationSample;
+	// #. 중복 검체여부를 판단하는 값( ○ : 중복된 검체가 있고 필요한 결과값도 있는 경우, △ : 중복된 검체는 있으나 결과값이 없는 경우)
+	@Column(length = 10)
+	private String checkDuplicationSample;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
