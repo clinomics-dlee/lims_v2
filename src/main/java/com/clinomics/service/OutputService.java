@@ -292,7 +292,7 @@ public class OutputService {
 					
 					datas.add(data);
 					
-					logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "] data : " + data.toString());
+					logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "] data : " + sample.getLaboratoryId());
 				}
 			}
 		}
@@ -410,7 +410,7 @@ public class OutputService {
 			data.put("fileFullPath", sample.getFilePath() + "/" + sample.getFileName());
 			data.put("chipType", sample.getChipTypeCode());
 				
-			logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + data.toString());
+			logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "]data : " + sample.getLaboratoryId());
 		}
 
 		rtn.put("result", "success");

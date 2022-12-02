@@ -167,7 +167,6 @@ public class Scheduler {
                         successRowData.remove(sampleKeyColumn);
 
                         Map<String, Object> data = Maps.newHashMap();
-                        logger.info("★★★★ successRowData=" + successRowData.toString());
                         data.putAll(successRowData);
                         // for (Map<String, String> mi : allMarkerInfos) {
                         //     String name = mi.get("name");
@@ -533,7 +532,6 @@ public class Scheduler {
             String sLine = null;
             while((sLine = br.readLine()) != null) {
                 errorString += sLine + ",";
-                logger.info("★★★★★★★★★★ errorString=" + errorString);
             }
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

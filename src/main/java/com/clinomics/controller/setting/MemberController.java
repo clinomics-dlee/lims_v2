@@ -28,7 +28,6 @@ public class MemberController {
 	@GetMapping("/get")
 	@ResponseBody
 	public Map<String, Object> get(@RequestParam Map<String, String> params) {
-		logger.info(params.toString());
 		return memberService.selectAll(params);
 	}
 
