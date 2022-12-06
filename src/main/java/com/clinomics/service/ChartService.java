@@ -62,8 +62,8 @@ public class ChartService {
 		LocalDateTime end = LocalDateTime.parse(paramEnd + "-01 00:00:00", formatter);
 		end = end.plusMonths(1).minusSeconds(1);
 		
-		String sDate = start.format(yyyymmFormat);
-		String fDate = end.format(yyyymmFormat);
+		String sDate = start.format(formatter);
+		String fDate = end.format(formatter);
 
 		String strBundles = params.get("bundleId") + "";
 		
@@ -250,7 +250,8 @@ public class ChartService {
 
 	private List<String> getChartLabels(LocalDateTime end, LocalDateTime loop) {
 		List<String> labels = new ArrayList<>();
-		while (end.getMonthValue() >= loop.getMonthValue()) {
+		//while (end.getMonthValue() >= loop.getMonthValue()) {
+		while (end.format(yyyymmFormat).compareTo(loop.format(yyyymmFormat)) >= 0) {
 			String yyyymm = loop.format(yyyymmFormat);
 			labels.add(yyyymm);
 			loop = loop.plusMonths(1);
@@ -262,7 +263,8 @@ public class ChartService {
 		List<Long> datas = new ArrayList<>();
 		Map<String, String> zero = Maps.newHashMap();
 		zero.put("count", "0");
-		while (end.getMonthValue() >= loop.getMonthValue()) {
+		//while (end.getMonthValue() >= loop.getMonthValue()) {
+		while (end.format(yyyymmFormat).compareTo(loop.format(yyyymmFormat)) >= 0) {
 			String yyyymm = loop.format(yyyymmFormat);
 			//long c = getCounting(map, "yyyymm", yyyymm, "name", name);
 			Optional<Map<String, String>> oma = map.stream()

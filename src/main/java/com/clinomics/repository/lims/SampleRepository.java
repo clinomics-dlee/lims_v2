@@ -28,60 +28,61 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
     @Query(value = "SELECT dayofmonth(s.created_date) AS c1, COUNT(*) AS c2"
                 + " , SUM(CASE WHEN s.output_cmpl_date IS NULL THEN 0 ELSE 1 END) AS c3"
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE EXTRACT(YEAR_MONTH FROM s.created_date) = :yyyymm "
+                + " WHERE s.created_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
                 + " GROUP BY dayofmonth(s.created_date) ", nativeQuery = true)
-    List<String[]> findCalendarDataByCreatedDate(@Param("yyyymm") String yyyymm
+    List<String[]> findCalendarDataByCreatedDate(@Param("sDate") String sDate, @Param("fDate") String fDate
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
 
     @Query(value = "SELECT dayofmonth(s.modified_date) AS c1, COUNT(*) AS c2"
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE EXTRACT(YEAR_MONTH FROM s.modified_date) = :yyyymm "
+                + " WHERE s.modified_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
                 + " GROUP BY dayofmonth(s.modified_date) ", nativeQuery = true)
-    List<String[]> findCalendarDataByModifiedDate(@Param("yyyymm") String yyyymm
+    List<String[]> findCalendarDataByModifiedDate(@Param("sDate") String sDate, @Param("fDate") String fDate
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
 
     @Query(value = "SELECT dayofmonth(s.anls_cmpl_date) AS c1, COUNT(*) AS c2"
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE EXTRACT(YEAR_MONTH FROM s.anls_cmpl_date) = :yyyymm "
+                + " WHERE s.anls_cmpl_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
                 + " GROUP BY dayofmonth(s.anls_cmpl_date) ", nativeQuery = true)
-    List<String[]> findCalendarDataByAnlsCmpldDate(@Param("yyyymm") String yyyymm
+    List<String[]> findCalendarDataByAnlsCmpldDate(@Param("sDate") String sDate, @Param("fDate") String fDate
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
 
     @Query(value = "SELECT dayofmonth(s.output_cmpl_date) AS c1, COUNT(*) AS c2"
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE EXTRACT(YEAR_MONTH FROM s.output_cmpl_date) = :yyyymm "
+                + " WHERE s.output_cmpl_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
                 + " GROUP BY dayofmonth(s.output_cmpl_date) ", nativeQuery = true)
-    List<String[]> findCalendarDataByOutputCmplDate(@Param("yyyymm") String yyyymm
+    List<String[]> findCalendarDataByOutputCmplDate(@Param("sDate") String sDate, @Param("fDate") String fDate
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
     
     @Query(value = "SELECT DATE_FORMAT(s.output_cmpl_date, '%Y%m') AS yyyymm, CONVERT(COUNT(*), char) AS count "
     			+ " , b.name AS name "
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE EXTRACT(YEAR_MONTH FROM s.anls_cmpl_date) BETWEEN :sDate AND :fDate "
+                + " WHERE s.anls_cmpl_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
+                + " AND s.output_cmpl_date IS NOT NULL "
                 + " GROUP BY EXTRACT(YEAR_MONTH FROM s.created_date), s.bundle_id ", nativeQuery = true)
     List<Map<String, String>> findChartDataByCreatedDate(@Param("sDate") String sDate
 											, @Param("fDate") String fDate
@@ -91,11 +92,12 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
     @Query(value = "SELECT DATE_FORMAT(s.output_cmpl_date, '%Y%m') AS yyyymm, CONVERT(COUNT(*), char) AS count "
 			+ " , b.name AS name "
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE EXTRACT(YEAR_MONTH FROM s.anls_cmpl_date) BETWEEN :sDate AND :fDate "
+                + " WHERE s.anls_cmpl_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
+                + " AND s.output_cmpl_date IS NOT NULL "
                 + " GROUP BY EXTRACT(YEAR_MONTH FROM s.created_date), s.bundle_id ", nativeQuery = true)
     List<Map<String, String>> findChartDataByAnlsCmplDate(@Param("sDate") String sDate
     										, @Param("fDate") String fDate
@@ -105,11 +107,12 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
     @Query(value = "SELECT DATE_FORMAT(s.output_cmpl_date, '%Y%m') AS yyyymm, CONVERT(COUNT(*), char) AS count "
 			+ " , b.name AS name "
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE EXTRACT(YEAR_MONTH FROM s.output_cmpl_date) BETWEEN :sDate AND :fDate "
+                + " WHERE s.output_cmpl_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
+                + " AND s.output_cmpl_date IS NOT NULL "
                 + " GROUP BY EXTRACT(YEAR_MONTH FROM s.output_cmpl_date), s.bundle_id ", nativeQuery = true)
     List<Map<String, String>> findChartDataByOutputCmplDate(@Param("sDate") String sDate
 											, @Param("fDate") String fDate

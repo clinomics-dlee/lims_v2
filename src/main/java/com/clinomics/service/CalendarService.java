@@ -1,5 +1,6 @@
 package com.clinomics.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -92,11 +93,19 @@ public class CalendarService {
 			List<Bundle> bs = bundleRepository.findByIsActiveTrue();
 			bundleIds = bs.stream().map(b -> b.getId()).collect(Collectors.toList());
 		}
+		
+		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime sLocalDate = LocalDateTime.parse(params.get("yyyymm") + "-01 00:00:00", formatter1);
+		LocalDateTime fLocalDate = sLocalDate.plusMonths(1).minusSeconds(1);
+		
+		String sdate = sLocalDate.format(formatter1);
+		String fdate = fLocalDate.format(formatter1);
+		
 
-		List<String[]> cal1 = sampleRepository.findCalendarDataByCreatedDate(yyyymm, bundleIds, Arrays.asList(StatusCode.class.getEnumConstants()).stream().map(e -> e.toString()).collect(Collectors.toList()));
-		List<String[]> cal2 = sampleRepository.findCalendarDataByModifiedDate(yyyymm, bundleIds, STS_EXP.stream().map(e -> e.getKey()).collect(Collectors.toList()));
-		List<String[]> cal3 = sampleRepository.findCalendarDataByModifiedDate(yyyymm, bundleIds, STS_JDGM.stream().map(e -> e.getKey()).collect(Collectors.toList()));
-		List<String[]> cal4 = sampleRepository.findCalendarDataByOutputCmplDate(yyyymm, bundleIds, STS_REPORT.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+		List<String[]> cal1 = sampleRepository.findCalendarDataByCreatedDate(sdate, fdate, bundleIds, Arrays.asList(StatusCode.class.getEnumConstants()).stream().map(e -> e.toString()).collect(Collectors.toList()));
+		List<String[]> cal2 = sampleRepository.findCalendarDataByModifiedDate(sdate, fdate, bundleIds, STS_EXP.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+		List<String[]> cal3 = sampleRepository.findCalendarDataByModifiedDate(sdate, fdate, bundleIds, STS_JDGM.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+		List<String[]> cal4 = sampleRepository.findCalendarDataByOutputCmplDate(sdate, fdate, bundleIds, STS_REPORT.stream().map(e -> e.getKey()).collect(Collectors.toList()));
 
 		ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> rtn = Maps.newHashMap();
