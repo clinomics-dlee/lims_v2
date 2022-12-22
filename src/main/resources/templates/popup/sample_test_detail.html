@@ -57,16 +57,10 @@
 					var sitm = data.sampleItem;
 					
 					for (var r in sitm) {
-						parsley = ' data-parsley-required="true"';
 						code = sitm[r].nameCode;
 						
 						readonly = '';
 						notnull = sitm[r].notNull;
-						
-						if (code == "barcode") {
-							notnull = true;
-							parsley = ' data-parsley-pattern="^[A-Z]+\-[0-9]+$" data-parsley-error-message="올바른 동의서 관리번호로 형태로 입력해 주세요.(알파벳대문자-숫자)"'
-						}
 						
 						value = data.sample.items[code];
 						//if (!value) data.sample.items
@@ -94,7 +88,7 @@
 							aDateInputs.push(code);
 							html += '<div class="input-group" id="date_' + code + '" >';
 							html += '<input type="text" class="form-control form-control-sm"'
-								+ (notnull ? parsley + ' data-date-format="YYYY-MM-DD" data-parsley-errors-container="#error_' + code + '"' : '')
+								+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + code + '"' : '')
 								+ ' placeholder="클릭하여 선택"'
 								+ ' placeholder="' + sitm[r].exampleValue + '"'
 								+ ' value="' + value + '"'
@@ -103,6 +97,22 @@
 							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
 							html += '</span>';
 							html += '</div><div id="error_' + code + '"></div>';
+						} else if (sitm[r].type == "number") {
+							var minParsley = "";
+							var maxParsley = "";
+							if (sitm[r].selectValue) {
+								var range = sitm[r].selectValue.split("-");
+								
+								if (range[0]) minParsley = 'data-parsley-min="' + range[0] + '"';
+								if (range[1]) maxParsley = 'data-parsley-max="' + range[1] + '"';
+							}
+
+							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+								+ 'placeholder="' + sitm[r].exampleValue + '" name="' + code + '" ' + autoComplete;
+							html += readonly;
+							html += " " + minParsley + " " + maxParsley + ' data-parsley-type="number" '
+							html += ' value="' + value + '"';
+							html += '/>';
 						} else {
 							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
 								+ 'placeholder="' + sitm[r].exampleValue + '" name="' + code + '" ' + autoComplete;

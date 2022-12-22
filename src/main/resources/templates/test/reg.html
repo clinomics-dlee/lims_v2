@@ -670,7 +670,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						+ '</div>'
 						+ '</th>';
 					for (var ii = 0; ii < max; ii++) {
-						parsley = ' data-parsley-required="true"';
 						bodyHtml += "<tr>";
 						bodyHtml += '<td><div class="form-check checkbox checkbox-css p-5">'
 							+ '<input type="checkbox" value="" id="checkbox_' + ii + '" name="checkbox" data="' + ii + '">'
@@ -680,15 +679,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 						for (var r in data) {
 							readonly = '';
 							notnull = data[r].notNull;
-							
 							if (bundle.autoBarcode && data[r].nameCode == "barcode") {
 								
 								readonly = ' readonly';
 								notnull = false;
-							}
-							if (data[r].nameCode == "barcode") {
-								notnull = true;
-								parsley = ' data-parsley-pattern="^[A-Z]+\-[0-9]+$" data-parsley-error-message="올바른 동의서 관리번호로 형태로 입력해 주세요.(알파벳대문자-숫자)"'
 							}
 							
 							var val = "";
@@ -718,13 +712,28 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								aDateInputs.push(data[r].nameCode);
 								//bodyHtml += '<div class="input-group" data-provide="datepicker" style="width:150px;">';
 								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm width-100"'
-									+ (notnull ? parsley + ' data-date-format="YYYY-MM-DD" data-parsley-errors-container="#error_' + data[r].nameCode + "_" + ii + '"' : '')
+									+ (notnull ? parsley + ' data-parsley-errors-container="#error_' + data[r].nameCode + "_" + ii + '"' : '')
 									+ ' placeholder="" '
 									+ 'placeholder="' + data[r].exampleValue + '" name="' + data[r].nameCode + '" " ' + autoComplete + '/>';
 								//bodyHtml += '<span class="input-group-append">';
 								//bodyHtml += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
 								//bodyHtml += '</span>';
 								bodyHtml += '</div><div id="error_' + data[r].nameCode + "_" + ii + '"></div>';
+							} else if (data[r].type == "number") {
+								var minParsley = "";
+								var maxParsley = "";
+								if (data[r].selectValue) {
+									var range = data[r].selectValue.split("-");
+									
+									if (range[0]) minParsley = 'data-parsley-min="' + range[0] + '"';
+									if (range[1]) maxParsley = 'data-parsley-max="' + range[1] + '"';
+								}
+								
+								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+									+ 'name="' + data[r].nameCode + '" ' + autoComplete
+									+ minParsley + " " + maxParsley + ' data-parsley-type="number" '
+									+ 'style="width:' + ((Number(data[r].width) / 10) - 50) + 'px;" ';
+								bodyHtml += '/>';
 							} else {
 								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
 									+ 'name="' + data[r].nameCode + '" ' + autoComplete

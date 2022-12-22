@@ -456,6 +456,21 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								//bodyHtml += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
 								//bodyHtml += '</span>';
 								bodyHtml += '</div><div id="error_' + data[r].nameCode + "_" + ii + '"></div>';
+							} else if (data[r].type == "number") {
+								var minParsley = "";
+								var maxParsley = "";
+								if (data[r].selectValue) {
+									var range = data[r].selectValue.split("-");
+									
+									if (range[0]) minParsley = 'data-parsley-min="' + range[0] + '"';
+									if (range[1]) maxParsley = 'data-parsley-max="' + range[1] + '"';
+								}
+								
+								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+									+ 'name="' + data[r].nameCode + '" ' + autoComplete
+									+ minParsley + " " + maxParsley + ' data-parsley-type="number" '
+									+ 'style="width:' + ((Number(data[r].width) / 10) - 50) + 'px;" ';
+								bodyHtml += '/>';
 							} else {
 								bodyHtml += '<input type="text" value="' + val + '" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
 									+ 'name="' + data[r].nameCode + '" ' + autoComplete

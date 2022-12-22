@@ -101,6 +101,22 @@
 							html += '<span class="input-group-text"><i class="fa fa-calendar"></i></span>';
 							html += '</span>';
 							html += '</div><div id="error_' + code + '"></div>';
+						} else if (sitm[r].type == "number") {
+							var minParsley = "";
+							var maxParsley = "";
+							if (sitm[r].selectValue) {
+								var range = sitm[r].selectValue.split("-");
+								
+								if (range[0]) minParsley = 'data-parsley-min="' + range[0] + '"';
+								if (range[1]) maxParsley = 'data-parsley-max="' + range[1] + '"';
+							}
+
+							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
+								+ 'placeholder="' + sitm[r].exampleValue + '" name="' + code + '" ' + autoComplete;
+							html += readonly;
+							html += " " + minParsley + " " + maxParsley + ' data-parsley-type="number" '
+							html += ' value="' + value + '"';
+							html += '/>';
 						} else {
 							html += '<input type="text" class="form-control form-control-sm"' + (notnull ? parsley : '') + ' '
 								+ 'placeholder="' + sitm[r].exampleValue + '" name="' + code + '" ' + autoComplete;

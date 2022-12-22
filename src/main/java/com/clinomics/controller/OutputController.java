@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.clinomics.service.InputExcelService;
 import com.clinomics.service.OutputService;
 import com.clinomics.service.SampleDbService;
-import com.clinomics.service.SampleItemService;
 import com.clinomics.service.setting.BundleService;
 
 @Controller
@@ -25,9 +24,6 @@ public class OutputController {
 	@Autowired
 	OutputService outputService;
 	
-	@Autowired
-	SampleItemService sampleItemService;
-
 	@Autowired
 	InputExcelService inputExcelService;
 
