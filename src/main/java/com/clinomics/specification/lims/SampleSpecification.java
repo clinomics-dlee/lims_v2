@@ -634,4 +634,50 @@ public class SampleSpecification {
 			return rtn;
 		};
 	}
+
+	public static Specification<Sample> approvedOutputCmplDateIsNull() {
+
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicatesAnds = new ArrayList<>();
+			predicatesAnds.add(criteriaBuilder.isNull(root.get("approvedOutputCmplDate")));
+			rtn = criteriaBuilder.and(predicatesAnds.toArray(new Predicate[predicatesAnds.size()]));
+
+			return rtn;
+
+		};
+	}
+
+	public static Specification<Sample> isHospital(boolean isHospital) {
+
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			if (isHospital) {
+				rtn = criteriaBuilder.isTrue(root.get("bundle").get("isHospital"));
+			} else {
+				rtn = criteriaBuilder.isFalse(root.get("bundle").get("isHospital"));
+			}
+			return rtn;
+		};
+	}
+
+	public static Specification<Sample> approvedProductNotLike(Map<String, String> params) {
+
+		return (root, query, criteriaBuilder) -> {
+			Predicate rtn = null;
+			List<Predicate> predicateLikes = new ArrayList<>();
+
+			if (params.containsKey("productType") && !params.get("productType").isEmpty()) {
+				String text = "%\\_" + params.get("productType") + "\\_%";
+
+				predicateLikes.add(criteriaBuilder.notLike(root.get("approvedOutputProductTypes"), text));
+				predicateLikes.add(criteriaBuilder.isNull(root.get("approvedOutputProductTypes")));
+
+				rtn = criteriaBuilder.or(predicateLikes.toArray(new Predicate[predicateLikes.size()]));
+			}
+
+			return rtn;
+
+		};
+	}
 }

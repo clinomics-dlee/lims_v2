@@ -284,6 +284,13 @@ public class Sample implements Serializable {
 	// #. 출고 예정일
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime outputScheduledDate;
+
+	// #. interface api 요청된 product에 type값 목록에 "_"를 붙임 ex> _GS_GSX_
+	private String approvedOutputProductTypes;
+
+	// #. 입고 승인 후 데이터 조회 완료일
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+	private LocalDateTime approvedOutputCmplDate;
 	
 	public String getGenotypingId() {
 		return this.laboratoryId + "-V" + this.version;

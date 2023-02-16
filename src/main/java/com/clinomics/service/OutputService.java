@@ -296,6 +296,59 @@ public class OutputService {
 				}
 			}
 		}
+
+		// #. 병원용 검체들중 실험단계에 있는 검체중 approvedOutputCmplDate 값이 없는 경우의 검체 목록 추가
+		Specification<Sample> hospitalWhere = Specification
+				.where(SampleSpecification.approvedProductNotLike(params))
+				.and(SampleSpecification.isHospital(true))
+				.and(SampleSpecification.approvedOutputCmplDateIsNull())
+				.and(SampleSpecification.statusIn(
+					Arrays.asList(StatusCode.S200_EXP_READY, StatusCode.S210_EXP_STEP1, StatusCode.S220_EXP_STEP2, StatusCode.S230_EXP_STEP3)));
+
+		List<Sample> hospitalSamples = sampleRepository.findAll(hospitalWhere);
+
+		// #. 추가 조건으로 병원용 검체 별도 조회
+		if (hospitalSamples.size() > 0) {
+			for (Sample sample : hospitalSamples) {
+				Set<String> productTypes = Sets.newHashSet();
+				sample.getBundle().getProduct().stream().forEach(p -> {
+					productTypes.add(p.getType());
+				});
+				
+				if (productTypes.contains(productType)) {
+					Map<String, Object> data = Maps.newHashMap();
+
+					Map<String, Object> items = sample.getItems();
+					data.put("barcode", sample.getLaboratoryId());
+					data.put("name", items.get("h_name"));
+					data.put("tel", items.get("h_tel"));
+					data.put("address", items.get("h_address"));
+
+					// #. 출생연도 birthyear 값이 있는 경우는 api 호출시 birthday에 '01-01'을 고정으로 붙여서 보냄
+					if (items.get("birthyear") != null && items.get("birthyear").toString().length() > 0) {
+						String birthyear = (String)items.get("birthyear");
+						birthyear = birthyear.trim() + "-01-01";
+
+						data.put("birthday", birthyear);
+					}
+
+					// #. 설문지정보 값을 추가
+					data.put("docinfos", sample.getDocInfos());
+					data.putAll(items);
+
+					data.put("experimentid", sample.getLaboratoryId());
+					data.put("collecteddate", (sample.getCollectedDate() != null ? sample.getCollectedDate().format(formatter) : ""));
+					data.put("receiveddate", (sample.getReceivedDate() != null ? sample.getReceivedDate().format(formatter) : ""));
+					data.put("sampletype", sample.getSampleType());
+					data.put("p_name", sample.getBundle().getName());
+
+					datas.add(data);
+						
+					logger.info("☆☆☆☆☆☆☆☆☆ [" + ip + "] hospital data : " + sample.getLaboratoryId());
+				}
+			}
+		}
+
 		
 		rtn.put("result", "success");
 		rtn.put("datas", datas);
@@ -324,8 +377,8 @@ public class OutputService {
 
 		if (samples.size() == 1) {
 			Sample sample = samples.get(0);
-			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ laboratory Id : " + sample.getLaboratoryId());
-			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ productType : " + productType);
+			logger.info("☆☆☆☆ laboratory Id : " + sample.getLaboratoryId());
+			logger.info("☆☆☆☆ productType : " + productType);
 			Set<String> productTypes = Sets.newHashSet();
 			sample.getBundle().getProduct().stream().forEach(p -> {
 				productTypes.add(p.getType());
@@ -334,7 +387,7 @@ public class OutputService {
 			if (productTypes.contains(productType)) {
 				// #. result status update
 				if (!isTest) {
-					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆ isTest : " + isTest);
+					logger.info("☆☆☆☆ isTest : " + isTest);
 					
 					String outputProductTypes = sample.getOutputProductTypes();
 					if (outputProductTypes == null) outputProductTypes = "";
@@ -366,11 +419,65 @@ public class OutputService {
 						}
 					}
 					sampleRepository.save(sample);
-					logger.info("☆☆☆☆☆☆☆☆☆☆☆☆  [" + ip + "]sample[" + samples.get(0).getLaboratoryId() + "] update complete.");
+					logger.info("☆☆☆☆  [" + ip + "]sample[" + samples.get(0).getLaboratoryId() + "] update complete.");
 				}
 			}
 		} else if (samples.size() > 1) {
-			logger.info("☆☆☆☆☆☆☆☆☆☆☆☆  sample[" + samples.get(0).getLaboratoryId() + "] count error : size = [" + samples.size() + "]");
+			logger.info("☆☆☆☆  sample[" + samples.get(0).getLaboratoryId() + "] count error : size = [" + samples.size() + "]");
+		}
+
+		Specification<Sample> hospitalWhere = Specification
+				.where(SampleSpecification.laboratoryIdEqual(laboratoryId))
+				.and(SampleSpecification.approvedProductNotLike(params))
+				.and(SampleSpecification.isHospital(true))
+				.and(SampleSpecification.approvedOutputCmplDateIsNull())
+				.and(SampleSpecification.statusIn(
+					Arrays.asList(StatusCode.S200_EXP_READY, StatusCode.S210_EXP_STEP1, StatusCode.S220_EXP_STEP2, StatusCode.S230_EXP_STEP3)));
+
+		List<Sample> hospitalSamples = sampleRepository.findAll(hospitalWhere);
+
+		// #. 추가 검색된 병원용 검체 별도 수정
+		if (hospitalSamples.size() == 1) {
+			Sample sample = hospitalSamples.get(0);
+			logger.info("☆☆☆☆ hospital laboratory Id : " + sample.getLaboratoryId());
+			logger.info("☆☆☆☆ hospital productType : " + productType);
+			Set<String> productTypes = Sets.newHashSet();
+			sample.getBundle().getProduct().stream().forEach(p -> {
+				productTypes.add(p.getType());
+			});
+
+			
+			if (productTypes.contains(productType)) {
+				// #. result status update
+				if (!isTest) {
+					logger.info("☆☆☆☆ hospital isTest : " + isTest);
+					
+					String outputProductTypes = sample.getApprovedOutputProductTypes();
+					if (outputProductTypes == null) outputProductTypes = "";
+					if (!outputProductTypes.contains(productTypeData)) {
+						outputProductTypes += productTypeData;
+						outputProductTypes.replace("__", "_");
+						sample.setApprovedOutputProductTypes(outputProductTypes);
+					}
+
+					boolean outputAllProduct = true;
+					for (Product p : sample.getBundle().getProduct()) {
+						if (!outputProductTypes.contains(p.getType())) {
+							outputAllProduct = false;
+							break;
+						}
+					}
+					// #. 현재 productType과 interface된 productType값이 동일한 경우 상태 및 일자 처리
+					if (outputAllProduct) {
+						sample.setApprovedOutputCmplDate(now);
+						sample.setApprovedOutputProductTypes("");
+					}
+					sampleRepository.save(sample);
+					logger.info("☆☆☆☆  hospital [" + ip + "]sample[" + hospitalSamples.get(0).getLaboratoryId() + "] update complete.");
+				}
+			}
+		} else if (samples.size() > 1) {
+			logger.info("☆☆☆☆  hospital sample[" + hospitalSamples.get(0).getLaboratoryId() + "] count error : size = [" + hospitalSamples.size() + "]");
 		}
 
 		rtn.put("result", "success");
