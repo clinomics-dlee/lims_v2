@@ -156,8 +156,9 @@ public class CalendarExcelService {
 				row.getCell(11).setCellValue("-"); // 폐기내용 - 폐기방법 - 자가처리
 				row.getCell(12).setCellValue(company); // 폐기내용 - 폐기방법 - 위탁처리
 				row.getCell(13).setCellValue("냉장"); // 기타 - 보관조건
-				row.getCell(14).setCellValue("이선주"); // 결재 - 담당
-				row.getCell(15).setCellValue(s.getJdgmDrctApproveMember().getName()); // 결재 - 관리책임자
+				row.getCell(14).setCellValue("원미나"); // 결재 - 담당
+				// row.getCell(15).setCellValue(s.getJdgmDrctApproveMember().getName()); // 결재 - 관리책임자
+				row.getCell(15).setCellValue("최정윤"); // 결재 - 관리책임자
 
 				index++;
 			}
