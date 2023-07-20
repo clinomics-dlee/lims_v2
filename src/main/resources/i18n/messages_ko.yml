@@ -101,6 +101,7 @@ common:
   next: 다음
   prev: 이전
   downloadHumanMaterials: 인체유래물등 다운로드
+  downloadTestResultStatistics: 검사 결과 통계표 다운로드
   specimenRecord : 검체기록지
   delayedSamples : 지연 검체 항목
   pleaseSelect: 선택해 주세요

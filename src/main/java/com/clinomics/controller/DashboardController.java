@@ -87,6 +87,14 @@ public class DashboardController {
 		requestExcel(xlsx, "인체유래물등 관리대장(" + sDate + " - " + fDate + ")", request, response);
 	}
 
+	@GetMapping("/result/excel/form")
+	public void exportTestResultStatisticsExcelForm(@RequestParam Map<String, String> params, HttpServletRequest request, HttpServletResponse response) {
+		XSSFWorkbook xlsx = calendarExcelService.exportTestResultStatisticsExcelForm(params);
+		String sDate = params.get("sDate") + "";
+		String fDate = params.get("fDate") + "";
+		requestExcel(xlsx, "검사결과통계(" + sDate + " - " + fDate + ")", request, response);
+	}
+
 	// ############################ private
 	private void requestExcel(XSSFWorkbook xlsx, String fileName, HttpServletRequest request, HttpServletResponse response) {
 		if (fileName == null || fileName.trim().length() < 1) {

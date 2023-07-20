@@ -53,6 +53,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		<th:block th:replace="popup/cal_after"></th:block>
 		<th:block th:replace="popup/cal_registered"></th:block>
 		<th:block th:replace="popup/cal_human"></th:block>
+		<th:block th:replace="popup/cal_test_result_statistics"></th:block>
 		<th:block th:replace="popup/sample_print"></th:block>
 		<th:block th:replace="popup/sample_delayed"></th:block>
 		<!-- end #sidebar -->
@@ -95,6 +96,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 								<button class="btn btn-white m-r-5 m-b-5" id="btn_next" th:text="#{common.next}">다음</button>
 								<button class="btn btn-default m-r-5 m-b-5 width-60" id="btn_today" th:text="#{common.today}">오늘</button>
 								<button class="btn btn-success m-r-5 m-b-5" id="btn_human" sec:authorize="hasAnyRole('ROLE_EXP_40', 'ROLE_EXP_80', 'ROLE_IT_99')" th:text="#{common.downloadHumanMaterials}">인체유래물등 다운로드</button>
+								<button class="btn btn-success m-r-5 m-b-5" onClick="testResultStatisticsPopupOnload();" sec:authorize="hasAnyRole('ROLE_EXP_40', 'ROLE_EXP_80', 'ROLE_IT_99')" th:text="#{common.downloadTestResultStatistics}">검사 결과 통계표 다운로드</button>
 								<button class="btn btn-success m-r-5 m-b-5" onClick="printPopup();" sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_OUTPUT_20', 'ROLE_EXP_80', 'ROLE_IT_99')" th:text="#{common.specimenRecord}">검체기록지</button>
 								<button class="btn btn-success m-r-5 m-b-5" onClick="delayedSamplePopupOnload();" sec:authorize="hasAnyRole('ROLE_INPUT_20', 'ROLE_OUTPUT_20', 'ROLE_EXP_80', 'ROLE_IT_99')" th:text="#{common.delayedSamples}">지연 검체 목록</button>
 							</div>
