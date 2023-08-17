@@ -179,11 +179,22 @@
 		if (!$('#frm_popup_sample_detail').parsley().validate()) {
 			return;	
 		}
+
+		var dataObj = $('#frm_popup_sample_detail').serializeObject();
+
+		// #. trim 처리
+		for (var key in dataObj) {
+			var value = dataObj[key];
+			if (value != null) {
+				value = value.trim();
+			}
+			dataObj[key] = value;
+		}
 		
 		$.ajax({
             url: '/input/save',
 			type: 'post',
-	        data : JSON.stringify($('#frm_popup_sample_detail').serializeObject()),
+	        data : JSON.stringify(dataObj),
 	        dataType : 'json',
 	        contentType : "application/json;charset=utf-8",
 	        beforeSend: function(xhr) {
