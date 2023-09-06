@@ -836,8 +836,12 @@ public class CalendarExcelService {
 
 		// #. geneCountInfoMaps 정보를 가지고 각 라인은 만들기
 		if (geneCountInfoMaps != null && geneCountInfoMaps.size() > 0) {
-			// #. 총 개수에 절반을 구하기
-			int halfIndex = (int)Math.round(((double)geneCountInfoMaps.size() / 2));
+			
+			// #. 마커 개수
+			int markerCount = Math.round((geneCountInfoMaps.size() / 3));
+
+			// #. 분기 시점 개수 구하기
+			int halfIndex = (int)Math.round((double)markerCount / 2) * 3;
 
 			for (int i = 0; i < geneCountInfoMaps.size(); i++) {
 				Map<String, String> geneCountInfoMap = geneCountInfoMaps.get(i);
