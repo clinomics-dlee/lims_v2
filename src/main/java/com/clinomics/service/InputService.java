@@ -193,12 +193,12 @@ public class InputService {
 			sample.setCreatedMember(member);
 			sample.setStatusCode(StatusCode.S000_INPUT_REG);
 
-			if (barcode.length() > 0) {
-				String barcodeLetter = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$1");
-				String barcodeNumber = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$2");
-				sample.setBarcodeLetter(barcodeLetter);
-				sample.setBarcodeNumber(barcodeNumber);
-			}
+			// if (barcode.length() > 0) {
+			// 	String barcodeLetter = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$1");
+			// 	String barcodeNumber = barcode.replaceAll("^([a-zA-Z]+)\\-([0-9]+)$", "$2");
+			// 	sample.setBarcodeLetter(barcodeLetter);
+			// 	sample.setBarcodeNumber(barcodeNumber);
+			// }
 			if (items.containsKey("h_name")) {
 				String hName = items.get("h_name") + "";
 				
