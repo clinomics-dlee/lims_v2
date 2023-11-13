@@ -96,7 +96,7 @@ public class AnalysisService {
 			textFileOs.write(textFileSb.toString().getBytes());
 			
 			StringBuilder commandsSb = new StringBuilder();
-			commandsSb.append("python ");
+			commandsSb.append(chipTypeCode.getProgram() + " ");
 			commandsSb.append(chipTypeCode.getCmd() + " ");
 			commandsSb.append(textFilePath + " "); // text 파일 경로 지정
 			commandsSb.append(analysisPath + " "); // 작업공간 경로 지정
