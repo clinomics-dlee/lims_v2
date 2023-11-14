@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import javax.transaction.Transactional;
+// import javax.transaction.Transactional;
 
 import com.clinomics.entity.lims.Member;
 import com.clinomics.entity.lims.Role;
@@ -44,6 +44,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -159,6 +161,7 @@ public class AnlsService {
 		return dataTableService.getDataTableMap(draw, pageNumber, total, filtered, lstMapCelFiles);
 	}
 
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Map<String, String> startAnls(List<String> mappingNos, String userId) {
 		Map<String, String> rtn = Maps.newHashMap();
 		LocalDateTime now = LocalDateTime.now();
@@ -202,6 +205,13 @@ public class AnlsService {
 			boolean includeGenoData = false;
 
 			for (Sample sample : samples) {
+				// #. 검체중 상태가 분석중 이후 단계에 있는 검체가 있다면 return
+				if (NumberUtils.toInt(sample.getStatusCode().getKey().substring(1, 4)) > 400) {
+					rtn.put("result", ResultCode.FAIL_UNKNOWN.get());
+					rtn.put("message", "분석이 진행중이거나 이후 단계의 검체가 존재합니다. Mapping No[" + mappingNo + "]");
+					return rtn;
+				}
+
 				// #. 해당 Mapping No에 Geno Data 검체가 한건이라도 존재하면 체크
 				if (sample.getBundle().isGenoData()) {
 					includeGenoData = true;
@@ -220,7 +230,6 @@ public class AnlsService {
 					return rtn;
 				}
 			}
-
 			for (Sample sample : samples) {
 				// #. sample 분석관련값 셋팅
 				sample.setFilePath(filePath);
