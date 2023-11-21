@@ -269,7 +269,7 @@ public class Scheduler {
             // #. 재분석 실행
             if (reAnalysisSamples.size() > 0 ) {
                 for (Sample reAnalysisSample : reAnalysisSamples) {
-                    analysisService.doPythonReAnalysis(reAnalysisSample.getChipBarcode(), reAnalysisSample.getFilePath());
+                    analysisService.doPythonReAnalysis(reAnalysisSample.getChipBarcode(), reAnalysisSample.getChipTypeCode(), reAnalysisSample.getFilePath());
                 }
             }
 		} catch(Exception e) {

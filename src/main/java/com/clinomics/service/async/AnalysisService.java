@@ -154,7 +154,7 @@ public class AnalysisService {
     }
 
 	@Async
-	public void doPythonReAnalysis(String chipBarcode, String analysisPath) {
+	public void doPythonReAnalysis(String chipBarcode, ChipTypeCode chipTypeCode, String analysisPath) {
 
 		// #. 명령어 실행
 		FileOutputStream textFileOs = null;
@@ -166,41 +166,45 @@ public class AnalysisService {
 				shellExt = ".bat";
 			}
 			StringBuilder commandsSb = new StringBuilder();
-			commandsSb.append("python3.7 ");
-			commandsSb.append("/BiO/Research/rowi007/SCRIPT/Service_lims_reAnalysis.py ");
+			commandsSb.append(chipTypeCode.getReProgram() + " ");
+			commandsSb.append(chipTypeCode.getReCmd() + " ");
 			commandsSb.append(chipBarcode); // chip barcode parameter
-	
-			logger.info("execute cmd=" + commandsSb.toString());
 			
-			String commandFilePath = analysisPath + "/re_" + chipBarcode + shellExt;
-			BufferedWriter fw = new BufferedWriter(new FileWriter(commandFilePath));
-			fw.write(commandsSb.toString());
-			fw.close();
-	
-			logger.info("commands shell file path=" + commandFilePath);
-			File shFile = new File(commandFilePath);
-			if (!shFile.canExecute()) shFile.setExecutable(true); // 실행권한
-			if (!shFile.canWrite()) shFile.setWritable(true); // 쓰기권한
-	
-			List<String> commands = new ArrayList<String>();
-			commands.add(commandFilePath);
-			
-			ProcessBuilder processBuilder = new ProcessBuilder(commands);
-			processBuilder.redirectErrorStream(true);
-			Process process = processBuilder.start();
-			
-			// #. 명령어 실행 표준 및 오류 처리
-			BufferedReader standardErrorBr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			StringBuilder standardErrorSb = new StringBuilder();
-			String lineString = null;
-			while ((lineString = standardErrorBr.readLine()) != null) {
-				standardErrorSb.append(lineString);
-				standardErrorSb.append("<br>");
+			logger.info("reanalysis execute cmd=" + commandsSb.toString());
+			if (chipTypeCode.getReProgram().length() > 0 && chipTypeCode.getReCmd().length() > 0) {
+				
+				String commandFilePath = analysisPath + "/re_" + chipBarcode + shellExt;
+				BufferedWriter fw = new BufferedWriter(new FileWriter(commandFilePath));
+				fw.write(commandsSb.toString());
+				fw.close();
+		
+				logger.info("reanalysis commands shell file path=" + commandFilePath);
+				File shFile = new File(commandFilePath);
+				if (!shFile.canExecute()) shFile.setExecutable(true); // 실행권한
+				if (!shFile.canWrite()) shFile.setWritable(true); // 쓰기권한
+		
+				List<String> commands = new ArrayList<String>();
+				commands.add(commandFilePath);
+				
+				ProcessBuilder processBuilder = new ProcessBuilder(commands);
+				processBuilder.redirectErrorStream(true);
+				Process process = processBuilder.start();
+				
+				// #. 명령어 실행 표준 및 오류 처리
+				BufferedReader standardErrorBr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				StringBuilder standardErrorSb = new StringBuilder();
+				String lineString = null;
+				while ((lineString = standardErrorBr.readLine()) != null) {
+					standardErrorSb.append(lineString);
+					standardErrorSb.append("<br>");
+				}
+				
+				logger.info(">> reanalysis standardErrorSb=" + standardErrorSb.toString());
+				
+				process.destroy();
+
 			}
-			
-			logger.info(">> standardErrorSb=" + standardErrorSb.toString());
-			
-			process.destroy();
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
