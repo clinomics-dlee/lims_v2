@@ -74,7 +74,7 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
     
-    @Query(value = "SELECT DATE_FORMAT(s.output_cmpl_date, '%Y%m') AS yyyymm, CONVERT(COUNT(*), char) AS count "
+    @Query(value = "SELECT DATE_FORMAT(s.created_date, '%Y%m') AS yyyymm, CONVERT(COUNT(*), char) AS count "
     			+ " , b.name AS name "
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
                 + " WHERE s.anls_cmpl_date BETWEEN :sDate AND :fDate "
@@ -82,23 +82,23 @@ public interface SampleRepository extends JpaRepository<Sample, Integer>, JpaSpe
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
-                + " AND s.output_cmpl_date IS NOT NULL "
+                + " AND s.created_date IS NOT NULL "
                 + " GROUP BY EXTRACT(YEAR_MONTH FROM s.created_date), s.bundle_id ", nativeQuery = true)
     List<Map<String, String>> findChartDataByCreatedDate(@Param("sDate") String sDate
 											, @Param("fDate") String fDate
                                             , @Param("bundleIds") List<Integer> bundleIds
                                             , @Param("statusCode") List<String> statusCodes);
     
-    @Query(value = "SELECT DATE_FORMAT(s.output_cmpl_date, '%Y%m') AS yyyymm, CONVERT(COUNT(*), char) AS count "
+    @Query(value = "SELECT DATE_FORMAT(s.jdgm_drct_approve_date, '%Y%m') AS yyyymm, CONVERT(COUNT(*), char) AS count "
 			+ " , b.name AS name "
                 + " FROM sample s INNER JOIN bundle b ON s.bundle_id = b.id AND b.is_active = 1 "
-                + " WHERE s.anls_cmpl_date BETWEEN :sDate AND :fDate "
+                + " WHERE s.jdgm_drct_approve_date BETWEEN :sDate AND :fDate "
                 + " AND s.is_test = 0 "
                 + " AND s.is_last_version = 1 "
                 + " AND s.bundle_id in :bundleIds "
                 + " AND s.status_code in :statusCode "
-                + " AND s.output_cmpl_date IS NOT NULL "
-                + " GROUP BY EXTRACT(YEAR_MONTH FROM s.created_date), s.bundle_id ", nativeQuery = true)
+                + " AND s.jdgm_drct_approve_date IS NOT NULL "
+                + " GROUP BY EXTRACT(YEAR_MONTH FROM s.jdgm_drct_approve_date), s.bundle_id ", nativeQuery = true)
     List<Map<String, String>> findChartDataByAnlsCmplDate(@Param("sDate") String sDate
     										, @Param("fDate") String fDate
                                             , @Param("bundleIds") List<Integer> bundleIds

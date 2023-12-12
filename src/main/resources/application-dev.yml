@@ -49,14 +49,14 @@ management:
 datasource:
   lims:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://192.168.0.201:13306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: clinomics
-    password: uiop7890
+    jdbcUrl: jdbc:mysql://localhost:3306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: root
+    password: 7890uiop
   pdf:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://192.168.0.201:13306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: clinomics
-    password: uiop7890
+    jdbcUrl: jdbc:mysql://localhost:3306/lims_v2?autoReconnect=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: root
+    password: 7890uiop
 lims:
   filePath: /BiO/Serve/lims_v2
   celFilePath: /BiO/Serve/lims_v2/celFiles
@@ -70,7 +70,7 @@ externalApi:
   tokenName: apiKey
   token: Sn4Wy4nlqmGEytAx5SkBXdhAp1LKYXXapc1hb6FG
 titan:
-  filePath: D:/BiO/Serve/lims_v2/titan
+  filePath: /BiO/Serve/lims_v2/titan
   ftp:
     address: 192.168.0.238
     port: 21
@@ -87,4 +87,4 @@ rest:
 logging:
   file: /BiO/Serve/lims_v2/logs/lims_v2.log
 server:
-  port: 9095
+  port: 8081
